@@ -17,13 +17,18 @@ CREATE TABLE tournament (
 
 CREATE TABLE tournament_phase (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    FOREIGN KEY (tournament_id) REFERENCES tournament (id) NOT NULL
+    tournament_id INTEGER NOT NULL,
+    FOREIGN KEY (tournament_id) REFERENCES tournament (id)
 );
 
 CREATE TABLE tournament_matchup (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    FOREIGN KEY (phase_id) REFERENCES tournament_phase (id) NOT NULL,
-    FOREIGN KEY (song_1) REFERENCES song (id) NOT NULL,
+    phase_id INTEGER NOT NULL,
+    song_1 INTEGER NOT NULL,
+    song_2 INTEGER,
+    song_winner INTEGER,
+    FOREIGN KEY (phase_id) REFERENCES tournament_phase (id),
+    FOREIGN KEY (song_1) REFERENCES song (id),
     FOREIGN KEY (song_2) REFERENCES song (id),
-    FOREIGN KEY (song_winner) REFERENCES song (id),
+    FOREIGN KEY (song_winner) REFERENCES song (id)
 );
