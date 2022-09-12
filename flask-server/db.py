@@ -16,7 +16,7 @@ def get_db():
     return g.db
 
 
-def close_db():
+def close_db(_=None):
     """Close the database"""
     db = g.pop('db', None)
     if db is not None:
