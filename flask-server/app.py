@@ -1,3 +1,4 @@
+"""Main app for tournament site"""
 import os
 
 from flask import Flask, jsonify
@@ -5,6 +6,7 @@ from flask import Flask, jsonify
 from db import init_app
 
 def create_app(test_config=None):
+    """Create the running app"""
     # create and configure the app
     app = Flask(__name__, instance_relative_config=True)
     app.config.from_mapping(
