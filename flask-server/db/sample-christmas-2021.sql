@@ -224,7 +224,7 @@ INSERT INTO tournament_matchup (phase_id, song_1, song_2, song_winner)
 INSERT INTO tournament_matchup (phase_id, song_1, song_2, song_winner)
     VALUES (2, 41, 43, 41);
 INSERT INTO tournament_matchup (phase_id, song_1, song_2, song_winner)
-    VALUES (2, 45, 48, 45)
+    VALUES (2, 45, 48, 45);
 INSERT INTO tournament_matchup (phase_id, song_1, song_2, song_winner)
     VALUES (2, 50, 51, 50);
 INSERT INTO tournament_matchup (phase_id, song_1, song_2, song_winner)
