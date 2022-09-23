@@ -133,149 +133,149 @@ INSERT INTO song (title, artist, spotify) --64
 INSERT INTO tournament_phase (tournament_id)
     VALUES (1);
 
-INSERT INTO tournament_matchup (phase_id, song_1, song_2, song_winner)
+INSERT INTO tournament_match (phase_id, song_1, song_2, song_winner)
     VALUES (1, 1, 2, 1);
-INSERT INTO tournament_matchup (phase_id, song_1, song_2, song_winner)
+INSERT INTO tournament_match (phase_id, song_1, song_2, song_winner)
     VALUES (1, 3, 4, 3);
-INSERT INTO tournament_matchup (phase_id, song_1, song_2, song_winner)
+INSERT INTO tournament_match (phase_id, song_1, song_2, song_winner)
     VALUES (1, 5, 6, 6);
-INSERT INTO tournament_matchup (phase_id, song_1, song_2, song_winner)
+INSERT INTO tournament_match (phase_id, song_1, song_2, song_winner)
     VALUES (1, 7, 8, 8);
-INSERT INTO tournament_matchup (phase_id, song_1, song_2, song_winner)
+INSERT INTO tournament_match (phase_id, song_1, song_2, song_winner)
     VALUES (1, 9, 10, 9);
-INSERT INTO tournament_matchup (phase_id, song_1, song_2, song_winner)
+INSERT INTO tournament_match (phase_id, song_1, song_2, song_winner)
     VALUES (1, 11, 12, 11);
-INSERT INTO tournament_matchup (phase_id, song_1, song_2, song_winner)
+INSERT INTO tournament_match (phase_id, song_1, song_2, song_winner)
     VALUES (1, 13, 14, 14);
-INSERT INTO tournament_matchup (phase_id, song_1, song_2, song_winner)
+INSERT INTO tournament_match (phase_id, song_1, song_2, song_winner)
     VALUES (1, 15, 16, 16);
-INSERT INTO tournament_matchup (phase_id, song_1, song_2, song_winner)
+INSERT INTO tournament_match (phase_id, song_1, song_2, song_winner)
     VALUES (1, 17, 18, 17);
-INSERT INTO tournament_matchup (phase_id, song_1, song_2, song_winner)
+INSERT INTO tournament_match (phase_id, song_1, song_2, song_winner)
     VALUES (1, 19, 20, 19);
-INSERT INTO tournament_matchup (phase_id, song_1, song_2, song_winner)
+INSERT INTO tournament_match (phase_id, song_1, song_2, song_winner)
     VALUES (1, 21, 22, 21);
-INSERT INTO tournament_matchup (phase_id, song_1, song_2, song_winner)
+INSERT INTO tournament_match (phase_id, song_1, song_2, song_winner)
     VALUES (1, 23, 24, 23);
-INSERT INTO tournament_matchup (phase_id, song_1, song_2, song_winner)
+INSERT INTO tournament_match (phase_id, song_1, song_2, song_winner)
     VALUES (1, 25, 26, 26);
-INSERT INTO tournament_matchup (phase_id, song_1, song_2, song_winner)
+INSERT INTO tournament_match (phase_id, song_1, song_2, song_winner)
     VALUES (1, 27, 28, 27);
-INSERT INTO tournament_matchup (phase_id, song_1, song_2, song_winner)
+INSERT INTO tournament_match (phase_id, song_1, song_2, song_winner)
     VALUES (1, 29, 30, 29);
-INSERT INTO tournament_matchup (phase_id, song_1, song_2, song_winner)
+INSERT INTO tournament_match (phase_id, song_1, song_2, song_winner)
     VALUES (1, 31, 32, 32);
-INSERT INTO tournament_matchup (phase_id, song_1, song_2, song_winner)
+INSERT INTO tournament_match (phase_id, song_1, song_2, song_winner)
     VALUES (1, 33, 34, 33);
-INSERT INTO tournament_matchup (phase_id, song_1, song_2, song_winner)
+INSERT INTO tournament_match (phase_id, song_1, song_2, song_winner)
     VALUES (1, 35, 36, 35);
-INSERT INTO tournament_matchup (phase_id, song_1, song_2, song_winner)
+INSERT INTO tournament_match (phase_id, song_1, song_2, song_winner)
     VALUES (1, 37, 38, 37);
-INSERT INTO tournament_matchup (phase_id, song_1, song_2, song_winner)
+INSERT INTO tournament_match (phase_id, song_1, song_2, song_winner)
     VALUES (1, 39, 40, 40);
-INSERT INTO tournament_matchup (phase_id, song_1, song_2, song_winner)
+INSERT INTO tournament_match (phase_id, song_1, song_2, song_winner)
     VALUES (1, 41, 42, 41);
-INSERT INTO tournament_matchup (phase_id, song_1, song_2, song_winner)
+INSERT INTO tournament_match (phase_id, song_1, song_2, song_winner)
     VALUES (1, 43, 44, 43);
-INSERT INTO tournament_matchup (phase_id, song_1, song_2, song_winner)
+INSERT INTO tournament_match (phase_id, song_1, song_2, song_winner)
     VALUES (1, 45, 46, 45);
-INSERT INTO tournament_matchup (phase_id, song_1, song_2, song_winner)
+INSERT INTO tournament_match (phase_id, song_1, song_2, song_winner)
     VALUES (1, 47, 48, 48);
-INSERT INTO tournament_matchup (phase_id, song_1, song_2, song_winner)
+INSERT INTO tournament_match (phase_id, song_1, song_2, song_winner)
     VALUES (1, 49, 50, 50);
-INSERT INTO tournament_matchup (phase_id, song_1, song_2, song_winner)
+INSERT INTO tournament_match (phase_id, song_1, song_2, song_winner)
     VALUES (1, 51, 52, 51);
-INSERT INTO tournament_matchup (phase_id, song_1, song_2, song_winner)
+INSERT INTO tournament_match (phase_id, song_1, song_2, song_winner)
     VALUES (1, 53, 54, 54);
-INSERT INTO tournament_matchup (phase_id, song_1, song_2, song_winner)
+INSERT INTO tournament_match (phase_id, song_1, song_2, song_winner)
     VALUES (1, 55, 56, 55);
-INSERT INTO tournament_matchup (phase_id, song_1, song_2, song_winner)
+INSERT INTO tournament_match (phase_id, song_1, song_2, song_winner)
     VALUES (1, 57, 58, 57);
-INSERT INTO tournament_matchup (phase_id, song_1, song_2, song_winner)
+INSERT INTO tournament_match (phase_id, song_1, song_2, song_winner)
     VALUES (1, 59, 60, 59);
-INSERT INTO tournament_matchup (phase_id, song_1, song_2, song_winner)
+INSERT INTO tournament_match (phase_id, song_1, song_2, song_winner)
     VALUES (1, 61, 62, 61);
-INSERT INTO tournament_matchup (phase_id, song_1, song_2, song_winner)
+INSERT INTO tournament_match (phase_id, song_1, song_2, song_winner)
     VALUES (1, 63, 64, 64);
 
 INSERT INTO tournament_phase (tournament_id)
     VALUES (1);
 
-INSERT INTO tournament_matchup (phase_id, song_1, song_2, song_winner)
+INSERT INTO tournament_match (phase_id, song_1, song_2, song_winner)
     VALUES (2, 1, 3, 3);
-INSERT INTO tournament_matchup (phase_id, song_1, song_2, song_winner)
+INSERT INTO tournament_match (phase_id, song_1, song_2, song_winner)
     VALUES (2, 6, 8, 6);
-INSERT INTO tournament_matchup (phase_id, song_1, song_2, song_winner)
+INSERT INTO tournament_match (phase_id, song_1, song_2, song_winner)
     VALUES (2, 9, 11, 9);
-INSERT INTO tournament_matchup (phase_id, song_1, song_2, song_winner)
+INSERT INTO tournament_match (phase_id, song_1, song_2, song_winner)
     VALUES (2, 14, 16, 16);
-INSERT INTO tournament_matchup (phase_id, song_1, song_2, song_winner)
+INSERT INTO tournament_match (phase_id, song_1, song_2, song_winner)
     VALUES (2, 17, 19, 17);
-INSERT INTO tournament_matchup (phase_id, song_1, song_2, song_winner)
+INSERT INTO tournament_match (phase_id, song_1, song_2, song_winner)
     VALUES (2, 21, 23, 21);
-INSERT INTO tournament_matchup (phase_id, song_1, song_2, song_winner)
+INSERT INTO tournament_match (phase_id, song_1, song_2, song_winner)
     VALUES (2, 26, 27, 27);
-INSERT INTO tournament_matchup (phase_id, song_1, song_2, song_winner)
+INSERT INTO tournament_match (phase_id, song_1, song_2, song_winner)
     VALUES (2, 29, 32, 29);
-INSERT INTO tournament_matchup (phase_id, song_1, song_2, song_winner)
+INSERT INTO tournament_match (phase_id, song_1, song_2, song_winner)
     VALUES (2, 33, 35, 35);
-INSERT INTO tournament_matchup (phase_id, song_1, song_2, song_winner)
+INSERT INTO tournament_match (phase_id, song_1, song_2, song_winner)
     VALUES (2, 37, 40, 37);
-INSERT INTO tournament_matchup (phase_id, song_1, song_2, song_winner)
+INSERT INTO tournament_match (phase_id, song_1, song_2, song_winner)
     VALUES (2, 41, 43, 41);
-INSERT INTO tournament_matchup (phase_id, song_1, song_2, song_winner)
+INSERT INTO tournament_match (phase_id, song_1, song_2, song_winner)
     VALUES (2, 45, 48, 45);
-INSERT INTO tournament_matchup (phase_id, song_1, song_2, song_winner)
+INSERT INTO tournament_match (phase_id, song_1, song_2, song_winner)
     VALUES (2, 50, 51, 50);
-INSERT INTO tournament_matchup (phase_id, song_1, song_2, song_winner)
+INSERT INTO tournament_match (phase_id, song_1, song_2, song_winner)
     VALUES (2, 54, 55, 55);
-INSERT INTO tournament_matchup (phase_id, song_1, song_2, song_winner)
+INSERT INTO tournament_match (phase_id, song_1, song_2, song_winner)
     VALUES (2, 57, 59, 57);
-INSERT INTO tournament_matchup (phase_id, song_1, song_2, song_winner)
+INSERT INTO tournament_match (phase_id, song_1, song_2, song_winner)
     VALUES (2, 61, 64, 61);
 
 INSERT INTO tournament_phase (tournament_id)
     VALUES (1);
 
-INSERT INTO tournament_matchup (phase_id, song_1, song_2, song_winner)
+INSERT INTO tournament_match (phase_id, song_1, song_2, song_winner)
     VALUES (3, 3, 6, 3);
-INSERT INTO tournament_matchup (phase_id, song_1, song_2, song_winner)
+INSERT INTO tournament_match (phase_id, song_1, song_2, song_winner)
     VALUES (3, 9, 16, 9);
-INSERT INTO tournament_matchup (phase_id, song_1, song_2, song_winner)
+INSERT INTO tournament_match (phase_id, song_1, song_2, song_winner)
     VALUES (3, 17, 21, 17);
-INSERT INTO tournament_matchup (phase_id, song_1, song_2, song_winner)
+INSERT INTO tournament_match (phase_id, song_1, song_2, song_winner)
     VALUES (3, 27, 29, 29);
-INSERT INTO tournament_matchup (phase_id, song_1, song_2, song_winner)
+INSERT INTO tournament_match (phase_id, song_1, song_2, song_winner)
     VALUES (3, 35, 37, 35);
-INSERT INTO tournament_matchup (phase_id, song_1, song_2, song_winner)
+INSERT INTO tournament_match (phase_id, song_1, song_2, song_winner)
     VALUES (3, 41, 45, 41);
-INSERT INTO tournament_matchup (phase_id, song_1, song_2, song_winner)
+INSERT INTO tournament_match (phase_id, song_1, song_2, song_winner)
     VALUES (3, 50, 55, 50);
-INSERT INTO tournament_matchup (phase_id, song_1, song_2, song_winner)
+INSERT INTO tournament_match (phase_id, song_1, song_2, song_winner)
     VALUES (3, 57, 61, 57);
 
 INSERT INTO tournament_phase (tournament_id)
     VALUES (1);
 
-INSERT INTO tournament_matchup (phase_id, song_1, song_2, song_winner)
+INSERT INTO tournament_match (phase_id, song_1, song_2, song_winner)
     VALUES (4, 3, 9, 3);
-INSERT INTO tournament_matchup (phase_id, song_1, song_2, song_winner)
+INSERT INTO tournament_match (phase_id, song_1, song_2, song_winner)
     VALUES (4, 17, 29, 17);
-INSERT INTO tournament_matchup (phase_id, song_1, song_2, song_winner)
+INSERT INTO tournament_match (phase_id, song_1, song_2, song_winner)
     VALUES (4, 35, 41, 35);
-INSERT INTO tournament_matchup (phase_id, song_1, song_2, song_winner)
+INSERT INTO tournament_match (phase_id, song_1, song_2, song_winner)
     VALUES (4, 50, 57, 50);
 
 INSERT INTO tournament_phase (tournament_id)
     VALUES (1);
 
-INSERT INTO tournament_matchup (phase_id, song_1, song_2, song_winner)
+INSERT INTO tournament_match (phase_id, song_1, song_2, song_winner)
     VALUES (5, 3, 17, 3);
-INSERT INTO tournament_matchup (phase_id, song_1, song_2, song_winner)
+INSERT INTO tournament_match (phase_id, song_1, song_2, song_winner)
     VALUES (5, 35, 50, 35);
 
 INSERT INTO tournament_phase (tournament_id)
     VALUES (1);
 
-INSERT INTO tournament_matchup (phase_id, song_1, song_2, song_winner)
+INSERT INTO tournament_match (phase_id, song_1, song_2, song_winner)
     VALUES (6, 3, 35, 3);
