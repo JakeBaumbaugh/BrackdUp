@@ -7,6 +7,7 @@ bp = Blueprint('tournament', __name__, url_prefix='/api/tournament')
 
 @bp.route('/list')
 def list_tournaments():
+    """Retrieve a list of the current tournaments"""
     names = db.get_db().execute(
         'SELECT t.id, t.name '
         'FROM tournament t '
@@ -15,6 +16,7 @@ def list_tournaments():
 
 @bp.route('/<int:tournament_id>')
 def get_tournament(tournament_id):
+    """Retrieve data on a tournament"""
     data = db.get_db().execute(
         'SELECT '
         '   t.id, '
@@ -49,6 +51,7 @@ def get_tournament(tournament_id):
 
 @bp.route('/<int:tournament_id>/phase/<int:phase_id>')
 def get_tournament_phase(tournament_id, phase_id):
+    """Retrieve data on one phase of a tournament"""
     data = db.get_db().execute(
         'SELECT '
         '   tp.id, '
@@ -81,6 +84,7 @@ def get_tournament_phase(tournament_id, phase_id):
     }
 
 def map_phases(rows):
+    """Map database data to phase objects"""
     phase_ids = list(set([row['phase_id'] for row in rows]))
     phase_ids.sort()
     phase_id_map = {phase_ids[i] : i for i in range(len(phase_ids))}
@@ -94,6 +98,7 @@ def map_phases(rows):
     return phases
 
 def map_match(row):
+    """Map database data to match objects"""
     return {
         'id': row['match_id'],
         'song_1': {
