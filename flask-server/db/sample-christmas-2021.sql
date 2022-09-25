@@ -130,8 +130,8 @@ INSERT INTO song (title, artist, spotify) --63
 INSERT INTO song (title, artist, spotify) --64
     VALUES ("Merry Christmas Everyone", "Shakin' Stevens", "https://open.spotify.com/track/2TE4xW3ImvpltVU0cPcKUn?si=a8ade4af55b1438a");
 
-INSERT INTO tournament_phase (tournament_id)
-    VALUES (1);
+INSERT INTO tournament_phase (tournament_id, name)
+    VALUES (1, "Round 1");
 
 INSERT INTO tournament_match (phase_id, song_1, song_2, song_winner)
     VALUES (1, 1, 2, 1);
@@ -198,8 +198,8 @@ INSERT INTO tournament_match (phase_id, song_1, song_2, song_winner)
 INSERT INTO tournament_match (phase_id, song_1, song_2, song_winner)
     VALUES (1, 63, 64, 64);
 
-INSERT INTO tournament_phase (tournament_id)
-    VALUES (1);
+INSERT INTO tournament_phase (tournament_id, name)
+    VALUES (1, "Round 2");
 
 INSERT INTO tournament_match (phase_id, song_1, song_2, song_winner)
     VALUES (2, 1, 3, 3);
@@ -234,8 +234,8 @@ INSERT INTO tournament_match (phase_id, song_1, song_2, song_winner)
 INSERT INTO tournament_match (phase_id, song_1, song_2, song_winner)
     VALUES (2, 61, 64, 61);
 
-INSERT INTO tournament_phase (tournament_id)
-    VALUES (1);
+INSERT INTO tournament_phase (tournament_id, name)
+    VALUES (1, "Sweet Sixteen");
 
 INSERT INTO tournament_match (phase_id, song_1, song_2, song_winner)
     VALUES (3, 3, 6, 3);
@@ -254,8 +254,8 @@ INSERT INTO tournament_match (phase_id, song_1, song_2, song_winner)
 INSERT INTO tournament_match (phase_id, song_1, song_2, song_winner)
     VALUES (3, 57, 61, 57);
 
-INSERT INTO tournament_phase (tournament_id)
-    VALUES (1);
+INSERT INTO tournament_phase (tournament_id, name)
+    VALUES (1, "Elite Eight");
 
 INSERT INTO tournament_match (phase_id, song_1, song_2, song_winner)
     VALUES (4, 3, 9, 3);
@@ -266,16 +266,16 @@ INSERT INTO tournament_match (phase_id, song_1, song_2, song_winner)
 INSERT INTO tournament_match (phase_id, song_1, song_2, song_winner)
     VALUES (4, 50, 57, 50);
 
-INSERT INTO tournament_phase (tournament_id)
-    VALUES (1);
+INSERT INTO tournament_phase (tournament_id, name)
+    VALUES (1, "Semifinals");
 
 INSERT INTO tournament_match (phase_id, song_1, song_2, song_winner)
     VALUES (5, 3, 17, 3);
 INSERT INTO tournament_match (phase_id, song_1, song_2, song_winner)
     VALUES (5, 35, 50, 35);
 
-INSERT INTO tournament_phase (tournament_id)
-    VALUES (1);
+INSERT INTO tournament_phase (tournament_id, name)
+    VALUES (1, "Holly Jolly Bowl");
 
 INSERT INTO tournament_match (phase_id, song_1, song_2, song_winner)
     VALUES (6, 3, 35, 3);

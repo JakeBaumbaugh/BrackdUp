@@ -19,6 +19,7 @@ CREATE TABLE tournament (
 CREATE TABLE tournament_phase (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     tournament_id INTEGER NOT NULL,
+    name TEXT NOT NULL,
     FOREIGN KEY (tournament_id) REFERENCES tournament (id)
 );
 
