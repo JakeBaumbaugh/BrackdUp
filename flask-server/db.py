@@ -37,4 +37,5 @@ def init_app(app):
     app.cli.add_command(init_db_command)
 
 def build_paths(file_names):
+    """Utility method for building file paths"""
     return [os.path.join('db', file) for file in file_names]

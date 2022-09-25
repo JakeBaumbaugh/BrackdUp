@@ -1,6 +1,5 @@
 """Endpoints for retrieving tournament data"""
-import json
-from flask import Blueprint, jsonify
+from flask import Blueprint
 import db
 
 bp = Blueprint('tournament', __name__, url_prefix='/api/tournament')
@@ -85,7 +84,7 @@ def get_tournament_phase(tournament_id, phase_id):
 
 def map_phases(rows):
     """Map database data to phase objects"""
-    phase_ids = list(set([row['phase_id'] for row in rows]))
+    phase_ids = list({row['phase_id'] for row in rows})
     phase_ids.sort()
     phase_id_map = {phase_ids[i] : i for i in range(len(phase_ids))}
     phases = [{ 'matches': [] } for _ in range(len(phase_ids))]
