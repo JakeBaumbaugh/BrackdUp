@@ -3,7 +3,8 @@ import os
 
 from flask import Flask, jsonify
 
-from db import init_app
+import db
+import tournament
 
 def create_app(test_config=None):
     """Create the running app"""
@@ -27,7 +28,9 @@ def create_app(test_config=None):
     except OSError:
         pass
 
-    init_app(app)
+    db.init_app(app)
+
+    app.register_blueprint(tournament.bp)
 
     @app.route("/api/")
     def test_route():

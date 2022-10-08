@@ -1,7 +1,7 @@
 DROP TABLE IF EXISTS song;
 DROP TABLE IF EXISTS tournament;
 DROP TABLE IF EXISTS tournament_phase;
-DROP TABLE IF EXISTS tournament_matchup;
+DROP TABLE IF EXISTS tournament_match;
 
 CREATE TABLE song (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -12,16 +12,18 @@ CREATE TABLE song (
 );
 
 CREATE TABLE tournament (
-    id INTEGER PRIMARY KEY AUTOINCREMENT
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL
 );
 
 CREATE TABLE tournament_phase (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     tournament_id INTEGER NOT NULL,
+    name TEXT NOT NULL,
     FOREIGN KEY (tournament_id) REFERENCES tournament (id)
 );
 
-CREATE TABLE tournament_matchup (
+CREATE TABLE tournament_match (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     phase_id INTEGER NOT NULL,
     song_1 INTEGER NOT NULL,
