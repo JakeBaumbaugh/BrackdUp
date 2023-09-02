@@ -1,0 +1,17 @@
+.bracket {
+    display: flex;
+    justify-content: space-evenly;
+    height: 40em;
+}
+
+.bracket > .column {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    width: 4em;
+}
+
+.bracket > .column > .card {
+    border: solid 2px red;
+    height: 1em;
+}
