@@ -1,17 +1,36 @@
 .bracket {
     display: flex;
     justify-content: space-evenly;
-    height: 40em;
+    align-items: stretch;
+    height: min-content;
+    gap: 8px;
 }
 
 .bracket > .column {
     display: flex;
     flex-direction: column;
     justify-content: space-around;
-    width: 4em;
+    gap: 8px;
 }
 
-.bracket > .column > .card {
-    border: solid 2px red;
-    height: 1em;
+.song-card {
+    border: solid 2px #282c34;
+    border-radius: 6px;
+    background-color: #f3f1ed;
+    color: #282c34;
+    display: flex;
+    flex-direction: column;
+    font-size: 6pt;
+}
+
+.song-card.final {
+    font-size: 10pt;
+}
+
+.song-card > * {
+    padding: 3px 10px 3px 3px;
+}
+
+.song-card > *:first-child {
+    border-bottom: solid 2px #282c34;
 }
