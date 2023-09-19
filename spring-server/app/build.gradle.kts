@@ -13,6 +13,9 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-data-jpa:3.1.3")
 	implementation("org.springframework.boot:spring-boot-starter-web:3.1.3")
 
+    implementation("org.postgresql:postgresql:42.6.0")
+    implementation("org.flywaydb:flyway-core:9.22.1")
+
     testImplementation("org.junit.jupiter:junit-jupiter:5.9.1")
     testImplementation("org.springframework.boot:spring-boot-starter-test:3.1.3")
 }
