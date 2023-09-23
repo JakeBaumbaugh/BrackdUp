@@ -34,6 +34,7 @@
     display: flex;
     flex-direction: column;
     font-size: 6pt;
+    width: 18em;
 }
 
 .song-card.final {
@@ -42,6 +43,9 @@
 
 .song-card > * {
     padding: 3px 10px 3px 3px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .song-card > *:first-child {

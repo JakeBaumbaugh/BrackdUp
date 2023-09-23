@@ -34,7 +34,7 @@ export default function Bracket({entries}: BracketProps) {
     }
 
     return songColumns ? (
-        <TransformWrapper>
+        <TransformWrapper maxScale={2}>
             <TransformComponent>
                 <div className="bracket">
                     {songColumns.map((songs, index) => <>
