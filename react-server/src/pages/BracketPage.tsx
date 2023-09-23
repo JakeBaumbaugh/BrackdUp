@@ -2,7 +2,7 @@ import Bracket from "../bracket/Bracket";
 
 export default function BracketPage() {
     return (
-        <main>
+        <main className="bracket-page">
             <Bracket entries={64}/>
         </main>
     );

@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
+import { TransformComponent, TransformWrapper } from "react-zoom-pan-pinch";
+import Song from "../model/Song";
 import { Tournament } from "../model/Tournament";
 import { getTournament } from "../service/TournamentService";
 import SongCard from "./SongCard";
 import "./bracket.css";
-import Song from "../model/Song";
 
 interface BracketProps {
     entries: number;
@@ -33,14 +34,18 @@ export default function Bracket({entries}: BracketProps) {
     }
 
     return songColumns ? (
-        <div className="bracket">
-            {songColumns.map((songs, index) => <>
-                <div className="column">
-                    {songs.map(song => <>
-                        <SongCard song={song} final={index == (songColumns.length - 1) / 2}/>
+        <TransformWrapper>
+            <TransformComponent>
+                <div className="bracket">
+                    {songColumns.map((songs, index) => <>
+                        <div className="column">
+                            {songs.map(song => <>
+                                <SongCard song={song} final={index == (songColumns.length - 1) / 2}/>
+                            </>)}
+                        </div>
                     </>)}
                 </div>
-            </>)}
-        </div>
+            </TransformComponent>
+        </TransformWrapper>
     ) : <></>;
 }
