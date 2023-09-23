@@ -1,11 +1,22 @@
+import { useEffect, useState } from "react";
+import { getTournament } from "../service/TournamentService";
 import SongCard from "./SongCard";
 import "./bracket.css";
+import { Tournament } from "../model/Tournament";
 
 interface BracketProps {
     entries: number;
 }
 
 export default function Bracket({entries}: BracketProps) {
+    const [tournament, setTournament] = useState<Tournament>();
+
+    useEffect(() => {
+        getTournament(1).then(setTournament);
+    }, []);
+
+    console.log(tournament);
+
     if(!Number.isInteger(Math.log2(entries))) {
         return <></>
     }

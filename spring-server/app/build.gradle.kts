@@ -2,6 +2,7 @@ plugins {
     // Apply the application plugin to add support for building a CLI application in Java.
     application
     id("org.springframework.boot") version "3.1.3"
+    id("io.freefair.lombok") version "8.3"
 }
 
 repositories {
@@ -12,6 +13,7 @@ dependencies {
     implementation("com.google.guava:guava:31.1-jre")
     implementation("org.springframework.boot:spring-boot-starter-data-jpa:3.1.3")
 	implementation("org.springframework.boot:spring-boot-starter-web:3.1.3")
+    implementation("org.springframework.boot:spring-boot-starter-security:3.1.3")
 
     implementation("org.postgresql:postgresql:42.6.0")
     implementation("org.flywaydb:flyway-core:9.22.1")
