@@ -27,7 +27,7 @@ public class TournamentController {
     }
     
     @GetMapping("/tournament")
-    @CrossOrigin(origins = "http://localhost:3000")
+    @CrossOrigin(originPatterns = "*:[*]")
     public Tournament get(@RequestParam(required = false) Integer id, @RequestParam(required = false) String name) {
         logger.info("GET request for tournament id={}, name={}", id, name);
         Optional<Tournament> tournament;
