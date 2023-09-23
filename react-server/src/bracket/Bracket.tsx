@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
+import { Tournament } from "../model/Tournament";
 import { getTournament } from "../service/TournamentService";
 import SongCard from "./SongCard";
 import "./bracket.css";
-import { Tournament } from "../model/Tournament";
+import Song from "../model/Song";
 
 interface BracketProps {
     entries: number;
@@ -10,12 +11,16 @@ interface BracketProps {
 
 export default function Bracket({entries}: BracketProps) {
     const [tournament, setTournament] = useState<Tournament>();
+    const [songColumns, setSongColumns] = useState<(Song|undefined)[][]>();
 
     useEffect(() => {
-        getTournament(1).then(setTournament);
+        getTournament(1).then(tournament => {
+            setTournament(tournament);
+            setSongColumns(tournament.getSongColumns());
+        });
     }, []);
 
-    console.log(tournament);
+    console.log(songColumns);
 
     if(!Number.isInteger(Math.log2(entries))) {
         return <></>
@@ -27,25 +32,15 @@ export default function Bracket({entries}: BracketProps) {
         cols.push(len);
     }
 
-    return (
+    return songColumns ? (
         <div className="bracket">
-            {cols.map(len => <>
+            {songColumns.map((songs, index) => <>
                 <div className="column">
-                    {Array.from(Array(len).keys()).map(() => <>
-                        <SongCard title="All I Want for Christmas is You" artist="Mariah Carey"/>
-                    </>)}
-                </div>
-            </>)}
-            <div className="column">
-                <SongCard final title="All I Want for Christmas is You" artist="Mariah Carey"/>
-            </div>
-            {cols.reverse().map(len => <>
-                <div className="column">
-                    {Array.from(Array(len).keys()).map(() => <>
-                        <SongCard title="All I Want for Christmas is You" artist="Mariah Carey"/>
+                    {songs.map(song => <>
+                        <SongCard song={song} final={index == (songColumns.length - 1) / 2}/>
                     </>)}
                 </div>
             </>)}
         </div>
-    );
+    ) : <></>;
 }
