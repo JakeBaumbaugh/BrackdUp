@@ -8,30 +8,25 @@ import "./bracket.css";
 import MatchConnectorColumn from "./MatchConnectorColumn";
 
 interface BracketProps {
-    entries: number;
+    id: number,
+    setTournamentNotFound: () => void,
 }
 
-export default function Bracket({entries}: BracketProps) {
+export default function Bracket({id, setTournamentNotFound}: BracketProps) {
     const [tournament, setTournament] = useState<Tournament>();
     const [songColumns, setSongColumns] = useState<(Song|null)[][]>();
 
     useEffect(() => {
-        getTournament(2).then(tournament => {
-            console.log("Retrieved tournament:", tournament);
-            setTournament(tournament);
-            setSongColumns(tournament.getSongColumns());
+        getTournament(id).then(tournament => {
+            if(!tournament) {
+                setTournamentNotFound();
+            } else {
+                console.log("Retrieved tournament:", tournament);
+                setTournament(tournament);
+                setSongColumns(tournament.getSongColumns());
+            }
         });
     }, []);
-
-    if(!Number.isInteger(Math.log2(entries))) {
-        return <></>
-    }
-
-    let cols = [];
-    
-    for(let len = entries/2; len >= 1; len /= 2) {
-        cols.push(len);
-    }
 
     return songColumns ? (
         <TransformWrapper maxScale={2}>

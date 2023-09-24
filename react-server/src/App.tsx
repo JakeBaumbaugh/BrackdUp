@@ -1,3 +1,4 @@
+import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import './App.css';
 import BracketPage from './pages/BracketPage';
 
@@ -8,7 +9,12 @@ function App() {
                 <span>Music Madness</span>
                 <button>Vote Now</button>
             </header>
-            <BracketPage/>
+            <BrowserRouter>
+                <Routes>
+                    <Route path="/" />
+                    <Route path="/tournament" Component={BracketPage} />
+                </Routes>
+            </BrowserRouter>
         </div>
     );
 }
