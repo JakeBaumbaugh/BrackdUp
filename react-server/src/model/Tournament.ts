@@ -22,7 +22,7 @@ export class Tournament {
         const leftSongs: (Song|null)[][] = [];
         const rightSongs: (Song|null)[][] = [];
         // Assumption: first level is filled out entirely
-        let halfLength = this.levels[0].getSongs.length / 2;
+        let halfLength = this.levels[0].getSongs().length / 2;
         this.levels.forEach(level => {
             const levelSongs = level.getSongs();
             const firstHalf = levelSongs.slice(0, halfLength);
@@ -33,16 +33,15 @@ export class Tournament {
         });
         // Fill with any nulls necessary
         if(this.levels.length > 1) {
-            console.log("leftSongs", leftSongs);
             if(leftSongs.at(-1)!.length != leftSongs.at(-2)!.length / 2) {
                 const toAdd = leftSongs.at(-2)!.length / 2 - leftSongs.at(-1)!.length;
                 const nulls = new Array(toAdd).fill(null);
-                leftSongs.at(-1)!.concat(nulls);
+                leftSongs.at(-1)!.push(...nulls);
             }
             if(rightSongs.at(0)!.length != rightSongs.at(1)!.length / 2) {
                 const toAdd = rightSongs.at(1)!.length / 2 - rightSongs.at(0)!.length;
                 const nulls = new Array(toAdd).fill(null);
-                rightSongs.at(0)!.unshift(...nulls);
+                rightSongs.at(0)!.push(...nulls);
             }
         }
         while(leftSongs.at(-1)!.length != 1) {
@@ -57,8 +56,17 @@ export class Tournament {
     }
 
     getWinner(): Song|null {
-        const finalMatches = this.levels.at(-1)?.rounds[0].matches;
-        if(!finalMatches || finalMatches.length > 1) {
+        // Check for no levels
+        if(!this.levels || this.levels.length == 0) {
+            return null;
+        }
+        const lastLevel = this.levels.at(-1)!;
+        // Check for no rounds
+        if(!lastLevel.rounds || lastLevel.rounds.length == 0) {
+            return null;
+        }
+        const finalMatches = lastLevel.rounds[0].matches;
+        if(!finalMatches || finalMatches.length != 1) {
             return null;
         }
         return finalMatches[0].songWinner ?? null;

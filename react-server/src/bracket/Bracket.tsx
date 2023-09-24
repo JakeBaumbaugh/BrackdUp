@@ -16,14 +16,12 @@ export default function Bracket({entries}: BracketProps) {
     const [songColumns, setSongColumns] = useState<(Song|null)[][]>();
 
     useEffect(() => {
-        getTournament(1).then(tournament => {
+        getTournament(2).then(tournament => {
             console.log("Retrieved tournament:", tournament);
             setTournament(tournament);
             setSongColumns(tournament.getSongColumns());
         });
     }, []);
-
-    console.log(songColumns);
 
     if(!Number.isInteger(Math.log2(entries))) {
         return <></>
