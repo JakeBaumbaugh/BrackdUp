@@ -5,6 +5,7 @@
 .App {
   --header-height: 100px;
   --vh100: calc(var(--vh, 1vh) * 100);
+  --dark-color: #282c34;
   
   background-color: #e6e3df;
   min-height: var(--vh100, 100vh);
@@ -13,7 +14,7 @@
 }
 
 header {
-  background-color: #282c34;
+  background-color: var(--dark-color);
   height: var(--header-height);
   display: flex;
   justify-content: space-between;

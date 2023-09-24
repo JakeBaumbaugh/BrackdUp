@@ -1,5 +1,6 @@
 package tournament.rest;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.slf4j.Logger;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
 import tournament.model.Tournament;
+import tournament.model.TournamentSummary;
 import tournament.service.TournamentService;
 
 @RestController
@@ -39,6 +41,13 @@ public class TournamentController {
             tournament = tournamentService.getTournament(name);
         }
         return tournament.orElseThrow(() -> create404("Tournament not found."));
+    }
+
+    @GetMapping("/tournaments")
+    @CrossOrigin(originPatterns = "*:[*]")
+    public List<TournamentSummary> get() {
+        logger.info("GET request for all tournaments");
+        return tournamentService.getTournaments();
     }
 
     private ResponseStatusException create404(String message) {

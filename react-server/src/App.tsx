@@ -1,6 +1,7 @@
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import './App.css';
-import BracketPage from './pages/BracketPage';
+import BracketPage from './bracket/BracketPage';
+import ListPage from './list/ListPage';
 
 function App() {
     return (
@@ -11,7 +12,7 @@ function App() {
             </header>
             <BrowserRouter>
                 <Routes>
-                    <Route path="/" />
+                    <Route path="/" Component={ListPage}/>
                     <Route path="/tournament" Component={BracketPage} />
                 </Routes>
             </BrowserRouter>

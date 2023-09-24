@@ -1,6 +1,7 @@
-import { useSearchParams } from "react-router-dom";
-import Bracket from "../bracket/Bracket";
 import { useEffect, useState } from "react";
+import { useSearchParams } from "react-router-dom";
+import Bracket from "./Bracket";
+import "./bracket.css";
 
 export default function BracketPage() {
     const [searchParams] = useSearchParams();

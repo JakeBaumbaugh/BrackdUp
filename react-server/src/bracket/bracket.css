@@ -25,10 +25,10 @@
 }
 
 .song-card {
-    border: solid 2px #282c34;
+    border: solid 2px var(--dark-color);
     border-radius: 6px;
     background-color: #282c3433;
-    color: #282c34;
+    color: var(--dark-color);
     display: flex;
     flex-direction: column;
     font-size: 6pt;
@@ -62,7 +62,7 @@
 
 .match-connector {
     width: 2.5em;
-    stroke: #282c34;
+    stroke: var(--dark-color);
     stroke-width: 2px;
     stroke-linecap: round;
     overflow: visible;

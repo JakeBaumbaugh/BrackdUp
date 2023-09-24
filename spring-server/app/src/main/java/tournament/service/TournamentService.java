@@ -1,11 +1,13 @@
 package tournament.service;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import tournament.model.Tournament;
+import tournament.model.TournamentSummary;
 import tournament.repository.TournamentRepository;
 
 @Service
@@ -24,5 +26,12 @@ public class TournamentService {
 
     public Optional<Tournament> getTournament(String name) {
         return tournamentRepository.findByName(name);
+    }
+
+    public List<TournamentSummary> getTournaments() {
+        return tournamentRepository.findAll()
+            .stream()
+            .map(Tournament::getTournamentSummary)
+            .toList();
     }
 }

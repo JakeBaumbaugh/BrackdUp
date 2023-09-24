@@ -1,0 +1,27 @@
+.list-page {
+    padding: 24px;
+    display: flex;
+    gap: 24px;
+}
+
+.list-page > * {
+    flex: 0 0 33.3333333%;
+    
+}
+
+.tournament-card {
+    height: 14em;
+    border: solid 3px var(--dark-color);
+    border-radius: 1em;
+    padding: 1em;
+    cursor: pointer;
+    background-color: #f3f1ed;
+}
+
+.tournament-card:hover, .tournament-card:focus {
+    background-color: #dddbd8;
+}
+
+.tournament-card h2 {
+    text-align: center;
+}
