@@ -1,7 +1,7 @@
 import Song from "../model/Song";
 
 interface SongCardProps {
-    song?: Song;
+    song: Song|null;
     final?: boolean;
 }
 

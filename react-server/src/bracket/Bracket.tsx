@@ -13,10 +13,11 @@ interface BracketProps {
 
 export default function Bracket({entries}: BracketProps) {
     const [tournament, setTournament] = useState<Tournament>();
-    const [songColumns, setSongColumns] = useState<(Song|undefined)[][]>();
+    const [songColumns, setSongColumns] = useState<(Song|null)[][]>();
 
     useEffect(() => {
         getTournament(1).then(tournament => {
+            console.log("Retrieved tournament:", tournament);
             setTournament(tournament);
             setSongColumns(tournament.getSongColumns());
         });

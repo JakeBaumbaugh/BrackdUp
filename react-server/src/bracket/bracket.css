@@ -48,6 +48,10 @@
     white-space: nowrap;
 }
 
+.song-card > *:after {
+    content: "\200b";
+}
+
 .song-card > *:first-child {
     background-color: #f3f1ed;
 }

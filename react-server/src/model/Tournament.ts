@@ -18,21 +18,50 @@ export class Tournament {
         return new Tournament(data.id, data.name, levels, data.matchesPerRound);
     }
 
-    getSongColumns(): (Song|undefined)[][] {
-        const songs: (Song|undefined)[][] = [];
+    getSongColumns(): (Song|null)[][] {
+        const leftSongs: (Song|null)[][] = [];
+        const rightSongs: (Song|null)[][] = [];
+        // Assumption: first level is filled out entirely
+        let halfLength = this.levels[0].getSongs.length / 2;
         this.levels.forEach(level => {
             const levelSongs = level.getSongs();
-            const midpoint = levelSongs.length/2;
-            const firstHalf = levelSongs.slice(0, midpoint);
-            const secondHalf = levelSongs.slice(midpoint);
-            songs.splice(songs.length/2, 0, firstHalf, secondHalf);
+            const firstHalf = levelSongs.slice(0, halfLength);
+            const secondHalf = levelSongs.slice(halfLength);
+            leftSongs.push(firstHalf);
+            rightSongs.unshift(secondHalf);
+            halfLength /= 2;
         });
-        songs.splice(songs.length/2, 0, [this.getWinner()]);
-        return songs;
+        // Fill with any nulls necessary
+        if(this.levels.length > 1) {
+            console.log("leftSongs", leftSongs);
+            if(leftSongs.at(-1)!.length != leftSongs.at(-2)!.length / 2) {
+                const toAdd = leftSongs.at(-2)!.length / 2 - leftSongs.at(-1)!.length;
+                const nulls = new Array(toAdd).fill(null);
+                leftSongs.at(-1)!.concat(nulls);
+            }
+            if(rightSongs.at(0)!.length != rightSongs.at(1)!.length / 2) {
+                const toAdd = rightSongs.at(1)!.length / 2 - rightSongs.at(0)!.length;
+                const nulls = new Array(toAdd).fill(null);
+                rightSongs.at(0)!.unshift(...nulls);
+            }
+        }
+        while(leftSongs.at(-1)!.length != 1) {
+            const nulls = new Array(leftSongs.at(-1)!.length / 2).fill(null);
+            leftSongs.push(nulls);
+        }
+        while(rightSongs.at(0)!.length != 1) {
+            const nulls = new Array(rightSongs.at(0)!.length / 2).fill(null);
+            rightSongs.unshift(nulls);
+        }
+        return [...leftSongs, [this.getWinner()], ...rightSongs];
     }
 
-    getWinner(): Song|undefined {
-        return this.levels.at(-1)?.rounds[0].matches[0].songWinner;
+    getWinner(): Song|null {
+        const finalMatches = this.levels.at(-1)?.rounds[0].matches;
+        if(!finalMatches || finalMatches.length > 1) {
+            return null;
+        }
+        return finalMatches[0].songWinner ?? null;
     }
 }
 
