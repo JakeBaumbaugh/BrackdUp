@@ -4,18 +4,21 @@ export class Tournament {
     id: number;
     name: string;
     levels: TournamentLevel[];
+    spotifyPlaylist?: string;
     matchesPerRound?: number;
 
-    constructor(id: number, name: string, levels: TournamentLevel[], matchesPerRound?: number) {
+    constructor(id: number, name: string, levels: TournamentLevel[], spotifyPlaylist?: string, matchesPerRound?: number) {
         this.id = id;
         this.name = name;
         this.levels = levels;
+        this.spotifyPlaylist = spotifyPlaylist;
         this.matchesPerRound = matchesPerRound ?? 8;
+
     }
 
     static fromJson(data: any): Tournament {
         const levels = data.levels.map((levelData: any) => TournamentLevel.fromJson(levelData));
-        return new Tournament(data.id, data.name, levels, data.matchesPerRound);
+        return new Tournament(data.id, data.name, levels, data.spotifyPlaylist, data.matchesPerRound);
     }
 
     getSongColumns(): (Song|null)[][] {

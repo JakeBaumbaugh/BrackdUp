@@ -7,25 +7,15 @@ import SongCard from "./SongCard";
 import MatchConnectorColumn from "./MatchConnectorColumn";
 
 interface BracketProps {
-    id: number,
-    setTournamentNotFound: () => void,
+    tournament: Tournament;
 }
 
-export default function Bracket({id, setTournamentNotFound}: BracketProps) {
-    const [tournament, setTournament] = useState<Tournament>();
+export default function Bracket({tournament}: BracketProps) {
     const [songColumns, setSongColumns] = useState<(Song|null)[][]>();
 
     useEffect(() => {
-        getTournament(id).then(tournament => {
-            if(!tournament) {
-                setTournamentNotFound();
-            } else {
-                console.log("Retrieved tournament:", tournament);
-                setTournament(tournament);
-                setSongColumns(tournament.getSongColumns());
-            }
-        });
-    }, []);
+        setSongColumns(tournament.getSongColumns());
+    }, [tournament]);
 
     return songColumns ? (
         <TransformWrapper maxScale={2}>

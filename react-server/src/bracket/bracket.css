@@ -1,6 +1,7 @@
 .bracket-page {
-    height: calc(var(--vh100, 100vh) - 100px);
+    height: calc(var(--vh100, 100vh) - var(--header-height));
     width: 100%;
+    position: relative;
 }
 
 .bracket-page .react-transform-wrapper {

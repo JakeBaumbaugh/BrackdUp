@@ -2,11 +2,17 @@
     padding: 24px;
     display: flex;
     gap: 24px;
+    flex-wrap: wrap;
 }
 
 .list-page > * {
     flex: 0 0 33.3333333%;
-    
+}
+
+@media only screen and (max-width: 600px) {
+    .list-page > * {
+        flex: 0 0 100%;
+    }
 }
 
 .tournament-card {

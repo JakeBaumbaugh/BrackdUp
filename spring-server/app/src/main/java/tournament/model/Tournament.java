@@ -28,6 +28,7 @@ public class Tournament {
     private Integer id;
     private String name;
     private Integer matchesPerRound;
+    private String spotifyPlaylist;
 
     @OneToMany
     @JoinColumn(name = "tournament_id")

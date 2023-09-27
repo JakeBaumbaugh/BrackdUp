@@ -1,0 +1,132 @@
+* {
+    box-sizing: border-box;
+}
+
+.App {
+    --header-height: 80px;
+    --vh100: calc(var(--vh, 1vh) * 100);
+    --dark-color: #282c34;
+
+    background-color: #e6e3df;
+    min-height: var(--vh100, 100vh);
+    display: flex;
+    flex-direction: column;
+}
+
+header {
+    background-color: var(--dark-color);
+    height: var(--header-height);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: white;
+    padding: 0 1em;
+    z-index: 3;
+}
+
+header h1 {
+    font-size: 24pt;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.2s;
+    margin: 0;
+    margin-right: 3em;
+}
+
+header h1:hover, header h1:focus {
+    color: #ccc;
+    transform: skewX(-10deg);
+}
+
+header img, header svg {
+    width: 2em;
+    height: 2em;
+    transition: all 220ms;
+}
+
+header img:hover, header img:active, header svg:hover, header svg:active {
+    filter: brightness(65%);
+    transform: rotate(10deg);
+}
+
+.tournament-info {
+    flex-grow: 1;
+    display: flex;
+    gap: 1.5em;
+    border-left: solid 1px #556;
+    padding: 12px 1em;
+    align-items: center;
+}
+
+.tournament-info h2 {
+    margin: 0;
+    flex-grow: 1;
+}
+
+.vote-button {
+    background-color: #f01d1d;
+    border: none;
+    color: white;
+    font-weight: 600;
+    font-size: 12pt;
+    border-radius: 8px;
+    box-shadow: 0 3px 5px rgba(0, 0, 0, 0.18);
+    
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    padding: 8px;
+
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.vote-button:hover, .vote-button:active {
+    background-color: #b50d0d;
+}
+
+@media only screen and (max-width: 600px) {
+    .App {
+        --header-height: 100px;
+    }
+
+    header {
+        padding-bottom: calc(var(--header-height) / 2);
+    }
+
+    header h1 {
+        font-size: 16pt;
+    }
+
+    .tournament-info {
+        position: absolute;
+        background-color: #7a797e;
+        left: 0;
+        right: 0;
+        top: calc(var(--header-height) / 2);
+        height: calc(var(--header-height) / 2);
+        overflow: hidden;
+        border-left: none;
+        font-size: 8pt;
+    }
+
+    header .vote-button {
+        font-size: 10pt;
+    }
+
+    header img {
+        width: 3em;
+        height: 3em;
+    }
+}
+
+@media only screen and (min-width: 600px) {
+    .mobile-only {
+        display: none;
+    }
+
+    header .profile-wrapper {
+        border-left: solid 1px #556;
+        padding: 14px 1em 14px 2em;
+    }
+}

@@ -6,11 +6,7 @@ const baseUrl = "http://24.145.26.202:3001";
 export function getTournament(id: number): Promise<Tournament|undefined> {
     return get("/tournament?id=" + id)
         .then(res => res.json())
-        .then(res => Tournament.fromJson(res))
-        .catch(() => {
-            console.log("Failed to load data for tournament", id);
-            return undefined;
-        });
+        .then(res => Tournament.fromJson(res));
 }
 
 export function getTournaments(): Promise<TournamentSummary[]> {

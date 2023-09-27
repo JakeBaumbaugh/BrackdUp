@@ -2,22 +2,29 @@ import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import Bracket from "./Bracket";
 import "./bracket.css";
+import { getTournament } from "../service/TournamentService";
+import { useTournamentContext } from "../context/TournamentContext";
 
 export default function BracketPage() {
     const [searchParams] = useSearchParams();
-    const [numId, setNumId] = useState<number>(NaN);
+    const [tournament, setTournament] = useTournamentContext();
     
     useEffect(() => {
-        setNumId(Number.parseInt(searchParams.get("id") ?? ""));
+        const id = Number.parseInt(searchParams.get("id") ?? "");
+        getTournament(id).then(tournament => {
+            console.log("Retrieved tournament:", tournament);
+            setTournament(tournament);
+        }).catch(() => setTournament(null));
+        return () => setTournament(null);
     }, [searchParams.get("id")]);
 
-    const setTournamentNotFound = () => setNumId(NaN);
-
-    return !Number.isNaN(numId) ? (
+    return tournament ? (
         <main className="bracket-page">
-            <Bracket id={numId} setTournamentNotFound={setTournamentNotFound}/>
+            <Bracket tournament={tournament}/>
         </main>
-    ) : (
+    ) :  tournament === null ? (
         <h2>Tournament not found.</h2>
+    ) : ( // tournament == undefined
+        <h2>Loading...</h2>
     );
 }

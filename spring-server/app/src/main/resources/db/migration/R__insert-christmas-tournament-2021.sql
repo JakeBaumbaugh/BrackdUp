@@ -5,8 +5,8 @@ BEGIN
 
 IF (SELECT id FROM tournament WHERE name = 'Christmas Tournament 2021') IS NULL THEN
 
-    INSERT INTO tournament (id, name)
-        VALUES (1, '2021 Christmas Tournament');
+    INSERT INTO tournament (id, name, spotify_playlist)
+        VALUES (1, '2021 Christmas Tournament', 'https://open.spotify.com/playlist/26ylmAx4VJHAqdMTBljcoF?si=9fca04e1037248ea');
 
     -- Songs
     INSERT INTO song (id, title, artist, spotify) --1
