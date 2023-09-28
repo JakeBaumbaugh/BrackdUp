@@ -121,17 +121,23 @@ IF (SELECT id FROM tournament WHERE name = 'Christmas Tournament 2021') IS NULL 
     
     -- Tournament rounds
     INSERT INTO tournament_round (id, level_id, start_date, end_date) --11
-        VALUES (11, 7, '2022-11-6 00:00', '2022-11-12 00:00');
+        -- VALUES (11, 7, '2022-11-6 00:00', '2022-11-12 00:00');
+        VALUES (11, 7, '2023-09-06 00:00', '2023-09-12 00:00');
     INSERT INTO tournament_round (id, level_id, start_date, end_date) --12
-        VALUES (12, 7, '2022-11-12 00:00', '2022-11-18 00:00');
+        -- VALUES (12, 7, '2022-11-12 00:00', '2022-11-18 00:00');
+        VALUES (12, 7, '2023-09-12 00:00', '2023-09-18 00:00');
     INSERT INTO tournament_round (id, level_id, start_date, end_date) --13
-        VALUES (13, 7, '2022-11-18 00:00', '2022-11-24 00:00');
+        -- VALUES (13, 7, '2022-11-18 00:00', '2022-11-24 00:00');
+        VALUES (13, 7, '2023-09-18 00:00', '2023-09-24 00:00');
     INSERT INTO tournament_round (id, level_id, start_date, end_date) --14
-        VALUES (14, 7, '2022-11-24 00:00', '2022-11-30 00:00');
+        -- VALUES (14, 7, '2022-11-24 00:00', '2022-11-30 00:00');
+        VALUES (14, 7, '2023-09-24 00:00', '2023-12-12 00:00');
     INSERT INTO tournament_round (id, level_id, start_date, end_date) --15
-        VALUES (15, 8, '2022-11-30 00:00', '2022-12-06 00:00');
+        -- VALUES (15, 8, '2022-11-30 00:00', '2022-12-06 00:00');
+        VALUES (15, 8, '2023-12-12 00:00', '2023-12-14 00:00');
     INSERT INTO tournament_round (id, level_id, start_date, end_date) --16
-        VALUES (16, 8, '2022-12-6 00:00', '2022-12-12 00:00');
+        -- VALUES (16, 8, '2022-12-6 00:00', '2022-12-12 00:00');
+        VALUES (16, 8, '2023-12-14 00:00', '2023-12-16 00:00');
     -- INSERT INTO tournament_round (id, level_id, start_date, end_date) --17
     --     VALUES (17, 9, '2022-12-12 00:00', '2022-12-18 00:00');
     -- INSERT INTO tournament_round (id, level_id, start_date, end_date) --18
@@ -193,48 +199,89 @@ IF (SELECT id FROM tournament WHERE name = 'Christmas Tournament 2021') IS NULL 
     INSERT INTO tournament_match (round_id, song_1, song_2, song_winner)
         VALUES (13, 41, 85, 41);
 
-    INSERT INTO tournament_match (round_id, song_1, song_2, song_winner)
-        VALUES (14, 17, 86, 17);
-    INSERT INTO tournament_match (round_id, song_1, song_2, song_winner)
-        VALUES (14, 15, 64, 64);
-    INSERT INTO tournament_match (round_id, song_1, song_2, song_winner)
-        VALUES (14, 87, 88, 87);
-    INSERT INTO tournament_match (round_id, song_1, song_2, song_winner)
-        VALUES (14, 89, 90, 90);
-    INSERT INTO tournament_match (round_id, song_1, song_2, song_winner)
-        VALUES (14, 59, 45, 59);
-    INSERT INTO tournament_match (round_id, song_1, song_2, song_winner)
-        VALUES (14, 91, 40, 40);
-    INSERT INTO tournament_match (round_id, song_1, song_2, song_winner)
-        VALUES (14, 92, 93, 93);
-    INSERT INTO tournament_match (round_id, song_1, song_2, song_winner)
-        VALUES (14, 94, 95, 95);
+    -- INSERT INTO tournament_match (round_id, song_1, song_2, song_winner)
+    --     VALUES (14, 17, 86, 17);
+    -- INSERT INTO tournament_match (round_id, song_1, song_2, song_winner)
+    --     VALUES (14, 15, 64, 64);
+    -- INSERT INTO tournament_match (round_id, song_1, song_2, song_winner)
+    --     VALUES (14, 87, 88, 87);
+    -- INSERT INTO tournament_match (round_id, song_1, song_2, song_winner)
+    --     VALUES (14, 89, 90, 90);
+    -- INSERT INTO tournament_match (round_id, song_1, song_2, song_winner)
+    --     VALUES (14, 59, 45, 59);
+    -- INSERT INTO tournament_match (round_id, song_1, song_2, song_winner)
+    --     VALUES (14, 91, 40, 40);
+    -- INSERT INTO tournament_match (round_id, song_1, song_2, song_winner)
+    --     VALUES (14, 92, 93, 93);
+    -- INSERT INTO tournament_match (round_id, song_1, song_2, song_winner)
+    --     VALUES (14, 94, 95, 95);
+    INSERT INTO tournament_match (round_id, song_1, song_2)
+        VALUES (14, 17, 86);
+    INSERT INTO tournament_match (round_id, song_1, song_2)
+        VALUES (14, 15, 64);
+    INSERT INTO tournament_match (round_id, song_1, song_2)
+        VALUES (14, 87, 88);
+    INSERT INTO tournament_match (round_id, song_1, song_2)
+        VALUES (14, 89, 90);
+    INSERT INTO tournament_match (round_id, song_1, song_2)
+        VALUES (14, 59, 45);
+    INSERT INTO tournament_match (round_id, song_1, song_2)
+        VALUES (14, 91, 40);
+    INSERT INTO tournament_match (round_id, song_1, song_2)
+        VALUES (14, 92, 93);
+    INSERT INTO tournament_match (round_id, song_1, song_2)
+        VALUES (14, 94, 95);
 
-    INSERT INTO tournament_match (round_id, song_1, song_2, song_winner)
-        VALUES (15, 21, 27, 21);
-    INSERT INTO tournament_match (round_id, song_1, song_2, song_winner)
-        VALUES (15, 50, 16, 50);
-    INSERT INTO tournament_match (round_id, song_1, song_2, song_winner)
-        VALUES (15, 13, 2, 13);
-    INSERT INTO tournament_match (round_id, song_1, song_2, song_winner)
-        VALUES (15, 68, 62, 62);
-    INSERT INTO tournament_match (round_id, song_1, song_2, song_winner)
-        VALUES (15, 61, 1, 1);
-    INSERT INTO tournament_match (round_id, song_1, song_2, song_winner)
-        VALUES (15, 71, 23, 71);
-    INSERT INTO tournament_match (round_id, song_1, song_2, song_winner)
-        VALUES (15, 75, 76, 76);
-    INSERT INTO tournament_match (round_id, song_1, song_2, song_winner)
-        VALUES (15, 35, 78, 35);
+    -- INSERT INTO tournament_match (round_id, song_1, song_2, song_winner)
+    --     VALUES (15, 21, 27, 21);
+    -- INSERT INTO tournament_match (round_id, song_1, song_2, song_winner)
+    --     VALUES (15, 50, 16, 50);
+    -- INSERT INTO tournament_match (round_id, song_1, song_2, song_winner)
+    --     VALUES (15, 13, 2, 13);
+    -- INSERT INTO tournament_match (round_id, song_1, song_2, song_winner)
+    --     VALUES (15, 68, 62, 62);
+    -- INSERT INTO tournament_match (round_id, song_1, song_2, song_winner)
+    --     VALUES (15, 61, 1, 1);
+    -- INSERT INTO tournament_match (round_id, song_1, song_2, song_winner)
+    --     VALUES (15, 71, 23, 71);
+    -- INSERT INTO tournament_match (round_id, song_1, song_2, song_winner)
+    --     VALUES (15, 75, 76, 76);
+    -- INSERT INTO tournament_match (round_id, song_1, song_2, song_winner)
+    --     VALUES (15, 35, 78, 35);
+    INSERT INTO tournament_match (round_id, song_1, song_2)
+        VALUES (15, 21, 27);
+    INSERT INTO tournament_match (round_id, song_1, song_2)
+        VALUES (15, 50, 16);
+    INSERT INTO tournament_match (round_id, song_1, song_2)
+        VALUES (15, 13, 2);
+    INSERT INTO tournament_match (round_id, song_1, song_2)
+        VALUES (15, 68, 62);
+    INSERT INTO tournament_match (round_id, song_1, song_2)
+        VALUES (15, 61, 1);
+    INSERT INTO tournament_match (round_id, song_1, song_2)
+        VALUES (15, 71, 23);
+    INSERT INTO tournament_match (round_id, song_1, song_2)
+        VALUES (15, 75, 76);
+    INSERT INTO tournament_match (round_id, song_1, song_2)
+        VALUES (15, 35, 78);
 
-    INSERT INTO tournament_match (round_id, song_1, song_2, song_winner)
-        VALUES (16, 57, 19, 57);
-    INSERT INTO tournament_match (round_id, song_1, song_2, song_winner)
-        VALUES (16, 52, 80, 52);
-    INSERT INTO tournament_match (round_id, song_1, song_2, song_winner)
-        VALUES (16, 81, 83, 81);
-    INSERT INTO tournament_match (round_id, song_1, song_2, song_winner)
-        VALUES (16, 29, 41, 41);
+    -- INSERT INTO tournament_match (round_id, song_1, song_2, song_winner)
+    --     VALUES (16, 57, 19, 57);
+    -- INSERT INTO tournament_match (round_id, song_1, song_2, song_winner)
+    --     VALUES (16, 52, 80, 52);
+    -- INSERT INTO tournament_match (round_id, song_1, song_2, song_winner)
+    --     VALUES (16, 81, 83, 81);
+    -- INSERT INTO tournament_match (round_id, song_1, song_2, song_winner)
+    --     VALUES (16, 29, 41, 41);
+    INSERT INTO tournament_match (round_id, song_1, song_2)
+        VALUES (16, 57, 19);
+    INSERT INTO tournament_match (round_id, song_1, song_2)
+        VALUES (16, 52, 80);
+    INSERT INTO tournament_match (round_id, song_1, song_2)
+        VALUES (16, 81, 83);
+    INSERT INTO tournament_match (round_id, song_1, song_2)
+        VALUES (16, 29, 41);
+    -- BELOW NEEDS UPDATED    
     -- INSERT INTO tournament_match (round_id, song_1, song_2, song_winner)
     --     VALUES (6, 50, 51, 50);
     -- INSERT INTO tournament_match (round_id, song_1, song_2, song_winner)

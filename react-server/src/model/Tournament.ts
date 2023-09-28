@@ -74,6 +74,12 @@ export class Tournament {
         }
         return finalMatches[0].songWinner ?? null;
     }
+
+    getCurrentRound(): TournamentRound|undefined {
+        const rounds = this.levels.flatMap(level => level.rounds);
+        const now = new Date();
+        return rounds.find(round => round.startDate < now && now < round.endDate);
+    }
 }
 
 export class TournamentLevel {
@@ -112,7 +118,7 @@ export class TournamentRound {
 
     static fromJson(data: any): TournamentRound {
         const matches = data.matches.map((matchData: any) => TournamentMatch.fromJson(matchData));
-        return new TournamentRound(data.id, data.startDate, data.endDate, matches);
+        return new TournamentRound(data.id, new Date(data.startDate), new Date(data.endDate), matches);
     }
 
     getSongs(): Song[] {

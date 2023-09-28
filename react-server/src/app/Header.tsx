@@ -18,7 +18,9 @@ export default function Header() {
                             <img src={SpotifyLogo} alt="Spotify Logo"/>
                         </a>
                     )}
-                    <button className="vote-button">VOTE</button>
+                    {tournament.getCurrentRound() && (
+                        <button className="vote-button">VOTE</button>
+                    )}
                 </div>
             </>}
             <div className="profile-wrapper">
