@@ -16,18 +16,54 @@
 }
 
 .tournament-card {
-    height: 14em;
-    border: solid 3px var(--dark-color);
+    --card-color: #f3f1ed;
+    --card-hover-color: #d6d4d2;
+    --card-outer-border-width: 4px;
+    --card-inner-border-width: 3px;
+
+    height: 16em;
+    border: solid var(--card-outer-border-width) var(--dark-color);
     border-radius: 1em;
-    padding: 1em;
     cursor: pointer;
-    background-color: #f3f1ed;
+    position: relative;
+    overflow: hidden;
+
+    display: flex;
+    flex-direction: column;
 }
 
-.tournament-card:hover, .tournament-card:focus {
-    background-color: #dddbd8;
-}
-
-.tournament-card h2 {
+.tournament-card .tournament-card-content {
+    background-color: var(--card-color);
+    padding: 1em;
+    flex: 1 0 0;
     text-align: center;
+}
+
+.tournament-card .tournament-card-content:hover, .tournament-card .tournament-card-content:focus {
+    background-color: var(--card-hover-color);
+}
+
+.tournament-card .button-row {
+    height: 3.3em;
+    border-top: solid var(--card-inner-border-width) var(--dark-color);
+    display: flex;
+    background-color: var(--dark-color);
+    gap: var(--card-inner-border-width);
+}
+
+.tournament-card .button-row > * {
+    flex: 1 0 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    background-color: var(--card-color);
+}
+
+.tournament-card .button-row > *:hover, .tournament-card .button-row > *:focus {
+    background-color: var(--card-hover-color);
+}
+
+.tournament-card .button-row img {
+    height: 2.4em;
 }

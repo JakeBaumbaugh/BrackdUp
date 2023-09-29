@@ -16,4 +16,5 @@ public class TournamentSummary {
     private ZonedDateTime endDate;
     private Song songWinner;
     private ZonedDateTime votingEndDate;
+    private String spotifyPlaylist;
 }

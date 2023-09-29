@@ -54,6 +54,7 @@ public class Tournament {
         getCurrentRound().ifPresent(currentRound ->
             summary.setVotingEndDate(currentRound.getEndDate())
         );
+        summary.setSpotifyPlaylist(spotifyPlaylist);
         return summary;
     }
 
