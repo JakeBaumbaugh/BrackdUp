@@ -77,8 +77,7 @@ export class Tournament {
 
     getCurrentRound(): TournamentRound|undefined {
         const rounds = this.levels.flatMap(level => level.rounds);
-        const now = new Date();
-        return rounds.find(round => round.startDate < now && now < round.endDate);
+        return rounds.find(round => round.isActive());
     }
 }
 
@@ -122,7 +121,18 @@ export class TournamentRound {
     }
 
     getSongs(): Song[] {
-        return this.matches.flatMap(match => match.getSongs());
+        const isActive = this.isActive();
+        const songs = this.matches.flatMap(match => match.getSongs());
+        songs.forEach(song => song.activeRound = isActive);
+        return songs;
+    }
+
+    isActive(): boolean {
+        if(!this.startDate || !this.endDate) {
+            return false;
+        }
+        const now = new Date();
+        return this.startDate < now && now < this.endDate;
     }
 }
 

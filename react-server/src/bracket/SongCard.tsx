@@ -6,8 +6,16 @@ interface SongCardProps {
 }
 
 export default function SongCard({song, final}: SongCardProps) {
+    let cardClass = "song-card";
+    if (final) {
+        cardClass += " final";
+    }
+    if(song?.activeRound) {
+        cardClass += " active";
+    }
+
     return <>
-        <div className={final ? "song-card final" :"song-card"}>
+        <div className={cardClass}>
             <div>{song?.title}</div>
             <div>{song?.artist}</div>
         </div>

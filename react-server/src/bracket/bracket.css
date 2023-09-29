@@ -42,23 +42,26 @@
     font-size: 10pt;
 }
 
+.song-card.active > * {
+    /* background-color: #cfdef5; */
+    background-color: #fcf1c0;
+    /* background-color: #ebd7f7; */
+}
+
 .song-card > * {
     padding: 3px 10px 3px 3px;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+    background-color: #f3f1ed;
 }
 
 .song-card > *:after {
     content: "\200b";
 }
 
-.song-card > *:first-child {
-    background-color: #f3f1ed;
-}
-
 .song-card > *:last-child {
-    background-color: #e4e2de;
+    filter: brightness(94%) saturate(130%);
 }
 
 .match-connector {

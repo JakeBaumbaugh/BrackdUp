@@ -4,4 +4,5 @@ export default interface Song {
     artist: string;
     spotify?: string;
     youtube?: string;
+    activeRound?: boolean;
 }
