@@ -1,7 +1,6 @@
 import { Tournament } from "../model/Tournament";
 import TournamentSummary from "../model/TournamentSummary";
-
-const baseUrl = "http://204.195.162.199:3001";
+import { get } from "./ServiceUtil";
 
 export function getTournament(id: number): Promise<Tournament|undefined> {
     return get("/tournament?id=" + id)
@@ -17,17 +16,4 @@ export function getTournaments(): Promise<TournamentSummary[]> {
             console.log("Failed to retrieve tournaments");
             return [];
         });
-}
-
-function get(url: string): Promise<Response> {
-    const fullUrl = baseUrl + url;
-    return fetch(fullUrl, {
-        method: "GET",
-        headers: {
-            "Authorization": "Basic xxxxxxxxxxxxxxx=",
-            "Accept": "application/json",
-            "Content-Type": "application/json",
-            // "Access-Control-Allow-Origin": "*",
-        }
-    });
 }

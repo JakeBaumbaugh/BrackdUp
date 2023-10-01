@@ -6,3 +6,10 @@ spring:
 
 server:
     port: 3001
+    ssl:
+        key-store: classpath:cert/springboot.p12
+        key-store-password: password
+        key-store-type: PKCS12
+        key-alias: springboot
+        key-password: password
+        enabled: true

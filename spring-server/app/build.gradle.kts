@@ -11,6 +11,8 @@ repositories {
 
 dependencies {
     implementation("com.google.guava:guava:31.1-jre")
+    implementation("com.google.api-client:google-api-client:1.34.1")
+    implementation("com.google.oauth-client:google-oauth-client:1.34.1")
     implementation("org.springframework.boot:spring-boot-starter-data-jpa:3.1.3")
 	implementation("org.springframework.boot:spring-boot-starter-web:3.1.3")
     implementation("org.springframework.boot:spring-boot-starter-security:3.1.3")

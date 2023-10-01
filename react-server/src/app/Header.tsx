@@ -1,11 +1,19 @@
-import { CgProfile } from "react-icons/cg";
+import { CredentialResponse, GoogleLogin } from "@react-oauth/google";
 import { useNavigate } from "react-router-dom";
 import { useTournamentContext } from "../context/TournamentContext";
 import SpotifyLogo from "../images/spotify_logo.svg";
+import { login } from "../service/UserService";
 
 export default function Header() {
     const navigate = useNavigate();
     const [tournament] = useTournamentContext();
+
+    const onLoginSuccess = (credentialResponse: CredentialResponse) => {
+        if(credentialResponse.credential) {
+            login(credentialResponse.credential);
+            // if login success, save JWT into context
+        }
+    };
 
     return (
         <header>
@@ -24,7 +32,10 @@ export default function Header() {
                 </div>
             </>}
             <div className="profile-wrapper">
-                <CgProfile/>
+                <GoogleLogin
+                    onSuccess={onLoginSuccess}
+                    onError={() => console.log("Google Login failed.")}
+                />
             </div>
         </header>
     );

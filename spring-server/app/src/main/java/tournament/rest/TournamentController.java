@@ -7,7 +7,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatusCode;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -29,7 +28,6 @@ public class TournamentController {
     }
     
     @GetMapping("/tournament")
-    @CrossOrigin(originPatterns = "*:[*]")
     public Tournament get(@RequestParam(required = false) Integer id, @RequestParam(required = false) String name) {
         logger.info("GET request for tournament id={}, name={}", id, name);
         Optional<Tournament> tournament;
@@ -44,7 +42,6 @@ public class TournamentController {
     }
 
     @GetMapping("/tournaments")
-    @CrossOrigin(originPatterns = "*:[*]")
     public List<TournamentSummary> get() {
         logger.info("GET request for all tournaments");
         return tournamentService.getTournaments();
