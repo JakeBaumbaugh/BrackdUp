@@ -5,6 +5,9 @@ import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationToken;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
@@ -17,17 +20,34 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import tournament.model.Profile;
+import tournament.service.ProfileService;
 
 public class JwtTokenFilter extends OncePerRequestFilter {
     private static Logger logger = LoggerFactory.getLogger(JwtTokenFilter.class);
 
+    private ProfileService profileService;
+
+    public JwtTokenFilter(ProfileService profileService) {
+        this.profileService = profileService;
+    }
+
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         String token = getToken(request);
-        logger.info("Found Bearer token: {}", token);
+        logger.debug("Found Bearer token: {}", token);
+
+        Payload payload = null;
         if(token != null) {
-            Payload payload = parseToken(token);
-            logger.info(payload != null ? payload.toPrettyString() : "Payload null.");
+            payload = parseToken(token);
+            logger.debug(payload != null ? payload.toPrettyString() : "Payload null.");
+        }
+
+        if (payload != null) {
+            Profile profile = profileService.getProfileFromPayload(payload);
+            Authentication auth = new PreAuthenticatedAuthenticationToken(profile, token);
+            auth.setAuthenticated(true);
+            SecurityContextHolder.getContext().setAuthentication(auth);
         }
 
         filterChain.doFilter(request, response);
