@@ -3,20 +3,25 @@ import { useNavigate } from "react-router-dom";
 import { useTournamentContext } from "../context/TournamentContext";
 import SpotifyLogo from "../images/spotify_logo.svg";
 import { login } from "../service/UserService";
+import { useProfileContext } from "../context/ProfileContext";
 
 export default function Header() {
     const navigate = useNavigate();
     const [tournament] = useTournamentContext();
+    const [profile, setProfile] = useProfileContext();
 
     const onLoginSuccess = (credentialResponse: CredentialResponse) => {
         if(credentialResponse.credential) {
-            login(credentialResponse.credential);
-            // if login success, save JWT into context
+            login(credentialResponse.credential)
+                .then(profile => {
+                    profile.jwt = credentialResponse.credential;
+                    setProfile(profile);
+                });
         }
     };
 
     return (
-        <header>
+        <header className={tournament ? "with-tournament" : ""}>
             <h1 onClick={() => navigate("/")}>Music Madness</h1>
             {tournament && <>
                 <div className="tournament-info">
@@ -31,12 +36,16 @@ export default function Header() {
                     )}
                 </div>
             </>}
-            <div className="profile-wrapper">
-                <GoogleLogin
-                    onSuccess={onLoginSuccess}
-                    onError={() => console.log("Google Login failed.")}
-                />
-            </div>
+            { !profile && (
+                <div className="profile-wrapper">
+                    <GoogleLogin
+                        onSuccess={onLoginSuccess}
+                        onError={() => console.log("Google Login failed.")}
+                        type="icon"
+                        shape="circle"
+                    />
+                </div>
+            )}
         </header>
     );
 }

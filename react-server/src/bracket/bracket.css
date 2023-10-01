@@ -1,6 +1,7 @@
 .bracket-page {
-    height: calc(var(--vh100, 100vh) - var(--header-height));
+    flex: 1 0 0;
     width: 100%;
+    min-height: 0;
     position: relative;
 }
 

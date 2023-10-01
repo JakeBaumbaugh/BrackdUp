@@ -3,19 +3,20 @@
 }
 
 .App {
-    --header-height: 80px;
     --vh100: calc(var(--vh, 1vh) * 100);
     --dark-color: #282c34;
 
     background-color: #e6e3df;
-    min-height: var(--vh100, 100vh);
+    height: var(--vh100, 100vh);
     display: flex;
     flex-direction: column;
 }
 
 header {
+    --header-height: 80px;
+    
     background-color: var(--dark-color);
-    height: var(--header-height);
+    flex: 0 0 var(--header-height);
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -38,13 +39,13 @@ header h1:hover, header h1:focus {
     transform: skewX(-10deg);
 }
 
-header img, header svg {
+.tournament-info img, .tournament-info svg {
     width: 2em;
     height: 2em;
     transition: all 220ms;
 }
 
-header img:hover, header img:active, header svg:hover, header svg:active {
+.tournament-info img:hover, .tournament-info img:active, .tournament-info svg:hover, .tournament-info svg:active {
     filter: brightness(65%);
     transform: rotate(10deg);
 }
@@ -86,11 +87,13 @@ header img:hover, header img:active, header svg:hover, header svg:active {
 }
 
 @media only screen and (max-width: 600px) {
-    .App {
-        --header-height: 100px;
-    }
 
     header {
+        --header-height: 50px;
+    }
+
+    header.with-tournament {
+        --header-height: 100px;
         padding-bottom: calc(var(--header-height) / 2);
     }
 
@@ -110,11 +113,11 @@ header img:hover, header img:active, header svg:hover, header svg:active {
         font-size: 8pt;
     }
 
-    header .vote-button {
+    .tournament-info .vote-button {
         font-size: 10pt;
     }
 
-    header img {
+    .tournament-info img {
         width: 3em;
         height: 3em;
     }
@@ -129,4 +132,8 @@ header img:hover, header img:active, header svg:hover, header svg:active {
         border-left: solid 1px #556;
         padding: 14px 1em 14px 2em;
     }
+}
+
+#g_a11y_announcement {
+    display: none;
 }
