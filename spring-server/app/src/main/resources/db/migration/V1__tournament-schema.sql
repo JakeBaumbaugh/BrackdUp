@@ -16,7 +16,7 @@ CREATE TABLE IF NOT EXISTS tournament (
 
 CREATE TABLE IF NOT EXISTS tournament_level (
     id SERIAL PRIMARY KEY,
-    tournament_id SERIAL NOT NULL REFERENCES tournament (id),
+    tournament_id INTEGER NOT NULL REFERENCES tournament (id),
     name TEXT NOT NULL
 );
 

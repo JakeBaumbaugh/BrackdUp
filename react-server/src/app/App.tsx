@@ -8,6 +8,7 @@ import Profile from '../model/Profile';
 import { Tournament } from '../model/Tournament';
 import './App.css';
 import Header from './Header';
+import VotePage from '../vote/VotePage';
 
 function App() {
     const tournamentState = useState<Tournament|null>();
@@ -21,6 +22,7 @@ function App() {
                     <Routes>
                         <Route path="/" Component={ListPage}/>
                         <Route path="/tournament" Component={BracketPage} />
+                        <Route path="/tournament/vote" Component={VotePage} />
                     </Routes>
                 </div>
             </TournamentContext.Provider>

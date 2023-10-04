@@ -11,11 +11,12 @@ export default function BracketPage() {
     
     useEffect(() => {
         const id = Number.parseInt(searchParams.get("id") ?? "");
-        getTournament(id).then(tournament => {
-            console.log("Retrieved tournament:", tournament);
-            setTournament(tournament);
-        }).catch(() => setTournament(null));
-        return () => setTournament(null);
+        if(tournament?.id !== id) {
+            getTournament(id).then(tournament => {
+                console.log("Retrieved tournament:", tournament);
+                setTournament(tournament);
+            }).catch(() => setTournament(null));
+        }
     }, [searchParams.get("id")]);
 
     return tournament ? (

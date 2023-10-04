@@ -5,12 +5,15 @@ import { getTournaments } from "../service/TournamentService";
 import SpotifyLogo from "../images/spotify_logo.svg";
 import "./list.css";
 import CountdownTimer from "./CountdownTimer";
+import { useTournamentContext } from "../context/TournamentContext";
 
 export default function ListPage() {
     const [tournaments, setTournaments] = useState<TournamentSummary[]>([]);
+    const [_, setTournament] = useTournamentContext();
     const navigate = useNavigate();
 
     useEffect(() => {
+        setTournament(null);
         getTournaments().then(tournaments => {
             const expiredTournaments: TournamentSummary[] = [];
             const activeTourmaments: TournamentSummary[] = [];
@@ -52,7 +55,7 @@ export default function ListPage() {
                             )}
                             { t.votingEndDate && (
                                 <div>
-                                    <button className="vote-button">VOTE</button>
+                                    <button className="vote-button" onClick={() => navigate(`/tournament/vote?id=${t.id}`)}>VOTE</button>
                                 </div>
                             )}
                         </div>
