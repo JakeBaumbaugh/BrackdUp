@@ -4,6 +4,8 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -45,5 +47,17 @@ public class TournamentRound {
 
     public void setEndDate(ZonedDateTime endDate) {
         this.endDate = endDate.withZoneSameInstant(ZoneId.of("America/New_York")).toLocalDateTime();
+    }
+
+    public boolean validSongVotes(List<Song> songs) {
+        // O(songs x matches), maybe could be better
+        Set<TournamentMatch> votedMatches = songs.stream()
+                .map(song -> matches.stream()
+                        .filter(match -> match.getSong1().getId().equals(song.getId()) || match.getSong2().getId().equals(song.getId()))
+                        .findFirst()
+                        .orElse(null)
+                )
+                .collect(Collectors.toSet());
+        return !votedMatches.contains(null) && votedMatches.size() == songs.size();
     }
 }

@@ -25,7 +25,7 @@ export default function Header() {
             <h1 onClick={() => navigate("/")}>Music Madness</h1>
             {tournament && <>
                 <div className="tournament-info">
-                    <h2>{tournament.name}</h2>
+                    <h2 onClick={() => navigate(`/tournament?id=${tournament.id}`)}>{tournament.name}</h2>
                     {tournament.spotifyPlaylist && (
                         <a href={tournament.spotifyPlaylist} target="_blank">
                             <img src={SpotifyLogo} alt="Spotify Logo"/>

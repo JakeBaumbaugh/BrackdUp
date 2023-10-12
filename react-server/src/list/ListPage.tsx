@@ -54,8 +54,8 @@ export default function ListPage() {
                                 </a>
                             )}
                             { t.votingEndDate && (
-                                <div>
-                                    <button className="vote-button" onClick={() => navigate(`/tournament/vote?id=${t.id}`)}>VOTE</button>
+                                <div onClick={() => navigate(`/tournament/vote?id=${t.id}`)}>
+                                    <button className="vote-button">VOTE</button>
                                 </div>
                             )}
                         </div>

@@ -28,13 +28,16 @@ header {
 header h1 {
     font-size: 24pt;
     font-weight: 600;
-    cursor: pointer;
-    transition: transform 0.2s;
     margin: 0;
     margin-right: 3em;
 }
 
-header h1:hover, header h1:focus {
+header h1, header h2 {
+    cursor: pointer;
+    transition: transform 220ms;
+}
+
+header h1:hover, header h1:focus, header h2:hover, header h2:focus {
     color: #ccc;
     transform: skewX(-10deg);
 }
@@ -60,8 +63,7 @@ header h1:hover, header h1:focus {
 }
 
 .tournament-info h2 {
-    margin: 0;
-    flex-grow: 1;
+    margin: 0 auto 0 0;
 }
 
 .vote-button {

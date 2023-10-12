@@ -1,0 +1,50 @@
+.song-card {
+    border: solid 2px var(--dark-color);
+    border-radius: 6px;
+    background-color: #282c3433;
+    color: var(--dark-color);
+    display: flex;
+    flex-direction: column;
+    width: 18em;
+    gap: 1px;
+    overflow: hidden;
+    transition: all 220ms;
+}
+
+.song-card > * {
+    padding: 3px 10px 3px 3px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    background-color: #f3f1ed;
+}
+
+.song-card > *:after {
+    content: "\200b";
+}
+
+.song-card > *:last-child {
+    filter: brightness(94%) saturate(130%);
+}
+
+.song-card.final {
+    font-size: 10pt;
+}
+
+.song-card.active > * {
+    /* background-color: #cfdef5; */
+    background-color: #fcf1c0;
+    /* background-color: #ebd7f7; */
+}
+
+.song-card.selected > * {
+    background-color: #d7f7da;
+}
+
+.song-card.clickable {
+    cursor: pointer;
+}
+
+.song-card.clickable:hover, .song-card.clickable:active {
+    filter: brightness(92%) saturate(120%);
+}

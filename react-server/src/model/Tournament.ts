@@ -154,6 +154,10 @@ export class TournamentMatch {
     }
 
     getSongs(): Song[] {
-        return [this.song1, this.song2];
+        return [{...this.song1}, {...this.song2}];
+    }
+
+    copy(): TournamentMatch {
+        return new TournamentMatch(this.id, this.song1, this.song2, this.songWinner);
     }
 }

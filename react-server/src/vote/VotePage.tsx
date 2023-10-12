@@ -1,17 +1,31 @@
+import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "react-router-dom";
+import SongCard from "../songcard/SongCard";
 import { useTournamentContext } from "../context/TournamentContext";
+import { getTournament, submitVote } from "../service/TournamentService";
 import "./vote.css";
-import { useEffect, useMemo } from "react";
-import { getTournament } from "../service/TournamentService";
-import SongCard from "../bracket/SongCard";
+import Song from "../model/Song";
+import { TournamentMatch } from "../model/Tournament";
+import { useProfileContext } from "../context/ProfileContext";
 
 export default function VotePage() {
     const [searchParams] = useSearchParams();
     const [tournament, setTournament] = useTournamentContext();
+    const [profile] = useProfileContext();
+    const [votedSongs, setVotedSongs] = useState<Set<Song>>(new Set([]));
     
     const matches = useMemo(() => {
         const round = tournament?.getCurrentRound();
-        return round?.matches || [];
+        let matches = round?.matches || [];
+        matches =  matches.map(match => match.copy());
+        matches.forEach(match => {
+            if(votedSongs.has(match.song1)) {
+                match.songWinner = match.song1;
+            } else if(votedSongs.has(match.song2)) {
+                match.songWinner = match.song2;
+            }
+        });
+        return matches;
     }, [tournament]);
     
     useEffect(() => {
@@ -24,27 +38,51 @@ export default function VotePage() {
         }
     }, [searchParams.get("id")]);
 
+    const vote = (match: TournamentMatch, song: Song) => {
+        setVotedSongs(votedSongs => {
+            const newVotedSongs = new Set(votedSongs);
+            if(newVotedSongs.has(song)) {
+                newVotedSongs.delete(song);
+            } else {
+                newVotedSongs.delete(match.song1);
+                newVotedSongs.delete(match.song2);
+                newVotedSongs.add(song);
+            }
+            return newVotedSongs;
+        });
+    }
+
+    const submit = () => {
+        if(profile?.jwt && tournament) {
+            const songIds = [...votedSongs].map(song => song.id);
+            submitVote(profile.jwt, tournament.id, songIds);
+            console.log("Submitted vote.");
+        } else {
+            console.log("Profile, JWT, or Tournament was not found.");
+        }
+    }
+
     return (
         <main className="vote-page">
             <div className="match-container">
                 { matches.map(match => (
                     <div key={match.id} className="match">
-                        <SongCard song={match.song1} />
+                        <SongCard
+                            song={match.song1}
+                            votedFor={votedSongs.has(match.song1)}
+                            onClick={() => vote(match, match.song1)}
+                        />
                         <hr/>
                         <p>VS</p>
                         <hr/>
-                        <SongCard song={match.song2} />
+                        <SongCard
+                            song={match.song2}
+                            votedFor={votedSongs.has(match.song2)}
+                            onClick={() => vote(match, match.song2)}
+                        />
                     </div>
                 ))}
-                {/* { matches.map(match => (
-                    <div key={match.id} className="match">
-                        <SongCard song={match.song1} />
-                        <hr/>
-                        <p>VS</p>
-                        <hr/>
-                        <SongCard song={match.song2} />
-                    </div>
-                ))} */}
+                <button onClick={submit}>SUBMIT</button>
             </div>
         </main>
     );

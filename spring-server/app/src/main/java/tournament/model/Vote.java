@@ -1,7 +1,8 @@
 package tournament.model;
 
-import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
@@ -32,15 +33,16 @@ public class Vote {
     private Song song;
 
     private LocalDateTime timestamp;
-}
 
-@Getter @Setter @NoArgsConstructor @ToString @EqualsAndHashCode
-class VoteId implements Serializable {
-    @ManyToOne
-    @JoinColumn(name = "profile_id")
-    private Profile profile;
+    public ZonedDateTime getTimestamp() {
+        return timestamp.atZone(ZoneId.of("America/New_York"));
+    }
 
-    @ManyToOne
-    @JoinColumn(name = "match_id")
-    private TournamentMatch match;
+    public void setTimestamp(ZonedDateTime timestamp) {
+        this.timestamp = timestamp.withZoneSameInstant(ZoneId.of("America/New_York")).toLocalDateTime();
+    }
+
+    public void setTimestamp() {
+        this.timestamp = ZonedDateTime.now(ZoneId.of("America/New_York")).toLocalDateTime();
+    }
 }

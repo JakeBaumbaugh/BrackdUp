@@ -17,7 +17,7 @@ export function post(url: string, jwt: string, body?: any): Promise<Response> {
     const fullUrl = baseUrl + url;
     return fetch(fullUrl, {
         method: "POST",
-        body: body,
+        body: JSON.stringify(body),
         headers: {
             "Authorization": `Bearer ${jwt}`,
             "Accept": "application/json",

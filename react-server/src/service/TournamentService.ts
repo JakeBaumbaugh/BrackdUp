@@ -1,6 +1,6 @@
 import { Tournament } from "../model/Tournament";
 import TournamentSummary from "../model/TournamentSummary";
-import { get } from "./ServiceUtil";
+import { get, post } from "./ServiceUtil";
 
 export function getTournament(id: number): Promise<Tournament|undefined> {
     return get("/tournament?id=" + id)
@@ -16,4 +16,11 @@ export function getTournaments(): Promise<TournamentSummary[]> {
             console.log("Failed to retrieve tournaments");
             return [];
         });
+}
+
+export function submitVote(jwt: string, tournamentId: number, songIds: number[]): Promise<Response> {
+    return post("/tournament/vote", jwt, {
+        tournament: tournamentId,
+        songs: songIds
+    });
 }

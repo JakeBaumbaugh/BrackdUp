@@ -3,7 +3,7 @@ import { TransformComponent, TransformWrapper } from "react-zoom-pan-pinch";
 import Song from "../model/Song";
 import { Tournament } from "../model/Tournament";
 import { getTournament } from "../service/TournamentService";
-import SongCard from "./SongCard";
+import SongCard from "../songcard/SongCard";
 import MatchConnectorColumn from "./MatchConnectorColumn";
 
 interface BracketProps {
