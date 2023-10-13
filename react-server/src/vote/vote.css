@@ -12,22 +12,62 @@
 }
 
 .match-container .match {
+    --item-gap: 8px;
+
     display: flex;
     align-items: center;
-    gap: 8px;
+    justify-content: center;
+    gap: var(--item-gap);
 }
 
-.match-container .song-card {
+.match .song-card {
     font-size: 12pt;
     flex: 0 0 auto;
 }
 
-.match-container .match hr {
+.match .match-connector {
+    width: 60%;
+    display: flex;
+    align-items: center;
+    gap: var(--item-gap);
+}
+
+.match .match-connector > * {
+    margin: 0;
+}
+
+.match hr {
     flex: 1 0 0;
+}
+
+.match-container > button {
+    width: 40%;
+    margin: 0 auto;
 }
 
 @media only screen and (min-width: 600px) {
     .match-container {
         padding: 0 30%;
+    }
+}
+
+@media only screen and (max-width: 600px) {
+    .match-container {
+        padding: 8px;
+        gap: 4em;
+    }
+
+    .match {
+        flex-wrap: wrap;
+    }
+
+    .match::after {
+        content: ". . . . . . .";
+        position: relative;
+        top: 1.3em;
+    }
+
+    .song-card  {
+        width: 100%;
     }
 }

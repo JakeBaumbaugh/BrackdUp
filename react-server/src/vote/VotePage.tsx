@@ -13,6 +13,7 @@ export default function VotePage() {
     const [tournament, setTournament] = useTournamentContext();
     const [profile] = useProfileContext();
     const [votedSongs, setVotedSongs] = useState<Set<Song>>(new Set([]));
+    const [saving, setSaving] = useState(false);
     
     const matches = useMemo(() => {
         const round = tournament?.getCurrentRound();
@@ -55,7 +56,9 @@ export default function VotePage() {
     const submit = () => {
         if(profile?.jwt && tournament) {
             const songIds = [...votedSongs].map(song => song.id);
-            submitVote(profile.jwt, tournament.id, songIds);
+            setSaving(true);
+            submitVote(profile.jwt, tournament.id, songIds)
+                .then(() => setSaving(false));
             console.log("Submitted vote.");
         } else {
             console.log("Profile, JWT, or Tournament was not found.");
@@ -72,9 +75,11 @@ export default function VotePage() {
                             votedFor={votedSongs.has(match.song1)}
                             onClick={() => vote(match, match.song1)}
                         />
-                        <hr/>
-                        <p>VS</p>
-                        <hr/>
+                        <div className="match-connector">
+                            <hr/>
+                            <p>VS</p>
+                            <hr/>
+                        </div>
                         <SongCard
                             song={match.song2}
                             votedFor={votedSongs.has(match.song2)}
@@ -82,7 +87,11 @@ export default function VotePage() {
                         />
                     </div>
                 ))}
-                <button onClick={submit}>SUBMIT</button>
+                <button
+                    onClick={submit}
+                    className="red-button"
+                    disabled={saving}
+                >SUBMIT</button>
             </div>
         </main>
     );

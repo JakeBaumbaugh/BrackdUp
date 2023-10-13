@@ -32,7 +32,7 @@ export default function Header() {
                         </a>
                     )}
                     {tournament.getCurrentRound() && (
-                        <button className="vote-button" onClick={() => navigate(`/tournament/vote?id=${tournament.id}`)}>VOTE</button>
+                        <button className="red-button" onClick={() => navigate(`/tournament/vote?id=${tournament.id}`)}>VOTE</button>
                     )}
                 </div>
             </>}

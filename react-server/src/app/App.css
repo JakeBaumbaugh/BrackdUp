@@ -66,7 +66,7 @@ header h1:hover, header h1:focus, header h2:hover, header h2:focus {
     margin: 0 auto 0 0;
 }
 
-.vote-button {
+.red-button {
     background-color: #f01d1d;
     border: none;
     color: white;
@@ -74,18 +74,22 @@ header h1:hover, header h1:focus, header h2:hover, header h2:focus {
     font-size: 12pt;
     border-radius: 8px;
     box-shadow: 0 3px 5px rgba(0, 0, 0, 0.18);
-    
+
     display: inline-flex;
     justify-content: center;
     align-items: center;
     padding: 8px;
 
     cursor: pointer;
-    transition: all 0.2s;
+    transition: background-color 220ms;
 }
 
-.vote-button:hover, .vote-button:active {
+.red-button:hover, .red-button:active {
     background-color: #b50d0d;
+}
+
+.red-button:disabled {
+    filter: saturate(60%);
 }
 
 @media only screen and (max-width: 600px) {

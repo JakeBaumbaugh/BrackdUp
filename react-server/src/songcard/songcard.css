@@ -8,7 +8,7 @@
     width: 18em;
     gap: 1px;
     overflow: hidden;
-    transition: all 220ms;
+    transition: filter 220ms;
 }
 
 .song-card > * {
