@@ -3,9 +3,13 @@ import TournamentSummary from "../model/TournamentSummary";
 import { get, post } from "./ServiceUtil";
 
 export function getTournament(id: number): Promise<Tournament|undefined> {
-    return get("/tournament?id=" + id)
+    return get(`/tournament?id=${id}`)
         .then(res => res.json())
-        .then(res => Tournament.fromJson(res));
+        .then(res => Tournament.fromJson(res))
+        .catch(() => {
+            console.log("Failed to retrieve tournament.");
+            return undefined;
+        });
 }
 
 export function getTournaments(): Promise<TournamentSummary[]> {
@@ -13,7 +17,7 @@ export function getTournaments(): Promise<TournamentSummary[]> {
         .then(res => res.json())
         .then(res => res.map(TournamentSummary.fromJson))
         .catch(() => {
-            console.log("Failed to retrieve tournaments");
+            console.log("Failed to retrieve tournaments.");
             return [];
         });
 }
@@ -23,4 +27,13 @@ export function submitVote(jwt: string, tournamentId: number, songIds: number[])
         tournament: tournamentId,
         songs: songIds
     });
+}
+
+export function getVotes(jwt: string, tournamentId: number): Promise<number[]> {
+    return get(`/tournament/vote?id=${tournamentId}`, jwt)
+        .then(res => res.json())
+        .catch(() => {
+            console.log("Failed to retrieve votes.");
+            return [];
+        });
 }

@@ -9,20 +9,23 @@ import { Tournament } from '../model/Tournament';
 import './App.css';
 import Header from './Header';
 import VotePage from '../vote/VotePage';
+import LoginPage from './LoginPage';
 
 function App() {
     const tournamentState = useState<Tournament|null>();
     const profileState = useState<Profile>();
+    const useOneTapState = useState<boolean>(false);
+    const [profile] = profileState;
 
     return (
-        <ProfileContext.Provider value={profileState}>
+        <ProfileContext.Provider value={{profile: profileState, useOneTap: useOneTapState}}>
             <TournamentContext.Provider value={tournamentState}>
                 <div className="App">
                     <Header/>
                     <Routes>
                         <Route path="/" Component={ListPage}/>
                         <Route path="/tournament" Component={BracketPage} />
-                        <Route path="/tournament/vote" Component={VotePage} />
+                        <Route path="/tournament/vote" Component={profile?.jwt ? VotePage : LoginPage} />
                     </Routes>
                 </div>
             </TournamentContext.Provider>

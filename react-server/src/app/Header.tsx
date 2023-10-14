@@ -8,7 +8,7 @@ import { useProfileContext } from "../context/ProfileContext";
 export default function Header() {
     const navigate = useNavigate();
     const [tournament] = useTournamentContext();
-    const [profile, setProfile] = useProfileContext();
+    const {profile: [profile, setProfile], useOneTap: [useOneTap]} = useProfileContext();
 
     const onLoginSuccess = (credentialResponse: CredentialResponse) => {
         if(credentialResponse.credential) {
@@ -43,6 +43,8 @@ export default function Header() {
                         onError={() => console.log("Google Login failed.")}
                         type="icon"
                         shape="circle"
+                        useOneTap={useOneTap}
+                        cancel_on_tap_outside={false}
                     />
                 </div>
             )}

@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import SongCard from "../songcard/SongCard";
 import { useTournamentContext } from "../context/TournamentContext";
-import { getTournament, submitVote } from "../service/TournamentService";
+import { getTournament, getVotes, submitVote } from "../service/TournamentService";
 import "./vote.css";
 import Song from "../model/Song";
 import { TournamentMatch } from "../model/Tournament";
@@ -11,23 +11,30 @@ import { useProfileContext } from "../context/ProfileContext";
 export default function VotePage() {
     const [searchParams] = useSearchParams();
     const [tournament, setTournament] = useTournamentContext();
-    const [profile] = useProfileContext();
-    const [votedSongs, setVotedSongs] = useState<Set<Song>>(new Set([]));
+    const {profile: [profile]} = useProfileContext();
+    const [votedSongs, setVotedSongs] = useState<Set<number>>(new Set([]));
     const [saving, setSaving] = useState(false);
+
+    const currentRound = tournament?.getCurrentRound();
     
     const matches = useMemo(() => {
-        const round = tournament?.getCurrentRound();
-        let matches = round?.matches || [];
+        // Setup votedSongs
+        if(profile?.jwt && tournament?.id) {
+            getVotes(profile?.jwt, tournament?.id)
+                .then(songIds => setVotedSongs(new Set(songIds)));
+        }
+        // Setup matches
+        let matches = currentRound?.matches || [];
         matches =  matches.map(match => match.copy());
         matches.forEach(match => {
-            if(votedSongs.has(match.song1)) {
+            if(votedSongs.has(match.song1.id)) {
                 match.songWinner = match.song1;
-            } else if(votedSongs.has(match.song2)) {
+            } else if(votedSongs.has(match.song2.id)) {
                 match.songWinner = match.song2;
             }
         });
         return matches;
-    }, [tournament]);
+    }, [currentRound, profile?.id]);
     
     useEffect(() => {
         const id = Number.parseInt(searchParams.get("id") ?? "");
@@ -42,12 +49,12 @@ export default function VotePage() {
     const vote = (match: TournamentMatch, song: Song) => {
         setVotedSongs(votedSongs => {
             const newVotedSongs = new Set(votedSongs);
-            if(newVotedSongs.has(song)) {
-                newVotedSongs.delete(song);
+            if(newVotedSongs.has(song.id)) {
+                newVotedSongs.delete(song.id);
             } else {
-                newVotedSongs.delete(match.song1);
-                newVotedSongs.delete(match.song2);
-                newVotedSongs.add(song);
+                newVotedSongs.delete(match.song1.id);
+                newVotedSongs.delete(match.song2.id);
+                newVotedSongs.add(song.id);
             }
             return newVotedSongs;
         });
@@ -55,9 +62,8 @@ export default function VotePage() {
 
     const submit = () => {
         if(profile?.jwt && tournament) {
-            const songIds = [...votedSongs].map(song => song.id);
             setSaving(true);
-            submitVote(profile.jwt, tournament.id, songIds)
+            submitVote(profile.jwt, tournament.id, [...votedSongs])
                 .then(() => setSaving(false));
             console.log("Submitted vote.");
         } else {
@@ -72,7 +78,7 @@ export default function VotePage() {
                     <div key={match.id} className="match">
                         <SongCard
                             song={match.song1}
-                            votedFor={votedSongs.has(match.song1)}
+                            votedFor={votedSongs.has(match.song1.id)}
                             onClick={() => vote(match, match.song1)}
                         />
                         <div className="match-connector">
@@ -82,7 +88,7 @@ export default function VotePage() {
                         </div>
                         <SongCard
                             song={match.song2}
-                            votedFor={votedSongs.has(match.song2)}
+                            votedFor={votedSongs.has(match.song2.id)}
                             onClick={() => vote(match, match.song2)}
                         />
                     </div>

@@ -1,16 +1,16 @@
 const baseUrl = "https://madness.basefive.org:3001";
 
-export function get(url: string): Promise<Response> {
+export function get(url: string, jwt?: string): Promise<Response> {
     const fullUrl = baseUrl + url;
     return fetch(fullUrl, {
         method: "GET",
         headers: {
-            // "Authorization": "Basic xxxxxxxxxxxxxxx=",
+            "Authorization": jwt ? `Bearer ${jwt}` : "",
             "Accept": "application/json",
             "Content-Type": "application/json",
             // "Access-Control-Allow-Origin": "*",
         }
-    });
+    }).then(response => response.ok ? response : Promise.reject(response));
 }
 
 export function post(url: string, jwt: string, body?: any): Promise<Response> {
@@ -24,5 +24,5 @@ export function post(url: string, jwt: string, body?: any): Promise<Response> {
             "Content-Type": "application/json",
             // "Access-Control-Allow-Origin": "*",
         }
-    });
+    }).then(response => response.ok ? response : Promise.reject(response));
 }

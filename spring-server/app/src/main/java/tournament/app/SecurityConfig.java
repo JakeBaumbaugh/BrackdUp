@@ -37,8 +37,9 @@ public class SecurityConfig {
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
             .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(requests -> requests
-                .requestMatchers(HttpMethod.POST).authenticated()
                 .requestMatchers(HttpMethod.GET).permitAll()
+                .requestMatchers(HttpMethod.POST).authenticated()
+                .requestMatchers("/tournament/vote").authenticated()
             )
             .addFilterBefore(new JwtTokenFilter(profileService), UsernamePasswordAuthenticationFilter.class)
             .build();

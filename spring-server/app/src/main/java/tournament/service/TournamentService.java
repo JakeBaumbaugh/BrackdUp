@@ -51,6 +51,17 @@ public class TournamentService {
         return songRepository.findAllById(songIds);
     }
 
+    public List<Integer> getVotedSongIds(Profile profile, TournamentRound round) {
+        List<VoteId> voteIds = round.getMatches()
+                .stream()
+                .map(match -> new VoteId(profile, match))
+                .toList();
+        List<Vote> votes = voteRepository.findAllById(voteIds);
+        return votes.stream()
+                .map(vote -> vote.getSong().getId())
+                .toList();
+    }
+
     public void vote(Profile profile, TournamentRound round, List<Song> songs) {
         List<VoteId> voteIds = round.getMatches()
                 .stream()
