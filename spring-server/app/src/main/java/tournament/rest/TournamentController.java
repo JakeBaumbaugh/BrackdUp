@@ -84,6 +84,12 @@ public class TournamentController {
         return tournamentService.getVotedSongIds(profile, currentRound);
     }
 
+    @GetMapping("/tournament/new")
+    public Integer newTournament(@RequestParam String name) {
+        logger.info("GET request to create a new sample tournament.");
+        return tournamentService.generateTournament(name).getId();
+    }
+
     private ResponseStatusException create404(String message) {
         return new ResponseStatusException(HttpStatusCode.valueOf(404), message);
     }

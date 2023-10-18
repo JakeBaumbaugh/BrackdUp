@@ -24,7 +24,7 @@ import tournament.model.Profile;
 import tournament.service.ProfileService;
 
 public class JwtTokenFilter extends OncePerRequestFilter {
-    private static Logger logger = LoggerFactory.getLogger(JwtTokenFilter.class);
+    private static final Logger logger = LoggerFactory.getLogger(JwtTokenFilter.class);
 
     private ProfileService profileService;
 
@@ -40,7 +40,11 @@ public class JwtTokenFilter extends OncePerRequestFilter {
         Payload payload = null;
         if(token != null) {
             payload = parseToken(token);
-            logger.debug(payload != null ? payload.toPrettyString() : "Payload null.");
+            if(payload == null) {
+                logger.debug("Payload null.");
+            } else {
+                logger.debug("Payload found for user {}.", payload.get("name"));
+            }
         }
 
         if (payload != null) {

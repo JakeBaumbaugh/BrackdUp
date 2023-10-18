@@ -7,31 +7,41 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OrderBy;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
 @Entity
-@Getter @Setter @NoArgsConstructor @ToString @EqualsAndHashCode
+@Getter @Setter @ToString @EqualsAndHashCode
 public class TournamentRound {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
     private LocalDateTime startDate;
     private LocalDateTime endDate;
+    
+    @Enumerated(EnumType.STRING)
+    private RoundStatus status;
 
-    @OneToMany
-    @JoinColumn(name = "round_id")
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "round_id", nullable = false)
     @OrderBy("id ASC")
     private List<TournamentMatch> matches;
+
+    public TournamentRound() {
+        status = RoundStatus.CREATED;
+    }
 
     public ZonedDateTime getStartDate() {
         return startDate.atZone(ZoneId.of("America/New_York"));

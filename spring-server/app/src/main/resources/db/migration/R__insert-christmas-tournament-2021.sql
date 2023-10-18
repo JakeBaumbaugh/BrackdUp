@@ -310,6 +310,12 @@ IF (SELECT id FROM tournament WHERE name = 'Christmas Tournament 2021') IS NULL 
 
     INSERT INTO tournament_match (round_id, song_1, song_2, song_winner)
         VALUES (10, 3, 35, 3);
+    
+    PERFORM
+        setval('tournament_id_seq', 1),
+        setval('tournament_level_id_seq', 6),
+        setval('tournament_round_id_seq', 10),
+        setval('song_id_seq', 64);
 
 END IF;
 

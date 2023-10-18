@@ -110,14 +110,14 @@ IF (SELECT id FROM tournament WHERE name = 'Christmas Tournament 2021') IS NULL 
         VALUES (7, 2, 'Round 1');
     INSERT INTO tournament_level (id, tournament_id, name) --8
         VALUES (8, 2, 'Round 2');
-    -- INSERT INTO tournament_level (id, tournament_id, name) --9
-    --     VALUES (9, 2, 'Sweet Sixteen');
-    -- INSERT INTO tournament_level (id, tournament_id, name) --10
-    --     VALUES (10, 2, 'Elite Eight');
-    -- INSERT INTO tournament_level (id, tournament_id, name) --11
-    --     VALUES (11, 2, 'Final Four');
-    -- INSERT INTO tournament_level (id, tournament_id, name) --12
-    --     VALUES (12, 2, 'Holly Jolly Bowl');
+    INSERT INTO tournament_level (id, tournament_id, name) --9
+        VALUES (9, 2, 'Sweet Sixteen');
+    INSERT INTO tournament_level (id, tournament_id, name) --10
+        VALUES (10, 2, 'Elite Eight');
+    INSERT INTO tournament_level (id, tournament_id, name) --11
+        VALUES (11, 2, 'Final Four');
+    INSERT INTO tournament_level (id, tournament_id, name) --12
+        VALUES (12, 2, 'Holly Jolly Bowl');
     
     -- Tournament rounds
     INSERT INTO tournament_round (id, level_id, start_date, end_date) --11
@@ -138,14 +138,15 @@ IF (SELECT id FROM tournament WHERE name = 'Christmas Tournament 2021') IS NULL 
     INSERT INTO tournament_round (id, level_id, start_date, end_date) --16
         -- VALUES (16, 8, '2022-12-6 00:00', '2022-12-12 00:00');
         VALUES (16, 8, '2023-12-14 00:00', '2023-12-16 00:00');
-    -- INSERT INTO tournament_round (id, level_id, start_date, end_date) --17
-    --     VALUES (17, 9, '2022-12-12 00:00', '2022-12-18 00:00');
-    -- INSERT INTO tournament_round (id, level_id, start_date, end_date) --18
-    --     VALUES (18, 10, '2022-12-18 00:00', '2022-12-22 00:00');
-    -- INSERT INTO tournament_round (id, level_id, start_date, end_date) --19
-    --     VALUES (19, 11, '2022-12-22 00:00', '2022-12-24 00:00');
-    -- INSERT INTO tournament_round (id, level_id, start_date, end_date) --20
-    --     VALUES (20, 12, '2022-12-24 00:00', '2022-12-25 00:00');
+    INSERT INTO tournament_round (id, level_id, start_date, end_date) --17
+        -- VALUES (17, 9, '2022-12-12 00:00', '2022-12-18 00:00');
+        VALUES (17, 9, '2022-12-16 00:00', '2022-12-18 00:00');
+    INSERT INTO tournament_round (id, level_id, start_date, end_date) --18
+        VALUES (18, 10, '2022-12-18 00:00', '2022-12-22 00:00');
+    INSERT INTO tournament_round (id, level_id, start_date, end_date) --19
+        VALUES (19, 11, '2022-12-22 00:00', '2022-12-24 00:00');
+    INSERT INTO tournament_round (id, level_id, start_date, end_date) --20
+        VALUES (20, 12, '2022-12-24 00:00', '2022-12-25 00:00');
     
     -- Tournament matches
     INSERT INTO tournament_match (round_id, song_1, song_2, song_winner)
@@ -324,6 +325,12 @@ IF (SELECT id FROM tournament WHERE name = 'Christmas Tournament 2021') IS NULL 
 
     -- INSERT INTO tournament_match (round_id, song_1, song_2, song_winner)
     --     VALUES (10, 3, 35, 3);
+
+    PERFORM
+        setval('tournament_id_seq', 2),
+        setval('tournament_level_id_seq', 12),
+        setval('tournament_round_id_seq', 20),
+        setval('song_id_seq', 95);
 
 END IF;
 

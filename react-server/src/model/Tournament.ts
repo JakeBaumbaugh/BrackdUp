@@ -30,22 +30,22 @@ export class Tournament {
             const levelSongs = level.getSongs();
             const firstHalf = levelSongs.slice(0, halfLength);
             const secondHalf = levelSongs.slice(halfLength);
-            leftSongs.push(firstHalf);
-            rightSongs.unshift(secondHalf);
+            if(levelSongs.length > 0) {
+                leftSongs.push(firstHalf);
+                rightSongs.unshift(secondHalf);
+            }
             halfLength /= 2;
         });
         // Fill with any nulls necessary
-        if(this.levels.length > 1) {
-            if(leftSongs.at(-1)!.length != leftSongs.at(-2)!.length / 2) {
-                const toAdd = leftSongs.at(-2)!.length / 2 - leftSongs.at(-1)!.length;
-                const nulls = new Array(toAdd).fill(null);
-                leftSongs.at(-1)!.push(...nulls);
-            }
-            if(rightSongs.at(0)!.length != rightSongs.at(1)!.length / 2) {
-                const toAdd = rightSongs.at(1)!.length / 2 - rightSongs.at(0)!.length;
-                const nulls = new Array(toAdd).fill(null);
-                rightSongs.at(0)!.push(...nulls);
-            }
+        if(leftSongs.length > 1 && leftSongs.at(-1)!.length != leftSongs.at(-2)!.length / 2) {
+            const toAdd = leftSongs.at(-2)!.length / 2 - leftSongs.at(-1)!.length;
+            const nulls = new Array(toAdd).fill(null);
+            leftSongs.at(-1)!.push(...nulls);
+        }
+        if(rightSongs.length > 1 && rightSongs.at(0)!.length != rightSongs.at(1)!.length / 2) {
+            const toAdd = rightSongs.at(1)!.length / 2 - rightSongs.at(0)!.length;
+            const nulls = new Array(toAdd).fill(null);
+            rightSongs.at(0)!.push(...nulls);
         }
         while(leftSongs.at(-1)!.length != 1) {
             const nulls = new Array(leftSongs.at(-1)!.length / 2).fill(null);

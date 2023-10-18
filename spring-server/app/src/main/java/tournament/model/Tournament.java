@@ -7,8 +7,10 @@ import java.util.Optional;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
@@ -24,14 +26,14 @@ import lombok.ToString;
 @Getter @Setter @NoArgsConstructor @ToString @EqualsAndHashCode
 public class Tournament {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
     private String name;
     private Integer matchesPerRound;
     private String spotifyPlaylist;
 
-    @OneToMany
-    @JoinColumn(name = "tournament_id")
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "tournament_id", nullable = false)
     @OrderBy("id ASC")
     private List<TournamentLevel> levels;
 
@@ -61,16 +63,24 @@ public class Tournament {
     @Transient
     @JsonIgnore
     public Optional<TournamentRound> getCurrentRound() {
-        return levels
-            .stream()
-            .flatMap(level -> level.getRounds().stream())
-            .filter(round -> {
-                ZonedDateTime now = ZonedDateTime.now(ZoneId.of("America/New_York"));
-                if(round.getStartDate() == null || round.getEndDate() == null) {
-                    return false;
-                }
-                return round.getStartDate().isBefore(now) && round.getEndDate().isAfter(now);
-            })
-            .findFirst();
+        return levels.stream()
+                .flatMap(level -> level.getRounds().stream())
+                .filter(round -> {
+                    ZonedDateTime now = ZonedDateTime.now(ZoneId.of("America/New_York"));
+                    if(round.getStartDate() == null || round.getEndDate() == null) {
+                        return false;
+                    }
+                    return round.getStartDate().isBefore(now) && round.getEndDate().isAfter(now);
+                })
+                .findFirst();
+    }
+
+    @Transient
+    @JsonIgnore
+    public Optional<TournamentRound> getRound(Integer roundId) {
+        return levels.stream()
+                .flatMap(level -> level.getRounds().stream())
+                .filter(round -> round.getId().equals(roundId))
+                .findFirst();
     }
 }

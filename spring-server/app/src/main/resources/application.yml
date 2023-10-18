@@ -3,6 +3,8 @@ spring:
         url: jdbc:postgresql://localhost:3002/postgres
         username: postgres
         password: password
+    jpa:
+        properties.hibernate.enable_lazy_load_no_trans: true
 
 server:
     port: 3001
@@ -13,3 +15,9 @@ server:
         key-alias: springboot
         key-password: password
         enabled: true
+
+logging:
+    level:
+        tournament: DEBUG
+
+resolve.delay.seconds: 10
