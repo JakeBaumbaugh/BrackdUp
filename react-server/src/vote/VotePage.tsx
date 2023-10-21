@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import SongCard from "../songcard/SongCard";
 import { useTournamentContext } from "../context/TournamentContext";
 import { getTournament, getVotes, submitVote } from "../service/TournamentService";
@@ -10,6 +10,7 @@ import { useProfileContext } from "../context/ProfileContext";
 
 export default function VotePage() {
     const [searchParams] = useSearchParams();
+    const navigate = useNavigate();
     const [tournament, setTournament] = useTournamentContext();
     const {profile: [profile]} = useProfileContext();
     const [votedSongs, setVotedSongs] = useState<Set<number>>(new Set([]));
@@ -24,7 +25,7 @@ export default function VotePage() {
                 .then(songIds => setVotedSongs(new Set(songIds)));
         }
         // Setup matches
-        let matches = currentRound?.matches || [];
+        let matches = currentRound?.matches ?? [];
         matches =  matches.map(match => match.copy());
         matches.forEach(match => {
             if(votedSongs.has(match.song1.id)) {
@@ -64,7 +65,10 @@ export default function VotePage() {
         if(profile?.jwt && tournament) {
             setSaving(true);
             submitVote(profile.jwt, tournament.id, [...votedSongs])
-                .then(() => setSaving(false));
+                .then(() => {
+                    setSaving(false);
+                    navigate(`/tournament?id=${tournament.id}`);
+                });
             console.log("Submitted vote.");
         } else {
             console.log("Profile, JWT, or Tournament was not found.");
