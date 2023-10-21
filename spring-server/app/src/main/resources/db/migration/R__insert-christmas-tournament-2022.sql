@@ -129,9 +129,9 @@ IF (SELECT id FROM tournament WHERE name = 'Christmas Tournament 2021') IS NULL 
     INSERT INTO tournament_round (id, level_id, start_date, end_date) --13
         -- VALUES (13, 7, '2022-11-18 00:00', '2022-11-24 00:00');
         VALUES (13, 7, '2023-09-18 00:00', '2023-09-24 00:00');
-    INSERT INTO tournament_round (id, level_id, start_date, end_date) --14
+    INSERT INTO tournament_round (id, level_id, start_date, end_date, status) --14
         -- VALUES (14, 7, '2022-11-24 00:00', '2022-11-30 00:00');
-        VALUES (14, 7, '2023-09-24 00:00', '2023-12-12 00:00');
+        VALUES (14, 7, '2023-09-24 00:00', '2023-12-12 00:00', 'ACTIVE');
     INSERT INTO tournament_round (id, level_id, start_date, end_date) --15
         -- VALUES (15, 8, '2022-11-30 00:00', '2022-12-06 00:00');
         VALUES (15, 8, '2023-12-12 00:00', '2023-12-14 00:00');

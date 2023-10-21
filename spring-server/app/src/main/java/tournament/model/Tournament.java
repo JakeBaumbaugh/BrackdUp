@@ -1,6 +1,5 @@
 package tournament.model;
 
-import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -53,8 +52,8 @@ public class Tournament {
             TournamentMatch finalMatch = lastRound.getMatches().get(0);
             summary.setSongWinner(finalMatch.getSongWinner());
         }
-        getCurrentRound().ifPresent(currentRound ->
-            summary.setVotingEndDate(currentRound.getEndDate())
+        getActiveRound().ifPresent(activeRound ->
+            summary.setVotingEndDate(activeRound.getEndDate())
         );
         summary.setSpotifyPlaylist(spotifyPlaylist);
         return summary;
@@ -62,16 +61,30 @@ public class Tournament {
 
     @Transient
     @JsonIgnore
-    public Optional<TournamentRound> getCurrentRound() {
+    public Optional<TournamentRound> getActiveRound() {
         return levels.stream()
                 .flatMap(level -> level.getRounds().stream())
-                .filter(round -> {
-                    ZonedDateTime now = ZonedDateTime.now(ZoneId.of("America/New_York"));
-                    if(round.getStartDate() == null || round.getEndDate() == null) {
-                        return false;
-                    }
-                    return round.getStartDate().isBefore(now) && round.getEndDate().isAfter(now);
-                })
+                .filter(round -> round.getStatus() == RoundStatus.ACTIVE)
+                .findFirst();
+    }
+
+    @Transient
+    @JsonIgnore
+    public Optional<TournamentRound> getRoundByCurrentDate() {
+        ZonedDateTime now = ZonedDateTime.now();
+        return levels.stream()
+                .flatMap(level -> level.getRounds().stream())
+                .filter(round -> round.isDateInRange(now))
+                .findFirst();
+    }
+
+    @Transient
+    @JsonIgnore
+    public Optional<TournamentRound> getVotableRound() {
+        ZonedDateTime now = ZonedDateTime.now();
+        return levels.stream()
+                .flatMap(level -> level.getRounds().stream())
+                .filter(round -> round.getStatus() == RoundStatus.ACTIVE && round.isDateInRange(now))
                 .findFirst();
     }
 

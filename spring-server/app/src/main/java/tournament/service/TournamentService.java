@@ -55,9 +55,10 @@ public class TournamentService {
 
     @EventListener @Transactional
     public void scheduleInitialResolves(ContextRefreshedEvent event) {
+        // TODO: Resolve any active non-votable rounds
         // Schedule initial resolves
         tournamentRepository.findAll()
-                .forEach(tournament -> tournament.getCurrentRound()
+                .forEach(tournament -> tournament.getVotableRound()
                         .ifPresent(round -> {
                             logger.info("Scheduling initial resolve for round {} in tournament {}.", round.getId(), tournament.getId());
                             scheduleRoundResolve(tournament, round);
@@ -170,9 +171,9 @@ public class TournamentService {
 
         // Update status of resolved round and newly starting round
         round.setStatus(RoundStatus.RESOLVED);
-        tournament.getCurrentRound().ifPresent(startingRound -> {
+        tournament.getRoundByCurrentDate().ifPresent(startingRound -> {
             logger.debug("Starting round {} for tournament {}.", startingRound.getId(), tournament.getId());
-            startingRound.setStatus(RoundStatus.IN_PROGRESS);
+            startingRound.setStatus(RoundStatus.ACTIVE);
             scheduleRoundResolve(tournament, startingRound);
         });
 
@@ -243,7 +244,7 @@ public class TournamentService {
             roundMatches.add(matches.get(matchIndex));
             round.setMatches(roundMatches);
         }
-        firstLevel.getRounds().get(0).setStatus(RoundStatus.IN_PROGRESS);
+        firstLevel.getRounds().get(0).setStatus(RoundStatus.ACTIVE);
 
         tournament = tournamentRepository.save(tournament);
         logger.debug("Created tournament: {}", tournament);

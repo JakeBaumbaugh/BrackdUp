@@ -6,6 +6,7 @@ import SpotifyLogo from "../images/spotify_logo.svg";
 import "./list.css";
 import CountdownTimer from "./CountdownTimer";
 import { useTournamentContext } from "../context/TournamentContext";
+import { ClipLoader } from "react-spinners"
 
 export default function ListPage() {
     const [tournaments, setTournaments] = useState<TournamentSummary[]>([]);
@@ -26,6 +27,20 @@ export default function ListPage() {
         });
     }, []);
 
+    const refreshSummary = (id: number) => {
+        // TODO: Only refresh one summary by id
+        getTournaments().then(tournaments => {
+            const expiredTournaments: TournamentSummary[] = [];
+            const activeTourmaments: TournamentSummary[] = [];
+            const futureTournaments: TournamentSummary[] = [];
+            tournaments.forEach(t => t.songWinner ? expiredTournaments.push(t) : t.votingEndDate ? activeTourmaments.push(t) : futureTournaments.push(t));
+            expiredTournaments.sort((t1, t2) => t2.startDate.valueOf() - t1.startDate.valueOf());
+            activeTourmaments.sort((t1, t2) => t2.votingEndDate!.valueOf() - t1.votingEndDate!.valueOf());
+            futureTournaments.sort((t1, t2) => t2.startDate.valueOf() - t1.startDate.valueOf());
+            setTournaments([...activeTourmaments, ...futureTournaments, ...expiredTournaments]);
+        });
+    };
+
     const redirect = (id: number) => {
         navigate(`/tournament?id=${id}`);
     };
@@ -36,15 +51,7 @@ export default function ListPage() {
                 <div className="tournament-card" key={t.id}>
                     <div className="tournament-card-content" onClick={() => redirect(t.id)}>
                         <h2>{t.name}</h2>
-                        { t.songWinner ? (
-                            // Expired tournament
-                            <p>Winner: {t.songWinner.title}</p>
-                        ) :  t.votingEndDate ? (
-                            // Active tournament
-                            <CountdownTimer endDate={t.votingEndDate}/>
-                        ) : (
-                            <p>Tournament begins: {t.startDate.toLocaleDateString()}</p>
-                        )}
+                        <TournamentCardContent summary={t} refreshSummary={() => refreshSummary(t.id)}/>
                     </div>
                     { (t.spotifyPlaylist || t.votingEndDate) && (
                         <div className="button-row">
@@ -64,4 +71,51 @@ export default function ListPage() {
             ))}
         </main>
     );
+}
+
+interface TournamentCardProps {
+    summary: TournamentSummary;
+    refreshSummary: () => void;
+}
+
+function TournamentCardContent({summary, refreshSummary}: TournamentCardProps) {
+    const [loading, setLoading] = useState(false);
+    const date = new Date();
+
+    useEffect(() => {
+        setLoading(!summary.votingEndDate || summary.votingEndDate < date);
+    }, [summary.votingEndDate]);
+
+    // Tournament over
+    if(summary.songWinner) {
+        return <>
+            <p>Winner: {summary.songWinner.title}</p>
+        </>
+    }
+
+    // Tournament yet to begin
+    if(date < summary.startDate) {
+        return <>
+            <p>Tournament begins: {summary.startDate.toLocaleDateString()}</p>
+        </>
+    }
+
+    // Tournament in progress
+
+    // Round end processing
+    if(loading) {
+        return <>
+            <ClipLoader/>
+        </>
+    }
+
+    const onComplete = () => {
+        setLoading(true);
+        setTimeout(() => refreshSummary(), 15000);
+    };
+
+    // Voting open
+    return <>
+        <CountdownTimer endDate={summary.votingEndDate!} onComplete={onComplete}/>
+    </>
 }

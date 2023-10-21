@@ -20,6 +20,8 @@ export default function Header() {
         }
     };
 
+    const activeRound = tournament?.getActiveRound();
+
     return (
         <header className={tournament ? "with-tournament" : ""}>
             <h1 onClick={() => navigate("/")}>Music Madness</h1>
@@ -31,8 +33,12 @@ export default function Header() {
                             <img src={SpotifyLogo} alt="Spotify Logo"/>
                         </a>
                     )}
-                    {tournament.getCurrentRound() && (
-                        <button className="red-button" onClick={() => navigate(`/tournament/vote?id=${tournament.id}`)}>VOTE</button>
+                    {activeRound && (
+                        <button 
+                            className="red-button"
+                            onClick={() => navigate(`/tournament/vote?id=${tournament.id}`)}
+                            disabled={!activeRound.isDateInRange(new Date())}
+                        >VOTE</button>
                     )}
                 </div>
             </>}

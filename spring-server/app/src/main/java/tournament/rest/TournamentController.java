@@ -61,14 +61,14 @@ public class TournamentController {
 
         Tournament tournament = tournamentService.getTournament(body.getTournament())
                 .orElseThrow(() -> create400("Tournament not found."));
-        TournamentRound currentRound = tournament.getCurrentRound()
+        TournamentRound activeRound = tournament.getVotableRound()
                 .orElseThrow(() -> create400("Tournament does not have an active round."));
         List<Song> songs = tournamentService.getSongs(body.getSongs());
-        if(!currentRound.validSongVotes(songs)) {
+        if(!activeRound.validSongVotes(songs)) {
             throw create400("Songs did not match active round.");
         }
 
-        tournamentService.vote(profile, currentRound, songs);
+        tournamentService.vote(profile, activeRound, songs);
     }
 
     @GetMapping("/tournament/vote")
@@ -78,10 +78,10 @@ public class TournamentController {
 
         Tournament tournament = tournamentService.getTournament(id)
                 .orElseThrow(() -> create400("Tournament not found."));
-        TournamentRound currentRound = tournament.getCurrentRound()
+        TournamentRound activeRound = tournament.getVotableRound()
                 .orElseThrow(() -> create400("Tournament does not have an active round."));
         
-        return tournamentService.getVotedSongIds(profile, currentRound);
+        return tournamentService.getVotedSongIds(profile, activeRound);
     }
 
     @GetMapping("/tournament/new")

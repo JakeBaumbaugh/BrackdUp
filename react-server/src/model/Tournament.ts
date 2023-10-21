@@ -75,9 +75,15 @@ export class Tournament {
         return finalMatches[0].songWinner ?? null;
     }
 
-    getCurrentRound(): TournamentRound|undefined {
+    getActiveRound(): TournamentRound|undefined {
         const rounds = this.levels.flatMap(level => level.rounds);
         return rounds.find(round => round.isActive());
+    }
+
+    getVotableRound(): TournamentRound|undefined {
+        const now = new Date();
+        const activeRound = this.getActiveRound();
+        return activeRound?.isDateInRange(now) ? activeRound : undefined;
     }
 }
 
@@ -102,22 +108,26 @@ export class TournamentLevel {
     }
 }
 
+export type RoundStatus = "CREATED" | "ACTIVE" | "RESOLVED";
+
 export class TournamentRound {
     id: number;
     startDate: Date;
     endDate: Date;
     matches: TournamentMatch[];
+    status: RoundStatus;
 
-    constructor(id: number, startDate: Date, endDate: Date, matches: TournamentMatch[]) {
+    constructor(id: number, startDate: Date, endDate: Date, matches: TournamentMatch[], status: RoundStatus) {
         this.id = id;
         this.startDate = startDate;
         this.endDate = endDate;
         this.matches = matches;
+        this.status = status;
     }
 
     static fromJson(data: any): TournamentRound {
         const matches = data.matches.map((matchData: any) => TournamentMatch.fromJson(matchData));
-        return new TournamentRound(data.id, new Date(data.startDate), new Date(data.endDate), matches);
+        return new TournamentRound(data.id, new Date(data.startDate), new Date(data.endDate), matches, data.status);
     }
 
     getSongs(): Song[] {
@@ -128,11 +138,14 @@ export class TournamentRound {
     }
 
     isActive(): boolean {
+        return this.status == "ACTIVE" && this.isDateInRange(new Date());
+    }
+
+    isDateInRange(date: Date): boolean {
         if(!this.startDate || !this.endDate) {
             return false;
         }
-        const now = new Date();
-        return this.startDate < now && now < this.endDate;
+        return this.startDate < date && date < this.endDate;
     }
 }
 

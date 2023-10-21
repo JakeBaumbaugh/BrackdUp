@@ -15,7 +15,7 @@ export default function VotePage() {
     const [votedSongs, setVotedSongs] = useState<Set<number>>(new Set([]));
     const [saving, setSaving] = useState(false);
 
-    const currentRound = tournament?.getCurrentRound();
+    const currentRound = tournament?.getVotableRound();
     
     const matches = useMemo(() => {
         // Setup votedSongs
