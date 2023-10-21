@@ -96,12 +96,16 @@ public class TournamentService {
     }
 
     public void vote(Profile profile, TournamentRound round, List<Song> songs) {
+        // Cognitive and runtime complexity could be cleaned up here, refactor if needed
+
+        // Get old vote objects
         List<VoteId> voteIds = round.getMatches()
                 .stream()
                 .map(match -> new VoteId(profile, match))
                 .toList();
         List<Vote> oldVotes = voteRepository.findAllById(voteIds);
 
+        // Create new vote objects
         List<Vote> votes = songs.stream().map(song -> {
             TournamentMatch match = round.getMatches()
                     .stream()
@@ -125,7 +129,14 @@ public class TournamentService {
             return vote;
         }).toList();
 
+        // Save new vote objects
         voteRepository.saveAll(votes);
+
+        // Remove old vote objects without new votes for its match
+        List<Vote> removeVotes = oldVotes.stream()
+                .filter(oldVote -> votes.stream().noneMatch(vote -> vote.getMatch().equals(oldVote.getMatch())))
+                .toList();
+        voteRepository.deleteAll(removeVotes);
     }
 
     private void resolveRound(Tournament tournament, TournamentRound round) {
