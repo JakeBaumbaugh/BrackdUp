@@ -15,27 +15,17 @@ export default function ListPage() {
 
     useEffect(() => {
         setTournament(null);
-        getTournaments().then(tournaments => {
-            const expiredTournaments: TournamentSummary[] = [];
-            const activeTourmaments: TournamentSummary[] = [];
-            const futureTournaments: TournamentSummary[] = [];
-            tournaments.forEach(t => t.songWinner ? expiredTournaments.push(t) : t.votingEndDate ? activeTourmaments.push(t) : futureTournaments.push(t));
-            expiredTournaments.sort((t1, t2) => t2.startDate.valueOf() - t1.startDate.valueOf());
-            activeTourmaments.sort((t1, t2) => t2.votingEndDate!.valueOf() - t1.votingEndDate!.valueOf());
-            futureTournaments.sort((t1, t2) => t2.startDate.valueOf() - t1.startDate.valueOf());
-            setTournaments([...activeTourmaments, ...futureTournaments, ...expiredTournaments]);
-        });
+        getTournamentSummaries();
     }, []);
 
-    const refreshSummary = (id: number) => {
-        // TODO: Only refresh one summary by id
+    const getTournamentSummaries = () => {
         getTournaments().then(tournaments => {
             const expiredTournaments: TournamentSummary[] = [];
             const activeTourmaments: TournamentSummary[] = [];
             const futureTournaments: TournamentSummary[] = [];
             tournaments.forEach(t => t.songWinner ? expiredTournaments.push(t) : t.votingEndDate ? activeTourmaments.push(t) : futureTournaments.push(t));
-            expiredTournaments.sort((t1, t2) => t2.startDate.valueOf() - t1.startDate.valueOf());
-            activeTourmaments.sort((t1, t2) => t2.votingEndDate!.valueOf() - t1.votingEndDate!.valueOf());
+            expiredTournaments.sort((t1, t2) => t2.endDate!.valueOf() - t1.endDate!.valueOf());
+            activeTourmaments.sort((t1, t2) => t1.votingEndDate!.valueOf() - t2.votingEndDate!.valueOf());
             futureTournaments.sort((t1, t2) => t2.startDate.valueOf() - t1.startDate.valueOf());
             setTournaments([...activeTourmaments, ...futureTournaments, ...expiredTournaments]);
         });
@@ -51,7 +41,7 @@ export default function ListPage() {
                 <div className="tournament-card" key={t.id}>
                     <div className="tournament-card-content" onClick={() => redirect(t.id)}>
                         <h2>{t.name}</h2>
-                        <TournamentCardContent summary={t} refreshSummary={() => refreshSummary(t.id)}/>
+                        <TournamentCardContent summary={t} refreshSummary={() => getTournamentSummaries()}/>
                     </div>
                     { (t.spotifyPlaylist || t.votingEndDate) && (
                         <div className="button-row">
