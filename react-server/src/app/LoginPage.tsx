@@ -3,12 +3,14 @@ import { useProfileContext } from "../context/ProfileContext";
 import "./login.css";
 
 export default function LoginPage() {
-    const {useOneTap: [_, setUseOneTap]} = useProfileContext();
+    const {profile: [profile], useOneTap: [_, setUseOneTap]} = useProfileContext();
 
     useEffect(() => {
-        setUseOneTap(true);
-        return () => setUseOneTap(false);
-    }, []);
+        if(profile === null) {
+            setUseOneTap(true);
+            return () => setUseOneTap(false);
+        }
+    }, [profile]);
 
     return (
         <main className="login-page">

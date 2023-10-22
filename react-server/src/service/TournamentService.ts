@@ -22,15 +22,15 @@ export function getTournaments(): Promise<TournamentSummary[]> {
         });
 }
 
-export function submitVote(jwt: string, tournamentId: number, songIds: number[]): Promise<Response> {
-    return post("/tournament/vote", jwt, {
+export function submitVote(tournamentId: number, songIds: number[]): Promise<Response> {
+    return post("/tournament/vote", {
         tournament: tournamentId,
         songs: songIds
     });
 }
 
-export function getVotes(jwt: string, tournamentId: number): Promise<number[]> {
-    return get(`/tournament/vote?id=${tournamentId}`, jwt)
+export function getVotes(tournamentId: number): Promise<number[]> {
+    return get(`/tournament/vote?id=${tournamentId}`)
         .then(res => res.json())
         .catch(() => {
             console.log("Failed to retrieve votes.");

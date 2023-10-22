@@ -6,13 +6,11 @@ import { getTournament, getVotes, submitVote } from "../service/TournamentServic
 import "./vote.css";
 import Song from "../model/Song";
 import { TournamentMatch } from "../model/Tournament";
-import { useProfileContext } from "../context/ProfileContext";
 
 export default function VotePage() {
     const [searchParams] = useSearchParams();
     const navigate = useNavigate();
     const [tournament, setTournament] = useTournamentContext();
-    const {profile: [profile]} = useProfileContext();
     const [votedSongs, setVotedSongs] = useState<Set<number>>(new Set([]));
     const [saving, setSaving] = useState(false);
 
@@ -20,8 +18,8 @@ export default function VotePage() {
     
     const matches = useMemo(() => {
         // Setup votedSongs
-        if(profile?.jwt && tournament?.id) {
-            getVotes(profile?.jwt, tournament?.id)
+        if(tournament?.id) {
+            getVotes(tournament.id)
                 .then(songIds => setVotedSongs(new Set(songIds)));
         }
         // Setup matches
@@ -35,7 +33,7 @@ export default function VotePage() {
             }
         });
         return matches;
-    }, [currentRound, profile?.id]);
+    }, [currentRound]);
     
     useEffect(() => {
         const id = Number.parseInt(searchParams.get("id") ?? "");
@@ -62,16 +60,16 @@ export default function VotePage() {
     }
 
     const submit = () => {
-        if(profile?.jwt && tournament) {
+        if(tournament) {
             setSaving(true);
-            submitVote(profile.jwt, tournament.id, [...votedSongs])
+            submitVote(tournament.id, [...votedSongs])
                 .then(() => {
                     setSaving(false);
                     navigate(`/tournament?id=${tournament.id}`);
                 });
             console.log("Submitted vote.");
         } else {
-            console.log("Profile, JWT, or Tournament was not found.");
+            console.log("Submitting vote failed.");
         }
     }
 

@@ -13,10 +13,8 @@ export default function Header() {
     const onLoginSuccess = (credentialResponse: CredentialResponse) => {
         if(credentialResponse.credential) {
             login(credentialResponse.credential)
-                .then(profile => {
-                    profile.jwt = credentialResponse.credential;
-                    setProfile(profile);
-                });
+                .then(profile => setProfile(profile))
+                .catch(() => setProfile(null));
         }
     };
 

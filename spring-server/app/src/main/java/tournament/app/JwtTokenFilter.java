@@ -1,6 +1,7 @@
 package tournament.app;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -18,6 +19,7 @@ import com.google.api.client.json.gson.GsonFactory;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import tournament.model.Profile;
@@ -34,8 +36,9 @@ public class JwtTokenFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        String token = getToken(request);
-        logger.debug("Found Bearer token: {}", token);
+        String cookieToken = getTokenFromCookie(request);
+        String token = cookieToken != null ? cookieToken : getTokenFromHeader(request);
+        logger.debug("Found token: {}", token);
 
         Payload payload = null;
         if(token != null) {
@@ -52,15 +55,32 @@ public class JwtTokenFilter extends OncePerRequestFilter {
             Authentication auth = new PreAuthenticatedAuthenticationToken(profile, token);
             auth.setAuthenticated(true);
             SecurityContextHolder.getContext().setAuthentication(auth);
+            if(cookieToken == null) {
+                response.addCookie(buildCookie(token));
+            }
+        } else {
+            response.addCookie(buildCookie(null));
         }
 
         filterChain.doFilter(request, response);
     }
     
-    private String getToken(HttpServletRequest request) {
+    private String getTokenFromHeader(HttpServletRequest request) {
         String authHeader = request.getHeader("Authorization");
-        if(authHeader != null && authHeader.startsWith("Bearer ")) {
+        if (authHeader != null && authHeader.startsWith("Bearer ")) {
             return authHeader.substring(7);
+        }
+        return null;
+    }
+
+    private String getTokenFromCookie(HttpServletRequest request) {
+        Cookie[] cookies = request.getCookies();
+        if (cookies != null) {
+            return Arrays.stream(cookies)
+                    .filter(cookie -> cookie.getName().equals("jwt"))
+                    .findFirst()
+                    .map(Cookie::getValue)
+                    .orElse(null);
         }
         return null;
     }
@@ -75,5 +95,15 @@ public class JwtTokenFilter extends OncePerRequestFilter {
         } catch (Exception e) {
             return null;
         }
+    }
+
+    private Cookie buildCookie(String jwt) {
+        int maxAgeSeconds = jwt != null ? (60 * 60 * 24 * 7) : 0;
+        Cookie cookie = new Cookie("jwt", jwt);
+        cookie.setHttpOnly(true);
+        cookie.setSecure(true);
+        cookie.setMaxAge(maxAgeSeconds);
+        logger.debug("Built jwt cookie: {}", cookie);
+        return cookie;
     }
 }
