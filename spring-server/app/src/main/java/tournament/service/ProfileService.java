@@ -31,6 +31,8 @@ public class ProfileService {
                     Profile profile = Profile.fromPayload(payload);
                     if(admins.contains(payload.getEmail())) {
                         profile.setRole(ProfileRole.ADMIN);
+                    } else {
+                        profile.setRole(ProfileRole.USER);
                     }
                     return profileRepository.save(profile);
                 });
