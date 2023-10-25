@@ -52,22 +52,22 @@
 }
 
 @media only screen and (max-width: 600px) {
-    .match-container {
+    .vote-page .match-container {
         padding: 8px;
         gap: 4em;
     }
 
-    .match {
+    .vote-page .match {
         flex-wrap: wrap;
     }
 
-    .match::after {
+    .vote-page .match::after {
         content: ". . . . . . .";
         position: relative;
         top: 1.3em;
     }
 
-    .song-card  {
+    .vote-page .song-card  {
         width: 100%;
     }
 }

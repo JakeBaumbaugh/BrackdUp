@@ -124,9 +124,10 @@ header h1:hover, header h1:focus, header h2:hover, header h2:focus {
         font-size: 10pt;
     }
 
-    .tournament-info img {
+    .tournament-info img, .tournament-info svg {
         width: 3em;
         height: 3em;
+        flex-shrink: 0;
     }
 }
 
