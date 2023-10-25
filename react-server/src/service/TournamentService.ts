@@ -1,6 +1,6 @@
 import { Tournament } from "../model/Tournament";
 import TournamentSummary from "../model/TournamentSummary";
-import { get, post } from "./ServiceUtil";
+import { delet, get, post } from "./ServiceUtil";
 
 export function getTournament(id: number): Promise<Tournament|undefined> {
     return get(`/tournament?id=${id}`)
@@ -36,4 +36,8 @@ export function getVotes(tournamentId: number): Promise<number[]> {
             console.log("Failed to retrieve votes.");
             return [];
         });
+}
+
+export function deleteTournament(tournamentId: number): Promise<Response> {
+    return delet(`/tournament/delete?id=${tournamentId}`);
 }

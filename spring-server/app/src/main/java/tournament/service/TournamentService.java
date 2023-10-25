@@ -80,6 +80,10 @@ public class TournamentService {
             .toList();
     }
 
+    public void deleteTournament(Integer id) {
+        tournamentRepository.deleteById(id);
+    }
+
     public List<Song> getSongs(List<Integer> songIds) {
         return songRepository.findAllById(songIds);
     }

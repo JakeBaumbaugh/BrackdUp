@@ -51,6 +51,7 @@ header h1:hover, header h1:focus, header h2:hover, header h2:focus {
 .tournament-info img:hover, .tournament-info img:active, .tournament-info svg:hover, .tournament-info svg:active {
     filter: brightness(65%);
     transform: rotate(10deg);
+    cursor: pointer;
 }
 
 .tournament-info {

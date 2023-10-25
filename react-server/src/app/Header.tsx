@@ -4,6 +4,8 @@ import { useTournamentContext } from "../context/TournamentContext";
 import SpotifyLogo from "../images/spotify_logo.svg";
 import { login } from "../service/UserService";
 import { useProfileContext } from "../context/ProfileContext";
+import { MdDeleteOutline } from "react-icons/md";
+import { deleteTournament } from "../service/TournamentService";
 
 export default function Header() {
     const navigate = useNavigate();
@@ -18,6 +20,15 @@ export default function Header() {
         }
     };
 
+    const onDelete = () => {
+        // TODO: Modal confirmation
+        if(tournament) {
+            deleteTournament(tournament.id)
+                .then(() => navigate("/"));
+            // TODO: Display error if tournament delete failed
+        }
+    }
+
     const activeRound = tournament?.getActiveRound();
 
     return (
@@ -28,7 +39,7 @@ export default function Header() {
                     <h2 onClick={() => navigate(`/tournament?id=${tournament.id}`)}>{tournament.name}</h2>
                     {tournament.spotifyPlaylist && (
                         <a href={tournament.spotifyPlaylist} target="_blank">
-                            <img src={SpotifyLogo} alt="Spotify Logo"/>
+                            <img src={SpotifyLogo} alt="Spotify Button"/>
                         </a>
                     )}
                     {activeRound && (
@@ -37,6 +48,9 @@ export default function Header() {
                             onClick={() => navigate(`/tournament/vote?id=${tournament.id}`)}
                             disabled={!activeRound.isDateInRange(new Date())}
                         >VOTE</button>
+                    )}
+                    {profile?.canDeleteTournament(tournament) && (
+                        <MdDeleteOutline onClick={onDelete}/>
                     )}
                 </div>
             </>}

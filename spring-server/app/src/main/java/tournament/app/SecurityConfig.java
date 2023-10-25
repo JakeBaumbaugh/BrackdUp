@@ -39,6 +39,7 @@ public class SecurityConfig {
             .authorizeHttpRequests(requests -> requests
                 .requestMatchers(HttpMethod.GET).permitAll()
                 .requestMatchers(HttpMethod.POST).authenticated()
+                .requestMatchers(HttpMethod.DELETE).authenticated()
                 .requestMatchers("/tournament/vote").authenticated()
             )
             .addFilterBefore(new JwtTokenFilter(profileService), UsernamePasswordAuthenticationFilter.class)
@@ -48,7 +49,7 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         final CorsConfiguration config = new CorsConfiguration();
         config.setAllowedOrigins(List.of("https://madness.basefive.org:3000"));
-        config.setAllowedMethods(List.of("HEAD", "GET", "POST", "OPTIONS"));
+        config.setAllowedMethods(List.of("HEAD", "GET", "POST", "OPTIONS", "DELETE"));
         config.setAllowedHeaders(List.of("Authorization", "Cache-Control", "Content-Type"));
         config.setAllowCredentials(true);
 

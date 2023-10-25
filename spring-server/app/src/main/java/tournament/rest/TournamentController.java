@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -88,6 +89,18 @@ public class TournamentController {
     public Integer newTournament(@RequestParam String name) {
         logger.info("GET request to create a new sample tournament.");
         return tournamentService.generateTournament(name).getId();
+    }
+
+    @DeleteMapping("/tournament/delete")
+    public void deleteTournament(Authentication authentication, @RequestParam Integer id) {
+        Profile profile = (Profile) authentication.getPrincipal();
+        logger.info("DELETE request to delete tournament id={} from user {}", id, profile.getName());
+
+        Tournament tournament = tournamentService.getTournament(id)
+                .orElseThrow(() -> create400("Tournament not found."));
+        if(profile.canDeleteTournament(tournament)) {
+            tournamentService.deleteTournament(id);
+        }
     }
 
     private ResponseStatusException create404(String message) {

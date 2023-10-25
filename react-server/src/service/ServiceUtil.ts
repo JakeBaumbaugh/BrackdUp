@@ -28,3 +28,17 @@ export function post(url: string, body?: any, jwt?: string): Promise<Response> {
         }
     }).then(response => response.ok ? response : Promise.reject(response));
 }
+
+export function delet(url: string, jwt?: string): Promise<Response> {
+    const fullUrl = baseUrl + url;
+    return fetch(fullUrl, {
+        method: "DELETE",
+        credentials: "include",
+        headers: {
+            "Authorization": `Bearer ${jwt}`,
+            "Accept": "application/json",
+            "Content-Type": "application/json",
+            // "Access-Control-Allow-Origin": "https://madness.basefive.org/3001",
+        }
+    }).then(response => response.ok ? response : Promise.reject(response));
+}

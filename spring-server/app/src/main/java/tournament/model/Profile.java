@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken.Payload;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -24,6 +26,8 @@ public class Profile {
     private String firstName;
     private String lastName;
     private String pictureLink;
+    @Enumerated(EnumType.STRING)
+    private ProfileRole role;
 
     public static Profile fromPayload(Payload googlePayload) {
         Profile profile = new Profile();
@@ -44,5 +48,12 @@ public class Profile {
             return lastName;
         }
         return firstName + " " + lastName;
+    }
+
+    @Transient
+    @JsonIgnore
+    public boolean canDeleteTournament(Tournament tournament) {
+        // TODO: tournament managers that can delete tournament
+        return role == ProfileRole.ADMIN;
     }
 }

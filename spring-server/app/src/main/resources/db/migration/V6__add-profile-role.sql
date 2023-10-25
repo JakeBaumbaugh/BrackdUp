@@ -1,0 +1,3 @@
+-- V6__add-profile-role
+
+ALTER TABLE profile ADD COLUMN IF NOT EXISTS role TEXT NOT NULL DEFAULT 'USER';
