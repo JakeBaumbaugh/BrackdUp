@@ -1,8 +1,9 @@
 .list-page {
-    padding: 24px;
-    display: flex;
+    padding: 1.5em 6em;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    grid-auto-rows: min-content;
     gap: 24px;
-    flex-wrap: wrap;
 }
 
 .list-page > * {

@@ -42,6 +42,10 @@ header h1:hover, header h1:focus, header h2:hover, header h2:focus {
     transform: skewX(-10deg);
 }
 
+main {
+    background-color: #e6e3df;
+}
+
 .tournament-info img, .tournament-info svg {
     width: 2em;
     height: 2em;

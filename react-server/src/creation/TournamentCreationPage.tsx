@@ -39,21 +39,23 @@ export default function TournamentCreationPage() {
     }
 
     return (
-        <form className="creation-page" onSubmit={handleSubmit}>
-            {content}
-            <div className="button-row">
-                <button
-                    type="button"
-                    onClick={() => setPage(page => page - 1)}
-                    disabled={page <= 0}
-                >BACK</button>
-                <button
-                    type={page === 2 ? "submit" : "button"}
-                    onClick={page === 2 ? undefined : () => setPage(page => page + 1)}
-                    key={page === 2 ? "submit-button" : "next-button"}
-                >{page === 2 ? "SUBMIT" : "NEXT"}</button>
-            </div>
-        </form>
+        <main className="creation-page">
+            <form onSubmit={handleSubmit}>
+                {content}
+                <div className="button-row">
+                    <button
+                        type="button"
+                        onClick={() => setPage(page => page - 1)}
+                        disabled={page <= 0}
+                    >BACK</button>
+                    <button
+                        type={page === 2 ? "submit" : "button"}
+                        onClick={page === 2 ? undefined : () => setPage(page => page + 1)}
+                        key={page === 2 ? "submit-button" : "next-button"}
+                    >{page === 2 ? "SUBMIT" : "NEXT"}</button>
+                </div>
+            </form>
+        </main>
     );
 }
 
