@@ -39,7 +39,15 @@
     text-align: center;
 }
 
-.tournament-card .tournament-card-content:hover, .tournament-card .tournament-card-content:focus {
+.tournament-card .tournament-card-content, 
+.tournament-card.create-tournament-card {
+    transition: background-color 220ms;
+}
+
+.tournament-card .tournament-card-content:hover, 
+.tournament-card .tournament-card-content:focus,
+.tournament-card.create-tournament-card:hover,
+.tournament-card.create-tournament-card:focus {
     background-color: var(--card-hover-color);
 }
 
@@ -66,4 +74,14 @@
 
 .tournament-card .button-row img {
     height: 2.4em;
+}
+
+.tournament-card.create-tournament-card {
+    justify-content: center;
+}
+
+.tournament-card.create-tournament-card > p {
+    font-size: 24pt;
+    font-weight: bold;
+    margin: -0.5em auto 0;
 }

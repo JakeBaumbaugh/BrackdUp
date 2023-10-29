@@ -3,6 +3,7 @@ package tournament.model;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -62,6 +63,13 @@ public class TournamentRound {
 
     public void setEndDate(ZonedDateTime endDate) {
         this.endDate = endDate.withZoneSameInstant(EASTERN).toLocalDateTime();
+    }
+
+    public void addMatch(TournamentMatch match) {
+        if (matches == null) {
+            matches = new ArrayList<>(1);
+        }
+        matches.add(match);
     }
 
     public boolean validSongVotes(List<Song> songs) {

@@ -7,10 +7,12 @@ import "./list.css";
 import CountdownTimer from "./CountdownTimer";
 import { useTournamentContext } from "../context/TournamentContext";
 import { ClipLoader } from "react-spinners"
+import { useProfileContext } from "../context/ProfileContext";
 
 export default function ListPage() {
     const [tournaments, setTournaments] = useState<TournamentSummary[]>([]);
     const [_, setTournament] = useTournamentContext();
+    const {profile: [profile]} = useProfileContext();
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -59,6 +61,11 @@ export default function ListPage() {
                     )}
                 </div>
             ))}
+            {profile?.role === "ADMIN" && (
+                <div className="tournament-card create-tournament-card" onClick={() => navigate("/tournament/new")}>
+                    <p>+</p>
+                </div>
+            )}
         </main>
     );
 }

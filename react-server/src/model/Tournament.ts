@@ -117,12 +117,12 @@ export class TournamentRound {
     matches: TournamentMatch[];
     status: RoundStatus;
 
-    constructor(id: number, startDate: Date, endDate: Date, matches: TournamentMatch[], status: RoundStatus) {
+    constructor(id: number, startDate: Date, endDate: Date, matches: TournamentMatch[], status?: RoundStatus) {
         this.id = id;
         this.startDate = startDate;
         this.endDate = endDate;
         this.matches = matches;
-        this.status = status;
+        this.status = status ?? "CREATED";
     }
 
     static fromJson(data: any): TournamentRound {

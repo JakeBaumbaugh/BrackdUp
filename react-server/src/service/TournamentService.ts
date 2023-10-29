@@ -1,4 +1,6 @@
+import Song from "../model/Song";
 import { Tournament } from "../model/Tournament";
+import TournamentBuilder from "../model/TournamentBuilder";
 import TournamentSummary from "../model/TournamentSummary";
 import { delet, get, post } from "./ServiceUtil";
 
@@ -40,4 +42,18 @@ export function getVotes(tournamentId: number): Promise<number[]> {
 
 export function deleteTournament(tournamentId: number): Promise<Response> {
     return delet(`/tournament/delete?id=${tournamentId}`);
+}
+
+export function searchSongs(title: string, artist: string): Promise<Song[]> {
+    return get(`/song/search?title=${title}&artist=${artist}`)
+        .then(res => res.json())
+        .then(res => res as Song[])
+        .catch(() => {
+            console.log("Failed to search songs.");
+            return [];
+        });
+}
+
+export function createTournament(builder: TournamentBuilder): Promise<Response> {
+    return post("/tournament/create", builder);
 }

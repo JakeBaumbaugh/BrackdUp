@@ -3,7 +3,7 @@
 DO $$
 BEGIN
 
-IF (SELECT id FROM tournament WHERE name = 'Christmas Tournament 2021') IS NULL THEN
+IF (SELECT id FROM tournament WHERE name = '2022 Christmas Tournament') IS NULL THEN
 
     INSERT INTO tournament (id, name, spotify_playlist)
         VALUES (2, '2022 Christmas Tournament', 'https://open.spotify.com/playlist/5foOh9yqbEqD3x6VJjwiBm?si=35d9f4393f424b89');

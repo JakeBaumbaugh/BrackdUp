@@ -3,7 +3,7 @@
 DO $$
 BEGIN
 
-IF (SELECT id FROM tournament WHERE name = 'Christmas Tournament 2021') IS NULL THEN
+IF (SELECT id FROM tournament WHERE name = '2021 Christmas Tournament') IS NULL THEN
 
     INSERT INTO tournament (id, name, spotify_playlist)
         VALUES (1, '2021 Christmas Tournament', 'https://open.spotify.com/playlist/26ylmAx4VJHAqdMTBljcoF?si=9fca04e1037248ea');
@@ -96,7 +96,7 @@ IF (SELECT id FROM tournament WHERE name = 'Christmas Tournament 2021') IS NULL 
     INSERT INTO song (id, title, artist, spotify) --43
         VALUES (43, 'Winter Wonderland', 'Leona Lewis', 'https://open.spotify.com/track/1YBItUnKj01KBXhpFtvINp?si=e50c797966824aec');
     INSERT INTO song (id, title, artist, spotify) --44
-        VALUES (44, 'Santy Baby', 'Eartha Kitt', 'https://open.spotify.com/track/1foCxQtxBweJtZmdxhEHVO?si=ad425c8494bd40c9');
+        VALUES (44, 'Santa Baby', 'Eartha Kitt', 'https://open.spotify.com/track/1foCxQtxBweJtZmdxhEHVO?si=ad425c8494bd40c9');
     INSERT INTO song (id, title, artist, spotify) --45
         VALUES (45, 'Mary, Did You Know?', 'Pentatonix', 'https://open.spotify.com/track/4z8sz6E4YyFuEkv5o7IJni?si=a2ea0efe6bdc4c25');
     INSERT INTO song (id, title, artist, spotify) --46

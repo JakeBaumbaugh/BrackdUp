@@ -19,6 +19,7 @@ import org.springframework.web.server.ResponseStatusException;
 import tournament.model.Profile;
 import tournament.model.Song;
 import tournament.model.Tournament;
+import tournament.model.TournamentBuilder;
 import tournament.model.TournamentRound;
 import tournament.model.TournamentSummary;
 import tournament.rest.request.VoteRequestBody;
@@ -101,6 +102,22 @@ public class TournamentController {
         if(profile.canDeleteTournament(tournament)) {
             tournamentService.deleteTournament(id);
         }
+    }
+
+    @PostMapping("/tournament/create")
+    public void createTournament(Authentication authentication, @RequestBody TournamentBuilder builder) {
+        Profile profile = (Profile) authentication.getPrincipal();
+        logger.info("POST request to create tournament {} from user {}", builder.getName(), profile.getName());
+
+        if(profile.canCreateTournament()) {
+            tournamentService.createTournament(builder);
+        }
+    }
+
+    @GetMapping("/song/search")
+    public List<Song> searchSongs(@RequestParam(required = false) String title, @RequestParam(required = false) String artist) {
+        logger.info("GET request to search songs for title={} and artist={}", title, artist);
+        return tournamentService.searchSongs(title, artist);
     }
 
     private ResponseStatusException create404(String message) {

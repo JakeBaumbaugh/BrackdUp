@@ -6,9 +6,11 @@ interface SongCardProps {
     final?: boolean;
     votedFor?: boolean;
     onClick?: () => void;
+    deletable?: boolean;
+    selectable?: boolean;
 }
 
-export default function SongCard({song, final, votedFor, onClick}: SongCardProps) {
+export default function SongCard({song, final, votedFor, onClick, deletable, selectable}: SongCardProps) {
     let cardClass = "song-card";
     if (final) {
         cardClass += " final";
@@ -21,6 +23,12 @@ export default function SongCard({song, final, votedFor, onClick}: SongCardProps
     }
     if(onClick) {
         cardClass += " clickable";
+    }
+    if(deletable) {
+        cardClass += " deletable";
+    }
+    if(selectable) {
+        cardClass += " selectable";
     }
 
     return <>

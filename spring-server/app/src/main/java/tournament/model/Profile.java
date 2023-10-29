@@ -56,4 +56,10 @@ public class Profile {
         // TODO: tournament managers that can delete tournament
         return role == ProfileRole.ADMIN;
     }
+
+    @Transient
+    @JsonIgnore
+    public boolean canCreateTournament() {
+        return role == ProfileRole.ADMIN;
+    }
 }

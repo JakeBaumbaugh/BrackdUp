@@ -1,0 +1,138 @@
+package tournament.service;
+
+import java.time.ZonedDateTime;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+import tournament.model.RoundStatus;
+import tournament.model.Song;
+import tournament.model.Tournament;
+import tournament.model.TournamentBuilder;
+import tournament.model.TournamentLevel;
+import tournament.model.TournamentMatch;
+import tournament.model.TournamentRound;
+import tournament.repository.SongRepository;
+import tournament.repository.TournamentRepository;
+
+@Component
+public class TournamentFactory {
+    private static final Logger logger = LoggerFactory.getLogger(TournamentFactory.class);
+
+    private SongRepository songRepository;
+    private TournamentRepository tournamentRepository;
+
+    @Autowired
+    public TournamentFactory(SongRepository songRepository, TournamentRepository tournamentRepository) {
+        this.songRepository = songRepository;
+        this.tournamentRepository = tournamentRepository;
+    }
+
+    public Tournament buildTournament(TournamentBuilder builder) {
+        List<Song> songs = builder.getSongs();
+        List<TournamentLevel> levels = builder.getLevels();
+
+        // Clear ids
+        // List<Song> songsToSave = new ArrayList<>();
+        songs.forEach(song -> {
+            if(song.getId() == -1) {
+                song.setId(null);
+                // songsToSave.add(song);
+            }
+        });
+        builder.getLevels().forEach(level -> {
+            level.setId(null);
+            level.getRounds().forEach(round -> round.setId(null));
+        });
+
+        // Shuffle songs
+        songs = songRepository.saveAll(songs);
+        Collections.shuffle(songs);
+
+        // Build first level matches
+        TournamentLevel firstLevel = levels.get(0);
+        for(int songIndex = 0; songIndex < songs.size(); songIndex += 2) {
+            TournamentMatch match = new TournamentMatch();
+            match.setSong1(songs.get(songIndex));
+            match.setSong2(songs.get(songIndex + 1));
+            int matchIndex = songIndex / 2;
+            TournamentRound round = firstLevel.getRounds().get(matchIndex / builder.getMatchesPerRound());
+            round.addMatch(match);
+        }
+
+        // Build tournament
+        Tournament tournament = new Tournament();
+        tournament.setName(builder.getName());
+        tournament.setMatchesPerRound(builder.getMatchesPerRound());
+        tournament.setSpotifyPlaylist(builder.getSpotifyPlaylist());
+        tournament.setLevels(levels);
+
+        return tournament;
+    }
+    
+    public Tournament buildDefaulTournament(String name) {
+        int songCount = 8;
+        int levelCount = (int) Math.round(Math.log(songCount) / Math.log(2));
+
+        // Build tournament
+        Tournament tournament = new Tournament();
+        tournament.setName(name);
+        tournament.setMatchesPerRound(2);
+        tournament.setLevels(new ArrayList<>());
+
+        // Build levels
+        ZonedDateTime startDate = ZonedDateTime.now();
+        for(int levelIndex = 0; levelIndex < levelCount; levelIndex++) {
+            TournamentLevel level = new TournamentLevel();
+            level.setName("Level " + (levelIndex+1));
+            // Build rounds
+            int songCountInLevel = songCount / (int) Math.pow(2, levelIndex);
+            int matchCountInLevel = songCountInLevel/2;
+            int roundCount = (int) Math.ceil((double) matchCountInLevel / tournament.getMatchesPerRound());
+            List<TournamentRound> rounds = new ArrayList<>();
+            for(int roundIndex = 0; roundIndex < roundCount; roundIndex++) {
+                TournamentRound round = new TournamentRound();
+                round.setStartDate(startDate);
+                startDate = startDate.plusMinutes(1);
+                round.setEndDate(startDate);
+                rounds.add(round);
+            }
+            logger.debug("Generated {} rounds for level index {}", rounds.size(), levelIndex);
+            level.setRounds(rounds);
+            tournament.getLevels().add(level);
+        }
+
+        // Select songs and build matches
+        List<Song> songs = songRepository.findAll();
+        Collections.shuffle(songs);
+        songs = songs.subList(0, songCount);
+        logger.debug("Selected songs for tournament: {}", songs);
+        List<TournamentMatch> matches = new ArrayList<>();
+        for(int i = 0; i < songs.size(); i+=2) {
+            TournamentMatch match = new TournamentMatch();
+            match.setSong1(songs.get(i));
+            match.setSong2(songs.get(i+1));
+            matches.add(match);
+        }
+        logger.debug("Created {} matches for the initial level of voting.", matches.size());
+
+        // Populate initial level
+        TournamentLevel firstLevel = tournament.getLevels().get(0);
+        for(int matchIndex = 0; matchIndex < matches.size(); matchIndex++) {
+            TournamentRound round = firstLevel.getRounds().get(matchIndex / tournament.getMatchesPerRound());
+            List<TournamentMatch> roundMatches = round.getMatches() == null ? new ArrayList<>() : round.getMatches();
+            roundMatches.add(matches.get(matchIndex));
+            round.setMatches(roundMatches);
+        }
+        firstLevel.getRounds().get(0).setStatus(RoundStatus.ACTIVE);
+
+        tournament = tournamentRepository.save(tournament);
+        logger.debug("Created tournament: {}", tournament);
+        return tournament;
+    }
+}

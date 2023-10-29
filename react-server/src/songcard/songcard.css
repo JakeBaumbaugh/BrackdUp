@@ -8,7 +8,7 @@
     width: 18em;
     gap: 1px;
     overflow: hidden;
-    transition: filter 220ms;
+    transition: filter, background-color 220ms;
 }
 
 .song-card > * {
@@ -17,6 +17,7 @@
     text-overflow: ellipsis;
     white-space: nowrap;
     background-color: #f3f1ed;
+    transition: background-color 220ms;
 }
 
 .song-card > *:after {
@@ -47,4 +48,24 @@
 
 .song-card.clickable:hover, .song-card.clickable:active {
     filter: brightness(92%) saturate(120%);
+}
+
+.song-card.clickable.deletable:hover,
+.song-card.clickable.deletable:active {
+    background-color: #D88;
+}
+
+.song-card.clickable.deletable:hover > *,
+.song-card.clickable.deletable:active > * {
+    background-color: #FAA;
+}
+
+.song-card.clickable.selectable:hover,
+.song-card.clickable.selectable:active {
+    background-color: #add1b0;
+}
+
+.song-card.clickable.selectable:hover > *,
+.song-card.clickable.selectable:active > * {
+    background-color: #d7f7da;
 }
