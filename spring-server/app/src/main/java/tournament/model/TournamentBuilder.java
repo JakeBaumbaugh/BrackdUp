@@ -1,6 +1,5 @@
 package tournament.model;
 
-import java.util.Collections;
 import java.util.List;
 
 import lombok.EqualsAndHashCode;

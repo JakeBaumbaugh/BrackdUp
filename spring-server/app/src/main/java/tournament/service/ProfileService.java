@@ -1,6 +1,7 @@
 package tournament.service;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -10,7 +11,10 @@ import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken.Payload;
 
 import tournament.model.Profile;
 import tournament.model.ProfileRole;
+import tournament.model.TournamentVoter;
+import tournament.model.TournamentVoterId;
 import tournament.repository.ProfileRepository;
+import tournament.repository.TournamentVoterRepository;
 
 @Service
 public class ProfileService {
@@ -19,22 +23,44 @@ public class ProfileService {
     List<String> admins;
 
     ProfileRepository profileRepository;
+    TournamentVoterRepository tournamentVoterRepository;
 
     @Autowired
-    public ProfileService(ProfileRepository profileRepository) {
+    public ProfileService(ProfileRepository profileRepository, TournamentVoterRepository tournamentVoterRepository) {
         this.profileRepository = profileRepository;
+        this.tournamentVoterRepository = tournamentVoterRepository;
     }
     
     public Profile getProfileFromPayload(Payload payload) {
-        return profileRepository.findByEmail(payload.getEmail())
+        Profile profile = profileRepository.findByEmail(payload.getEmail())
                 .orElseGet(() -> {
-                    Profile profile = Profile.fromPayload(payload);
-                    if(admins.contains(payload.getEmail())) {
-                        profile.setRole(ProfileRole.ADMIN);
-                    } else {
-                        profile.setRole(ProfileRole.USER);
-                    }
-                    return profileRepository.save(profile);
+                    // Create profile
+                    Profile p = Profile.fromPayload(payload);
+                    p.setRole(admins.contains(payload.getEmail()) ? ProfileRole.ADMIN : ProfileRole.USER);
+                    return profileRepository.save(p);
                 });
+        // Add profile to any tournament voters
+        List<TournamentVoter> voters = tournamentVoterRepository.findAllByEmail(profile.getEmail());
+        voters.forEach(voter -> voter.setProfile(profile));
+        tournamentVoterRepository.saveAll(voters);
+
+        return profile;
+    }
+
+    public Optional<Profile> findByEmail(String email) {
+        return profileRepository.findByEmail(email);
+    }
+
+    public boolean profileCanVote(Profile profile, Integer tournamentId) {
+        TournamentVoterId voterId = new TournamentVoterId(tournamentId, profile.getEmail());
+        return tournamentVoterRepository.findById(voterId).isPresent();
+    }
+
+    public boolean profileCanCreate(Profile profile) {
+        return profile.isAdmin();
+    }
+
+    public boolean profileCanEdit(Profile profile) {
+        return profile.isAdmin();
     }
 }

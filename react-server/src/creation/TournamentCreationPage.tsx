@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import DateTime from "react-datetime";
 import { Moment } from "moment";
 import TournamentBuilder from "../model/TournamentBuilder";
-import SongCard from "../songcard/SongCard";
+import SongCard from "../card/SongCard";
 import Song from "../model/Song";
 import { createTournament, searchSongs } from "../service/TournamentService";
 import { TournamentRound } from "../model/Tournament";

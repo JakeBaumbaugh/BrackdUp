@@ -1,11 +1,10 @@
 import { CredentialResponse, GoogleLogin } from "@react-oauth/google";
+import { MdSettings } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
+import { useProfileContext } from "../context/ProfileContext";
 import { useTournamentContext } from "../context/TournamentContext";
 import SpotifyLogo from "../images/spotify_logo.svg";
-import { login } from "../service/UserService";
-import { useProfileContext } from "../context/ProfileContext";
-import { MdDeleteOutline } from "react-icons/md";
-import { deleteTournament } from "../service/TournamentService";
+import { login } from "../service/ProfileService";
 
 export default function Header() {
     const navigate = useNavigate();
@@ -19,15 +18,6 @@ export default function Header() {
                 .catch(() => setProfile(null));
         }
     };
-
-    const onDelete = () => {
-        // TODO: Modal confirmation
-        if(tournament) {
-            deleteTournament(tournament.id)
-                .then(() => navigate("/"));
-            // TODO: Display error if tournament delete failed
-        }
-    }
 
     const activeRound = tournament?.getActiveRound();
 
@@ -49,8 +39,8 @@ export default function Header() {
                             disabled={!activeRound.isDateInRange(new Date())}
                         >VOTE</button>
                     )}
-                    {profile?.canDeleteTournament(tournament) && (
-                        <MdDeleteOutline onClick={onDelete}/>
+                    {profile?.canEditTournament(tournament) && (
+                        <MdSettings onClick={() => navigate(`tournament/settings?id=${tournament.id}`)}/>
                     )}
                 </div>
             </>}

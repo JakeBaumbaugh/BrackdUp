@@ -11,7 +11,7 @@ interface SongCardProps {
 }
 
 export default function SongCard({song, final, votedFor, onClick, deletable, selectable}: SongCardProps) {
-    let cardClass = "song-card";
+    let cardClass = "card song-card";
     if (final) {
         cardClass += " final";
     }

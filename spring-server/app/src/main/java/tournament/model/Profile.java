@@ -52,14 +52,7 @@ public class Profile {
 
     @Transient
     @JsonIgnore
-    public boolean canDeleteTournament(Tournament tournament) {
-        // TODO: tournament managers that can delete tournament
-        return role == ProfileRole.ADMIN;
-    }
-
-    @Transient
-    @JsonIgnore
-    public boolean canCreateTournament() {
+    public boolean isAdmin() {
         return role == ProfileRole.ADMIN;
     }
 }

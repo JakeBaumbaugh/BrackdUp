@@ -1,0 +1,15 @@
+.voter-card {
+    border: solid 2px var(--dark-color);
+    border-radius: 6px;
+    background-color: #282c3433;
+    color: var(--dark-color);
+    font-weight: 550;
+    overflow: hidden;
+    transition: filter, background-color 220ms;
+}
+
+.voter-card > * {
+    padding: 12px;
+    background-color: #f3f1ed;
+    transition: background-color 220ms;
+}

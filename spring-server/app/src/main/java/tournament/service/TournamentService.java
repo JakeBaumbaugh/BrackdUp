@@ -1,9 +1,7 @@
 package tournament.service;
 
 import java.time.ZonedDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,19 +14,10 @@ import org.springframework.stereotype.Service;
 
 import io.micrometer.common.util.StringUtils;
 import jakarta.transaction.Transactional;
-import tournament.model.Profile;
-import tournament.model.RoundStatus;
-import tournament.model.Song;
-import tournament.model.Tournament;
-import tournament.model.TournamentBuilder;
-import tournament.model.TournamentLevel;
-import tournament.model.TournamentMatch;
-import tournament.model.TournamentRound;
-import tournament.model.TournamentSummary;
-import tournament.model.Vote;
-import tournament.model.VoteId;
+import tournament.model.*;
 import tournament.repository.SongRepository;
 import tournament.repository.TournamentRepository;
+import tournament.repository.TournamentVoterRepository;
 import tournament.repository.VoteRepository;
 
 @Service
@@ -38,21 +27,27 @@ public class TournamentService {
     @Value("${resolve.delay.seconds:15}")
     private Integer resolveDelaySeconds;
     
+    private ProfileService profileService;
     private TournamentRepository tournamentRepository;
     private SongRepository songRepository;
     private VoteRepository voteRepository;
+    private TournamentVoterRepository tournamentVoterRepository;
     private TournamentFactory tournamentFactory;
     private ThreadPoolTaskScheduler threadPoolTaskScheduler;
 
     @Autowired
-    public TournamentService(TournamentRepository tournamentRepository,
+    public TournamentService(ProfileService profileService,
+                             TournamentRepository tournamentRepository,
                              SongRepository songRepository,
                              VoteRepository voteRepository,
+                             TournamentVoterRepository tournamentVoterRepository,
                              TournamentFactory tournamentFactory,
                              ThreadPoolTaskScheduler threadPoolTaskScheduler) {
+        this.profileService = profileService;
         this.tournamentRepository = tournamentRepository;
         this.songRepository = songRepository;
         this.voteRepository = voteRepository;
+        this.tournamentVoterRepository = tournamentVoterRepository;
         this.tournamentFactory = tournamentFactory;
         this.threadPoolTaskScheduler = threadPoolTaskScheduler;
     }
@@ -177,6 +172,50 @@ public class TournamentService {
                 .filter(oldVote -> votes.stream().noneMatch(vote -> vote.getMatch().equals(oldVote.getMatch())))
                 .toList();
         voteRepository.deleteAll(removeVotes);
+    }
+
+    public List<TournamentVoter> getVotersForTournament(Integer tournamentId) {
+        return tournamentVoterRepository.findAllByTournamentId(tournamentId);
+    }
+
+    public TournamentSettings getTournamentSettings(Integer tournamentId) {
+        List<TournamentVoter> voters = getVotersForTournament(tournamentId);
+        return new TournamentSettings(tournamentId, voters);
+    }
+
+    public void saveTournamentSettings(TournamentSettings settings) {
+        Integer tournamentId = settings.getTournamentId();
+        if (tournamentId == null) {
+            return;
+        }
+        // Build maps
+        Map<String, TournamentVoter> oldVoters = new HashMap<>();
+        getVotersForTournament(tournamentId).forEach(voter -> oldVoters.put(voter.getEmail(), voter));
+        Map<String, TournamentVoter> newVoters = new HashMap<>();
+        settings.getVoters().forEach(voter -> newVoters.put(voter.getEmail(), voter));
+
+        // Delete removed voters
+        List<TournamentVoter> removedVoters = oldVoters
+                .values()
+                .stream()
+                .filter(voter -> !newVoters.containsKey(voter.getEmail()))
+                .toList();
+        logger.debug("Removing tournament voters: {}", removedVoters);
+        tournamentVoterRepository.deleteAll(removedVoters);
+
+        // Map newVoters to database entities or add profiles
+        newVoters.keySet().forEach(key -> 
+            newVoters.compute(key, (email, voter) -> {
+                if (oldVoters.containsKey(email)) {
+                    return oldVoters.get(email);
+                } else {
+                    profileService.findByEmail(email).ifPresent(voter::setProfile);
+                    return voter;
+                }
+            })
+        );
+        logger.debug("Saving tournament voters: {}", newVoters.values());
+        tournamentVoterRepository.saveAll(newVoters.values());
     }
 
     private void resolveRound(Tournament tournament, TournamentRound round) {

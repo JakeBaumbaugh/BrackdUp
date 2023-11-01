@@ -1,7 +1,9 @@
 import Song from "../model/Song";
 import { Tournament } from "../model/Tournament";
 import TournamentBuilder from "../model/TournamentBuilder";
+import TournamentSettings from "../model/TournamentSettings";
 import TournamentSummary from "../model/TournamentSummary";
+import TournamentVoter from "../model/TournamentVoter";
 import { delet, get, post } from "./ServiceUtil";
 
 export function getTournament(id: number): Promise<Tournament|undefined> {
@@ -32,12 +34,26 @@ export function submitVote(tournamentId: number, songIds: number[]): Promise<Res
 }
 
 export function getVotes(tournamentId: number): Promise<number[]> {
-    return get(`/tournament/vote?id=${tournamentId}`)
+    return get(`/tournament/vote?tournamentId=${tournamentId}`)
         .then(res => res.json())
         .catch(() => {
             console.log("Failed to retrieve votes.");
             return [];
         });
+}
+
+export function getTournamentSettings(tournamentId: number): Promise<TournamentSettings|null> {
+    return get(`/tournament/settings?tournamentId=${tournamentId}`)
+        .then(res => res.json())
+        .then(res => TournamentSettings.fromJson(res))
+        .catch(() => {
+            console.log("Failed to retrieve voters.");
+            return null;
+        });
+}
+
+export function saveTournamentSettings(settings: TournamentSettings): Promise<Response> {
+    return post("/tournament/settings", settings);
 }
 
 export function deleteTournament(tournamentId: number): Promise<Response> {

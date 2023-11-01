@@ -38,11 +38,9 @@ public class TournamentFactory {
         List<TournamentLevel> levels = builder.getLevels();
 
         // Clear ids
-        // List<Song> songsToSave = new ArrayList<>();
         songs.forEach(song -> {
             if(song.getId() == -1) {
                 song.setId(null);
-                // songsToSave.add(song);
             }
         });
         builder.getLevels().forEach(level -> {

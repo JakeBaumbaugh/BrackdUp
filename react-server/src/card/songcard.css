@@ -42,21 +42,21 @@
     background-color: #d7f7da;
 }
 
-.song-card.clickable {
+.card.clickable {
     cursor: pointer;
 }
 
-.song-card.clickable:hover, .song-card.clickable:active {
+.card.clickable:hover, .card.clickable:active {
     filter: brightness(92%) saturate(120%);
 }
 
-.song-card.clickable.deletable:hover,
-.song-card.clickable.deletable:active {
+.card.clickable.deletable:hover,
+.card.clickable.deletable:active {
     background-color: #D88;
 }
 
-.song-card.clickable.deletable:hover > *,
-.song-card.clickable.deletable:active > * {
+.card.clickable.deletable:hover > *,
+.card.clickable.deletable:active > * {
     background-color: #FAA;
 }
 

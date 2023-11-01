@@ -6,13 +6,14 @@ import { TournamentContext } from "../context/TournamentContext";
 import ListPage from "../list/ListPage";
 import Profile from "../model/Profile";
 import { Tournament } from "../model/Tournament";
-import { checkCookies } from "../service/UserService";
+import { checkCookies } from "../service/ProfileService";
 import VotePage from "../vote/VotePage";
 import Header from "./Header";
 import LoginPage from "./LoginPage";
 import TournamentCreationPage from "../creation/TournamentCreationPage";
 import "./App.css";
 import "react-datetime/css/react-datetime.css";
+import TournamentSettingsPage from "../settings/TournamentSettingsPage";
 
 function App() {
     const tournamentState = useState<Tournament|null>();
@@ -39,6 +40,7 @@ function App() {
                         <Route path="/" Component={ListPage}/>
                         <Route path="/tournament" Component={BracketPage} />
                         <Route path="/tournament/vote" Component={profile ? VotePage : LoginPage} />
+                        <Route path="/tournament/settings" Component={TournamentSettingsPage} />
                         <Route path="/tournament/new" Component={TournamentCreationPage} />
                     </Routes>
                 </div>

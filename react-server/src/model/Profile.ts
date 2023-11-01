@@ -33,8 +33,16 @@ export default class Profile {
         return `${this.firstName} ${this.lastName}`;
     }
 
-    canDeleteTournament(tournament: Tournament): boolean {
-        // TODO: tournament managers that can delete the tournament
+    isAdmin(): boolean {
         return this.role === "ADMIN";
+    }
+
+    canEditTournament(tournament: Tournament): boolean {
+        // TODO: tournament managers that can delete the tournament
+        return this.isAdmin();
+    }
+
+    canCreateTournament(): boolean {
+        return this.isAdmin();
     }
 }
