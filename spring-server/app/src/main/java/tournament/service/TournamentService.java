@@ -79,7 +79,9 @@ public class TournamentService {
             .toList();
     }
 
+    @Transactional
     public void deleteTournament(Integer id) {
+        tournamentVoterRepository.deleteByTournamentId(id);
         tournamentRepository.deleteById(id);
     }
 

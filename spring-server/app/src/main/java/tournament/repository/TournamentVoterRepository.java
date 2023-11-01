@@ -10,4 +10,5 @@ import tournament.model.TournamentVoterId;
 public interface TournamentVoterRepository extends ListCrudRepository<TournamentVoter, TournamentVoterId> {
     List<TournamentVoter> findAllByTournamentId(Integer tournamentId);
     List<TournamentVoter> findAllByEmail(String email);
+    long deleteByTournamentId(Integer tournamentId);
 }
