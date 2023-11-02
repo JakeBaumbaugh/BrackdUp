@@ -6,13 +6,10 @@
     gap: 24px;
 }
 
-.list-page > * {
-    flex: 0 0 33.3333333%;
-}
-
 @media only screen and (max-width: 600px) {
-    .list-page > * {
-        flex: 0 0 100%;
+    .list-page {
+        padding: 1em;
+        grid-template-columns: 1fr;
     }
 }
 

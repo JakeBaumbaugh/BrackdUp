@@ -27,7 +27,13 @@
 }
 
 .bracket .song-card {
-    font-size: 6pt;
+    font-size: 7pt;
+    font-weight: 550;
+    color: #282c34d0;
+}
+
+.bracket .song-card.final {
+    font-size: 10pt;
 }
 
 .match-connector {

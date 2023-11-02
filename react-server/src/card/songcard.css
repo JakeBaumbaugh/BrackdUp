@@ -28,10 +28,6 @@
     filter: brightness(94%) saturate(130%);
 }
 
-.song-card.final {
-    font-size: 10pt;
-}
-
 .song-card.active > * {
     /* background-color: #cfdef5; */
     background-color: #fcf1c0;
