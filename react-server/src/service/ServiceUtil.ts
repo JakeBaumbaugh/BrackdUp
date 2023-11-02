@@ -1,4 +1,4 @@
-const baseUrl = "https://madness.basefive.org:3001";
+const baseUrl = process.env.REACT_APP_SERVER_URL ?? "";
 
 export function get(url: string, jwt?: string): Promise<Response> {
     const fullUrl = baseUrl + url;
