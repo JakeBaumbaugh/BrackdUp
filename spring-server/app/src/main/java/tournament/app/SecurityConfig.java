@@ -48,7 +48,9 @@ public class SecurityConfig {
 
     public CorsConfigurationSource corsConfigurationSource() {
         final CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(List.of("https://madness.basefive.org:3000", "https://madness-dev.basefive.org:3000"));
+        config.setAllowedOrigins(List.of("https://madness.basefive.org",
+                                         "https://madness.basefive.org:3000",
+                                         "https://madness-dev.basefive.org:3000"));
         config.setAllowedMethods(List.of("HEAD", "GET", "POST", "OPTIONS", "DELETE"));
         config.setAllowedHeaders(List.of("Authorization", "Cache-Control", "Content-Type"));
         config.setAllowCredentials(true);

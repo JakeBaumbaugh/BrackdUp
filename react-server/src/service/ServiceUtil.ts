@@ -1,4 +1,7 @@
 const baseUrl = process.env.REACT_APP_SERVER_URL ?? "";
+if(!process.env?.REACT_APP_SERVER_URL) {
+    console.warn("Server URL not found, using empty default.");
+}
 
 export function get(url: string, jwt?: string): Promise<Response> {
     const fullUrl = baseUrl + url;

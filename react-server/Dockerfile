@@ -1,17 +1,15 @@
-FROM node:18
-
-RUN mkdir -p /home/node/app/node_modules && chown -R node:node /home/node/app
-
-WORKDIR /home/node/app
-
-USER node
-
-COPY --chown=node:node package*.json ./
-
+FROM node:18 as build
+WORKDIR /app
+ENV PATH /app/node_modules/.bin:$PATH
+COPY package.json ./
+COPY package-lock.json ./
 RUN npm install
+COPY . ./
+RUN npm run build
 
-COPY --chown=node:node . .
-
-CMD ["node", "app.js"]
+FROM nginx:stable-alpine
+COPY --from=build /app/build /usr/share/nginx/html
+COPY nginx/nginx.conf /etc/nginx/conf.d/default.conf
+CMD ["nginx", "-g", "daemon off;"]
 # port 3000
 # expecting server on 3001
