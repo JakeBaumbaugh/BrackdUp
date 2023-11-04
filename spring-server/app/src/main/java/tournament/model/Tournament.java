@@ -96,4 +96,11 @@ public class Tournament {
                 .filter(round -> round.getId().equals(roundId))
                 .findFirst();
     }
+
+    @Transient
+    @JsonIgnore
+    public ZonedDateTime getStartDate() {
+        TournamentRound firstRound = levels.get(0).getRounds().get(0);
+        return firstRound.getStartDate();
+    }
 }

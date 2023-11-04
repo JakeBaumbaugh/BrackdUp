@@ -21,4 +21,5 @@ logging:
         tournament: DEBUG
 
 resolve.delay.seconds: 10
+start.delay.seconds: 1
 user.admins: jake.baumbaugh@gmail.com
