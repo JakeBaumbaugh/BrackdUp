@@ -26,6 +26,9 @@ public class TournamentService {
 
     @Value("${resolve.delay.seconds:15}")
     private Integer resolveDelaySeconds;
+
+    @Value("${start.delay.seconds:1}")
+    private Integer startDelaySeconds;
     
     private ProfileService profileService;
     private TournamentRepository tournamentRepository;
@@ -55,13 +58,21 @@ public class TournamentService {
     @EventListener @Transactional
     public void scheduleInitialResolves(ContextRefreshedEvent event) {
         // TODO: Resolve any active non-votable rounds
-        // Schedule initial resolves
+        ZonedDateTime now = ZonedDateTime.now();
+        // Schedule initial starts and resolves
         tournamentRepository.findAll()
-                .forEach(tournament -> tournament.getVotableRound()
-                        .ifPresent(round -> {
-                            logger.info("Scheduling initial resolve for round {} in tournament {}.", round.getId(), tournament.getId());
-                            scheduleRoundResolve(tournament, round);
-                        }));
+                .forEach(tournament -> {
+                    tournament.getVotableRound()
+                            .ifPresent(round -> {
+                                logger.info("Scheduling initial resolve for round {} in tournament {}.", round.getId(), tournament.getId());
+                                scheduleRoundResolve(tournament, round);
+                            });
+                    if (tournament.getStartDate().isAfter(now)) {
+                        scheduleTournamentStart(tournament);
+                    } else if (tournament.getLevels().get(0).getRounds().get(0).getStatus() == RoundStatus.CREATED) {
+                        startTournament(tournament);
+                    }
+                });
     }
 
     public Optional<Tournament> getTournament(Integer id) {
@@ -89,7 +100,12 @@ public class TournamentService {
         Tournament tournament = tournamentFactory.buildTournament(builder);
         logger.info("Created tournament: {}", tournament);
         if(tournament != null) {
-            tournamentRepository.save(tournament);
+            tournament = tournamentRepository.save(tournament);
+            if (tournament.getRoundByCurrentDate().isPresent()) {
+                startTournament(tournament);
+            } else {
+                scheduleTournamentStart(tournament);
+            }
         }
     }
 
@@ -286,8 +302,42 @@ public class TournamentService {
         ZonedDateTime scheduleTime = round.getEndDate().plusSeconds(resolveDelaySeconds);
         logger.info("Scheduling resolution of round {} for tournament {} at {}.", round.getId(), tournament.getId(), scheduleTime);
         threadPoolTaskScheduler.schedule(() -> {
-            logger.info("Attempting to resolve round {} for tournament {}", round.getId(), tournament.getId());
+            logger.info("Attempting to resolve round {} for tournament {}.", round.getId(), tournament.getId());
             resolveRound(tournament.getId(), round.getId());
+        }, scheduleTime.toInstant());
+    }
+
+    private boolean startTournament(Tournament tournament) {
+        TournamentRound firstRound = tournament.getLevels().get(0).getRounds().get(0);
+        if (firstRound.getStatus() == RoundStatus.CREATED) {
+            firstRound.setStatus(RoundStatus.ACTIVE);
+            tournamentRepository.save(tournament);
+            logger.info("Successfully started first round of tournament {}", tournament.getId());
+            scheduleRoundResolve(tournament, firstRound);
+            return true;
+        } else {
+            logger.warn("Cannot start tournament {}, tournament has already been started.", tournament.getId());
+            return false;
+        }
+    }
+
+    private boolean startTournament(Integer tournamentId) {
+        try {
+            Tournament tournament = getTournament(tournamentId).orElseThrow();
+            return startTournament(tournament);
+        } catch (Exception e) {
+            logger.error("Encountered exception trying to begin the first round of tournament {}: {}", tournamentId, e);
+            return false;
+        }
+    }
+
+    private void scheduleTournamentStart(Tournament tournament) {
+        TournamentRound firstRound = tournament.getLevels().get(0).getRounds().get(0);
+        ZonedDateTime scheduleTime = firstRound.getStartDate().plusSeconds(startDelaySeconds);
+        logger.info("Scheduling start of tournament {} at {}.", tournament.getId(), scheduleTime);
+        threadPoolTaskScheduler.schedule(() -> {
+            logger.info("Attempting to start tournament {}.", tournament.getId());
+            startTournament(tournament.getId());
         }, scheduleTime.toInstant());
     }
 }
