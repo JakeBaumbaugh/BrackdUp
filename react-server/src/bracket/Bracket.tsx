@@ -17,15 +17,19 @@ export default function Bracket({tournament}: BracketProps) {
     }, [tournament]);
 
     return songColumns ? (
-        <TransformWrapper maxScale={2}>
+        <TransformWrapper minScale={0.5} maxScale={2}>
             <TransformComponent>
                 <div className="bracket">
                     {songColumns.map((songs, index) => <>
                         {index > 0 && <MatchConnectorColumn left={songColumns[index-1].length} right={songs.length}/>}
                         <div className="column">
-                            {songs.map(song => <>
-                                <SongCard song={song} final={index == (songColumns.length - 1) / 2}/>
-                            </>)}
+                            {songs.map(song =>
+                                <SongCard
+                                    song={song}
+                                    final={index == (songColumns.length - 1) / 2}
+                                    key={`${song?.title}-${song?.artist}`}
+                                />
+                            )}
                         </div>
                     </>)}
                 </div>

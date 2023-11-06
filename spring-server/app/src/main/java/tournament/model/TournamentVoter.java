@@ -23,4 +23,8 @@ public class TournamentVoter {
     @ManyToOne
     @JoinColumn(name = "profile_id")
     private Profile profile;
+
+    public void setEmail(String email) {
+        this.email = email.toLowerCase();
+    }
 }
