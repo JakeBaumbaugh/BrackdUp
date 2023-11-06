@@ -3,6 +3,7 @@ import { MdSettings } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
 import { useProfileContext } from "../context/ProfileContext";
 import { useTournamentContext } from "../context/TournamentContext";
+import MadnessLogo from "../images/icon.png";
 import SpotifyLogo from "../images/spotify_logo.svg";
 import { login } from "../service/ProfileService";
 
@@ -23,8 +24,11 @@ export default function Header() {
 
     return (
         <header className={tournament ? "with-tournament" : ""}>
-            <h1 onClick={() => navigate("/")}>Music Madness</h1>
-            {tournament && <>
+            <h1 onClick={() => navigate("/")}>
+                <img src={MadnessLogo} alt="Music Madness"/>    
+                Music Madness
+            </h1>
+            {tournament && (
                 <div className="tournament-info">
                     <h2 onClick={() => navigate(`/tournament?id=${tournament.id}`)}>{tournament.name}</h2>
                     {tournament.spotifyPlaylist && (
@@ -43,7 +47,7 @@ export default function Header() {
                         <MdSettings onClick={() => navigate(`tournament/settings?id=${tournament.id}`)}/>
                     )}
                 </div>
-            </>}
+            )}
             { !profile && (
                 <div className="profile-wrapper">
                     <GoogleLogin

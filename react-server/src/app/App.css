@@ -32,16 +32,30 @@ header h1 {
     font-weight: 600;
     margin: 0;
     margin-right: 3em;
+    
+    display: flex;
+    gap: 6px;
+    align-items: center;
 }
 
 header h1, header h2 {
     cursor: pointer;
-    transition: transform 220ms;
+    transition: all 220ms;
 }
 
 header h1:hover, header h1:focus, header h2:hover, header h2:focus {
-    color: #ccc;
-    transform: skewX(-10deg);
+    /* color: #bbb; */
+    filter: brightness(72%);
+}
+
+header h1 > img {
+    width: 1em;
+    height: 1em;
+    transition: all 220ms;
+}
+
+header h1:hover img, header h1:focus img {
+    transform: rotate(10deg);
 }
 
 main {
@@ -51,13 +65,13 @@ main {
 .tournament-info img, .tournament-info svg {
     width: 2em;
     height: 2em;
+    cursor: pointer;
     transition: all 220ms;
 }
 
 .tournament-info img:hover, .tournament-info img:active, .tournament-info svg:hover, .tournament-info svg:active {
     filter: brightness(65%);
     transform: rotate(10deg);
-    cursor: pointer;
 }
 
 .tournament-info {

@@ -1,14 +1,18 @@
 package tournament.model;
 
-import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 
-@Getter @Setter @NoArgsConstructor @AllArgsConstructor @ToString @EqualsAndHashCode
+@Getter @Setter @NoArgsConstructor @ToString @EqualsAndHashCode
 public class TournamentVoterId {
     private Integer tournamentId;
     private String email;
+
+    public TournamentVoterId(Integer tournamentId, String email) {
+        this.tournamentId = tournamentId;
+        this.email = email.toLowerCase();
+    }
+
+    public void setEmail(String email) {
+        this.email = email.toLowerCase();
+    }
 }
