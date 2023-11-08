@@ -1,7 +1,11 @@
 package tournament.service;
 
 import java.time.ZonedDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,7 +22,6 @@ import tournament.model.*;
 import tournament.repository.SongRepository;
 import tournament.repository.TournamentRepository;
 import tournament.repository.TournamentVoterRepository;
-import tournament.repository.VoteRepository;
 
 @Service
 public class TournamentService {
@@ -31,9 +34,9 @@ public class TournamentService {
     private Integer startDelaySeconds;
     
     private ProfileService profileService;
+    private VoteService voteService;
     private TournamentRepository tournamentRepository;
     private SongRepository songRepository;
-    private VoteRepository voteRepository;
     private TournamentVoterRepository tournamentVoterRepository;
     private TournamentFactory tournamentFactory;
     private ThreadPoolTaskScheduler threadPoolTaskScheduler;
@@ -42,14 +45,14 @@ public class TournamentService {
     public TournamentService(ProfileService profileService,
                              TournamentRepository tournamentRepository,
                              SongRepository songRepository,
-                             VoteRepository voteRepository,
+                             VoteService voteService,
                              TournamentVoterRepository tournamentVoterRepository,
                              TournamentFactory tournamentFactory,
                              ThreadPoolTaskScheduler threadPoolTaskScheduler) {
         this.profileService = profileService;
         this.tournamentRepository = tournamentRepository;
         this.songRepository = songRepository;
-        this.voteRepository = voteRepository;
+        this.voteService = voteService;
         this.tournamentVoterRepository = tournamentVoterRepository;
         this.tournamentFactory = tournamentFactory;
         this.threadPoolTaskScheduler = threadPoolTaskScheduler;
@@ -142,7 +145,7 @@ public class TournamentService {
                 .stream()
                 .map(match -> new VoteId(profile, match))
                 .toList();
-        List<Vote> votes = voteRepository.findAllById(voteIds);
+        List<Vote> votes = voteService.findAllById(voteIds);
         return votes.stream()
                 .map(vote -> vote.getSong().getId())
                 .toList();
@@ -156,7 +159,7 @@ public class TournamentService {
                 .stream()
                 .map(match -> new VoteId(profile, match))
                 .toList();
-        List<Vote> oldVotes = voteRepository.findAllById(voteIds);
+        List<Vote> oldVotes = voteService.findAllById(voteIds);
 
         // Create new vote objects
         List<Vote> votes = songs.stream().map(song -> {
@@ -183,17 +186,30 @@ public class TournamentService {
         }).toList();
 
         // Save new vote objects
-        voteRepository.saveAll(votes);
+        voteService.saveAll(votes);
 
         // Remove old vote objects without new votes for its match
         List<Vote> removeVotes = oldVotes.stream()
                 .filter(oldVote -> votes.stream().noneMatch(vote -> vote.getMatch().equals(oldVote.getMatch())))
                 .toList();
-        voteRepository.deleteAll(removeVotes);
+        voteService.deleteAll(removeVotes);
     }
 
     public List<TournamentVoter> getVotersForTournament(Integer tournamentId) {
-        return tournamentVoterRepository.findAllByTournamentId(tournamentId);
+        Optional<Tournament> optionalTournament = getTournament(tournamentId);
+        if (optionalTournament.isEmpty()) {
+            return List.of();
+        }
+        List<TournamentVoter> voters = tournamentVoterRepository.findAllByTournamentId(tournamentId);
+        // Check if voters have voted for the current votable round
+        optionalTournament.get().getVotableRound().ifPresent(round -> {
+            List<Vote> roundVotes = voteService.findByRound(round);
+            voters.forEach(voter -> {
+                Profile profile = voter.getProfile();
+                voter.setHasVoted(profile != null && roundVotes.stream().anyMatch(vote -> vote.getProfile().equals(profile)));
+            });
+        });
+        return voters;
     }
 
     public TournamentSettings getTournamentSettings(Integer tournamentId) {
@@ -250,7 +266,7 @@ public class TournamentService {
         // Resolve votes for round
         round.getMatches().forEach(match -> {
             logger.debug("Selecting a winner for match {}", match.getId());
-            List<Vote> votes = voteRepository.findByMatch(match);
+            List<Vote> votes = voteService.findByMatch(match);
             match.decideWinner(votes);
             logger.debug("Selected song as winner: {}", match.getSongWinnerTitle());
         });

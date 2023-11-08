@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useTournamentContext } from "../context/TournamentContext";
 import TournamentVoter from "../model/TournamentVoter";
@@ -6,6 +6,8 @@ import { deleteTournament, getTournament, getTournamentSettings, saveTournamentS
 import "./settings.css";
 import VoterCard from "../card/VoterCard";
 import TournamentSettings from "../model/TournamentSettings";
+import Profile from "../model/Profile";
+import { Tooltip } from "@mui/material";
 
 export default function TournamentSettingsPage() {
     const [searchParams] = useSearchParams();
@@ -30,6 +32,8 @@ export default function TournamentSettingsPage() {
                 .then(settings => setSettings(settings));
         }
     }, [tournament?.id]);
+
+    const votersWithProfiles = useMemo(() => settings?.voters.filter(voter => voter.profile) ?? [], [settings]);
 
     const addVoter = () => {
         const email = voterInput.trim();
@@ -61,6 +65,37 @@ export default function TournamentSettingsPage() {
     return (
         <main className="settings-page">
             {(tournament && settings) ? <>
+                {tournament.getVotableRound() && (
+                    <div className="voting-status">
+                        <h3>Current Round</h3>
+                        <p>Has Voted:</p>
+                        <div className="voter-profiles">
+                            {votersWithProfiles?.filter(voter => voter.hasVoted).map(voter => (
+                                <Tooltip
+                                    key={voter.email}
+                                    title={voter.profile!.getName()}
+                                    placement="right"
+                                    arrow
+                                >
+                                    <img src={voter.profile!.pictureLink}/>
+                                </Tooltip>
+                            ))}
+                        </div>
+                        <p>Has Not Voted:</p>
+                        <div className="voter-profiles">
+                            {votersWithProfiles?.filter(voter => voter.hasVoted === false).map(voter => (
+                                <Tooltip
+                                    key={voter.email}
+                                    title={voter.profile!.getName()}
+                                    placement="right"
+                                    arrow
+                                >
+                                    <img src={voter.profile!.pictureLink}/>
+                                </Tooltip>
+                            ))}
+                        </div>
+                    </div>
+                )}
                 <div className="voter-settings">
                     <h3>Voters</h3>
                     <input
