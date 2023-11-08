@@ -5,6 +5,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.IdClass;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Transient;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -23,6 +24,9 @@ public class TournamentVoter {
     @ManyToOne
     @JoinColumn(name = "profile_id")
     private Profile profile;
+
+    @Transient
+    private Boolean hasVoted;
 
     public void setEmail(String email) {
         this.email = email.toLowerCase();

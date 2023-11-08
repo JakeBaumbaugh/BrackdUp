@@ -5,6 +5,11 @@
     gap: 2em;
 }
 
+.settings-page h3 {
+    font-size: 18pt;
+    margin: 0;
+}
+
 .settings-page .voter-settings {
     display: grid;
     grid-template-columns: 1fr 1.6em;
@@ -14,8 +19,6 @@
 
 .settings-page .voter-settings h3 {
     grid-column: 1 / -1;
-    font-size: 18pt;
-    margin: 0;
 }
 
 .settings-page .voter-settings .voter-list {
@@ -34,4 +37,27 @@
 .settings-page .button-row button {
     font-size: 12pt;
     padding: 4px 8px;
+}
+
+.settings-page .voting-status {
+    display: grid;
+    grid-auto-rows: min-content;
+    grid-template-columns: max-content 1fr;
+    column-gap: 1em;
+}
+
+.voting-status > h3 {
+    grid-column: 1 / -1;
+}
+
+.voting-status > .voter-profiles {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.voting-status > .voter-profiles img {
+    width: 2.5em;
+    height: 2.5em;
+    border-radius: 50%;
 }
