@@ -74,13 +74,15 @@ public class TournamentFactory {
     }
     
     public Tournament buildDefaulTournament(String name) {
-        int songCount = 8;
+        int songCount = 64;
         int levelCount = (int) Math.round(Math.log(songCount) / Math.log(2));
+        int matchesPerRound = 8;
+        int roundLengthMinutes = 3;
 
         // Build tournament
         Tournament tournament = new Tournament();
         tournament.setName(name);
-        tournament.setMatchesPerRound(2);
+        tournament.setMatchesPerRound(matchesPerRound);
         tournament.setLevels(new ArrayList<>());
 
         // Build levels
@@ -96,7 +98,7 @@ public class TournamentFactory {
             for(int roundIndex = 0; roundIndex < roundCount; roundIndex++) {
                 TournamentRound round = new TournamentRound();
                 round.setStartDate(startDate);
-                startDate = startDate.plusMinutes(1);
+                startDate = startDate.plusMinutes(roundLengthMinutes);
                 round.setEndDate(startDate);
                 rounds.add(round);
             }

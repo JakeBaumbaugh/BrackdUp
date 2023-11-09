@@ -69,28 +69,4 @@ public class TournamentMatch {
     public String getSongWinnerTitle() {
         return songWinner != null ? songWinner.getTitle() : null;
     }
-
-    @Transient
-    @JsonIgnore
-    public void decideWinner(List<Vote> votes) {
-        List<Vote> song1Votes = new ArrayList<>();
-        List<Vote> song2Votes = new ArrayList<>();
-        votes.forEach(vote -> {
-            if (song1 != null && song1.equals(vote.getSong())) {
-                song1Votes.add(vote);
-            } else if (song2 != null && song2.equals(vote.getSong())) {
-                song2Votes.add(vote);
-            }
-        });
-        
-        Song winner;
-        if (song1Votes.size() > song2Votes.size()) {
-            winner = song1;
-        } else if (song2Votes.size() > song1Votes.size()) {
-            winner = song2;
-        } else {
-            winner = Math.random() > 0.5 ? song1 : song2;
-        }
-        songWinner = winner;
-    }
 }
