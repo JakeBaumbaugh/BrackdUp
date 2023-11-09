@@ -152,47 +152,7 @@ public class TournamentService {
     }
 
     public void vote(Profile profile, TournamentRound round, List<Song> songs) {
-        // Cognitive and runtime complexity could be cleaned up here, refactor if needed
-
-        // Get old vote objects
-        List<VoteId> voteIds = round.getMatches()
-                .stream()
-                .map(match -> new VoteId(profile, match))
-                .toList();
-        List<Vote> oldVotes = voteService.findAllById(voteIds);
-
-        // Create new vote objects
-        List<Vote> votes = songs.stream().map(song -> {
-            TournamentMatch match = round.getMatches()
-                    .stream()
-                    .filter(m -> m.getSong1().equals(song) || m.getSong2().equals(song))
-                    .findFirst()
-                    .get();
-            
-            Vote vote = oldVotes.stream()
-                    .filter(oldVote -> oldVote.getProfile().equals(profile) && oldVote.getMatch().equals(match))
-                    .findFirst()
-                    .orElseGet(() -> {
-                        Vote newVote = new Vote();
-                        newVote.setProfile(profile);
-                        newVote.setMatch(match);
-                        return newVote;
-                    });
-            if(!song.equals(vote.getSong())) {
-                vote.setSong(song);
-                vote.setTimestamp();
-            }
-            return vote;
-        }).toList();
-
-        // Save new vote objects
-        voteService.saveAll(votes);
-
-        // Remove old vote objects without new votes for its match
-        List<Vote> removeVotes = oldVotes.stream()
-                .filter(oldVote -> votes.stream().noneMatch(vote -> vote.getMatch().equals(oldVote.getMatch())))
-                .toList();
-        voteService.deleteAll(removeVotes);
+        voteService.submitVotes(profile, round, songs);
     }
 
     public List<TournamentVoter> getVotersForTournament(Integer tournamentId) {
@@ -264,12 +224,7 @@ public class TournamentService {
                 });
         
         // Resolve votes for round
-        round.getMatches().forEach(match -> {
-            logger.debug("Selecting a winner for match {}", match.getId());
-            List<Vote> votes = voteService.findByMatch(match);
-            match.decideWinner(votes);
-            logger.debug("Selected song as winner: {}", match.getSongWinnerTitle());
-        });
+        voteService.resolveRound(round);
 
         if(round.getMatches().size() > 1) {
             // Generate new matches

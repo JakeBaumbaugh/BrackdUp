@@ -1,10 +1,16 @@
 package tournament.service;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import tournament.model.Profile;
+import tournament.model.Song;
 import tournament.model.TournamentMatch;
 import tournament.model.TournamentRound;
 import tournament.model.Vote;
@@ -13,6 +19,7 @@ import tournament.repository.VoteRepository;
 
 @Service
 public class VoteService {
+    private static final Logger logger = LoggerFactory.getLogger(VoteService.class);
     
     VoteRepository voteRepository;
 
@@ -29,6 +36,14 @@ public class VoteService {
         return voteRepository.findByMatch(match);
     }
 
+    public List<Vote> findValidVotesByMatch(TournamentMatch match) {
+        return findByMatch(match)
+                .stream()
+                .filter(vote -> vote.getSong() != null
+                                && (vote.getSong().equals(match.getSong1()) || vote.getSong().equals(match.getSong2())))
+                .toList();
+    }
+
     public List<Vote> findByRound(TournamentRound round) {
         return voteRepository.findByMatchIn(round.getMatches());
     }
@@ -39,5 +54,91 @@ public class VoteService {
 
     public void deleteAll(List<Vote> votes) {
         voteRepository.deleteAll(votes);
+    }
+
+    public void resolveMatch(TournamentMatch match) {
+        logger.debug("Selecting a winner for match {}", match.getId());
+
+        Song song1 = match.getSong1();
+        Song song2 = match.getSong2();
+        List<Vote> votes = findValidVotesByMatch(match);
+        
+        List<Vote> song1Votes = new ArrayList<>();
+        List<Vote> song2Votes = new ArrayList<>();
+        votes.forEach(vote -> {
+            if (vote.getSong().equals(song1)) {
+                song1Votes.add(vote);
+            } else {
+                song2Votes.add(vote);
+            }
+        });
+        
+        Song winner;
+        if (song1Votes.size() > song2Votes.size()) {
+            winner = song1;
+        } else if (song2Votes.size() > song1Votes.size()) {
+            winner = song2;
+        } else {
+            // Handle tie
+            Optional<Vote> lastVote = votes.stream().max((vote1, vote2) -> vote1.getTimestamp().compareTo(vote2.getTimestamp()));
+            if (lastVote.isPresent()) {
+                Song lastVoteSong = lastVote.get().getSong();
+                winner = lastVoteSong.equals(song1) ? song2 : song1;
+            } else {
+                // No votes recorded, select randomly
+                winner = Math.random() > 0.5 ? song1 : song2;
+            }
+        }
+        match.setSongWinner(winner);
+
+        logger.debug("Selected song \"{}\" as winner for match {}", match.getSongWinnerTitle(), match.getId());
+    }
+
+    public void resolveRound(TournamentRound round) {
+        round.getMatches().forEach(this::resolveMatch);
+    }
+
+    public void submitVotes(Profile profile, TournamentRound round, List<Song> songs) {
+        // Cognitive and runtime complexity could be cleaned up here, refactor if needed
+
+        // Get old vote objects
+        List<VoteId> voteIds = round.getMatches()
+                .stream()
+                .map(match -> new VoteId(profile, match))
+                .toList();
+        List<Vote> oldVotes = findAllById(voteIds);
+
+        // Create new vote objects
+        List<Vote> votes = songs.stream().map(song -> {
+            TournamentMatch match = round.getMatches()
+                    .stream()
+                    .filter(m -> m.getSong1().equals(song) || m.getSong2().equals(song))
+                    .findFirst()
+                    .get();
+            
+            Vote vote = oldVotes.stream()
+                    .filter(oldVote -> oldVote.getProfile().equals(profile) && oldVote.getMatch().equals(match))
+                    .findFirst()
+                    .orElseGet(() -> {
+                        Vote newVote = new Vote();
+                        newVote.setProfile(profile);
+                        newVote.setMatch(match);
+                        return newVote;
+                    });
+            if(!song.equals(vote.getSong())) {
+                vote.setSong(song);
+                vote.setTimestamp();
+            }
+            return vote;
+        }).toList();
+
+        // Save new vote objects
+        saveAll(votes);
+
+        // Remove old vote objects without new votes for its match
+        List<Vote> removeVotes = oldVotes.stream()
+                .filter(oldVote -> votes.stream().noneMatch(vote -> vote.getMatch().equals(oldVote.getMatch())))
+                .toList();
+        deleteAll(removeVotes);
     }
 }
