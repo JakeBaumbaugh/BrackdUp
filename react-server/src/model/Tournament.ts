@@ -1,4 +1,4 @@
-import Song from "./Song";
+import Song, { BracketSong } from "./Song";
 
 export class Tournament {
     id: number;
@@ -21,9 +21,9 @@ export class Tournament {
         return new Tournament(data.id, data.name, levels, data.spotifyPlaylist, data.matchesPerRound);
     }
 
-    getSongColumns(): (Song|null)[][] {
-        const leftSongs: (Song|null)[][] = [];
-        const rightSongs: (Song|null)[][] = [];
+    getSongColumns(): (BracketSong|null)[][] {
+        const leftSongs: (BracketSong|null)[][] = [];
+        const rightSongs: (BracketSong|null)[][] = [];
         // Assumption: first level is filled out entirely
         let halfLength = this.levels[0].getSongs().length / 2;
         this.levels.forEach(level => {
@@ -154,16 +154,20 @@ export class TournamentMatch {
     song1: Song;
     song2: Song;
     songWinner?: Song;
+    song1VoteCount?: number;
+    song2VoteCount?: number;
 
-    constructor(id: number, song1: Song, song2: Song, songWinner?: Song) {
+    constructor(id: number, song1: Song, song2: Song, songWinner?: Song, song1VoteCount?: number, song2VoteCount?: number) {
         this.id = id;
         this.song1 = song1;
         this.song2 = song2;
         this.songWinner = songWinner;
+        this.song1VoteCount = song1VoteCount;
+        this.song2VoteCount = song2VoteCount;
     }
 
     static fromJson(data: any): TournamentMatch {
-        return new TournamentMatch(data.id, data.song1, data.song2, data.songWinner);
+        return new TournamentMatch(data.id, data.song1, data.song2, data.songWinner, data.song1VoteCount, data.song2VoteCount);
     }
 
     getSongs(): Song[] {

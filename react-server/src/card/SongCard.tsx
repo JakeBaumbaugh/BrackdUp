@@ -1,8 +1,8 @@
-import Song from "../model/Song";
+import { BracketSong } from "../model/Song";
 import "./songcard.css";
 
 interface SongCardProps {
-    song: Song|null;
+    song: BracketSong|null;
     final?: boolean;
     votedFor?: boolean;
     onClick?: () => void;
@@ -32,9 +32,14 @@ export default function SongCard({song, final, votedFor, onClick, deletable, sel
     }
 
     return <>
-        <div className={cardClass} onClick={onClick}>
-            <div>{song?.title}</div>
-            <div>{song?.artist}</div>
+        <div className="song-card-wrapper">
+            <div className={cardClass} onClick={onClick}>
+                <div>{song?.title}</div>
+                <div>{song?.artist}</div>
+            </div>
+            {song?.receivedVoteCount !== undefined && song.totalVoteCount !== undefined && song.totalVoteCount > 0 && (
+                <span className="tag after-tag">{Math.round(100 * song.receivedVoteCount / song.totalVoteCount)}%</span>
+            )}
         </div>
     </>;
 }

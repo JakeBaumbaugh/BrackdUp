@@ -98,18 +98,6 @@ public class TournamentController {
         return tournamentService.getVotedSongIds(profile, activeRound);
     }
 
-    @GetMapping("/tournament/create")
-    public Integer newTournament(Authentication authentication, @RequestParam String name) {
-        Profile profile = (Profile) authentication.getPrincipal();
-        logger.info("GET request to create a new sample tournament.");
-
-        if (!profileService.profileCanCreate(profile)) {
-            throw new ResponseStatusException(HttpStatusCode.valueOf(403));
-        }
-
-        return tournamentService.generateTournament(name).getId();
-    }
-
     @PostMapping("/tournament/create")
     public void createTournament(Authentication authentication, @RequestBody TournamentBuilder builder) {
         Profile profile = (Profile) authentication.getPrincipal();

@@ -10,7 +10,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import tournament.model.Profile;
+import tournament.model.RoundStatus;
 import tournament.model.Song;
+import tournament.model.Tournament;
 import tournament.model.TournamentMatch;
 import tournament.model.TournamentRound;
 import tournament.model.Vote;
@@ -73,6 +75,9 @@ public class VoteService {
             }
         });
         
+        match.setSong1VoteCount(song1Votes.size());
+        match.setSong2VoteCount(song2Votes.size());
+
         Song winner;
         if (song1Votes.size() > song2Votes.size()) {
             winner = song1;
@@ -140,5 +145,33 @@ public class VoteService {
                 .filter(oldVote -> votes.stream().noneMatch(vote -> vote.getMatch().equals(oldVote.getMatch())))
                 .toList();
         deleteAll(removeVotes);
+    }
+
+    public Tournament fillVoteCounts(Tournament tournament) {
+        tournament.getLevels()
+                .stream()
+                .flatMap(level -> level.getRounds().stream()) // Get all rounds in tournament
+                .filter(round -> round.getStatus() == RoundStatus.RESOLVED) // Filter only resolved rounds
+                .flatMap(round -> round.getMatches().stream()) // Get all matches in resolved rounds
+                .filter(match -> match.getSong1VoteCount() == null || match.getSong2VoteCount() == null) // Filter only matches without vote counts
+                .forEach(match -> {
+                    // Find votes for song 1 and song 2
+                    List<Vote> votes = findValidVotesByMatch(match);
+                    List<Vote> song1Votes = new ArrayList<>();
+                    List<Vote> song2Votes = new ArrayList<>();
+                    votes.forEach(vote -> {
+                        if (vote.getSong().equals(match.getSong1())) {
+                            song1Votes.add(vote);
+                        } else {
+                            song2Votes.add(vote);
+                        }
+                    });
+                    // Populate vote counts
+                    match.setSong1VoteCount(song1Votes.size());
+                    match.setSong2VoteCount(song2Votes.size());
+                    logger.debug("Set {} votes for song 1 and {} votes for song 2 for match {} in tournament {}",
+                            song1Votes.size(), song2Votes.size(), match.getId(), tournament.getId());
+                });
+        return tournament;
     }
 }

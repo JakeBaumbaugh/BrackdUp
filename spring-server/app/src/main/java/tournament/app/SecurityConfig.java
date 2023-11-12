@@ -37,10 +37,11 @@ public class SecurityConfig {
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
             .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(requests -> requests
-                .requestMatchers(HttpMethod.GET).permitAll()
-                .requestMatchers(HttpMethod.POST).authenticated()
-                .requestMatchers(HttpMethod.DELETE).authenticated()
-                .requestMatchers("/tournament/vote").authenticated()
+            .requestMatchers("/tournament/vote").authenticated()
+            .requestMatchers("/admin/**").authenticated()
+            .requestMatchers(HttpMethod.POST).authenticated()
+            .requestMatchers(HttpMethod.DELETE).authenticated()
+            .requestMatchers(HttpMethod.GET).permitAll()
             )
             .addFilterBefore(new JwtTokenFilter(profileService), UsernamePasswordAuthenticationFilter.class)
             .build();
