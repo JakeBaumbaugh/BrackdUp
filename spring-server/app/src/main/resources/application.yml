@@ -5,6 +5,8 @@ spring:
         password: password
     jpa:
         properties.hibernate.enable_lazy_load_no_trans: true
+    jackson:
+        default-property-inclusion: NON_NULL
 
 server:
     port: 3001

@@ -1,25 +1,11 @@
 package tournament.model;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.OrderBy;
-import jakarta.persistence.Transient;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
+import jakarta.persistence.*;
+import lombok.*;
 
 @Entity
 @Getter @Setter @NoArgsConstructor @ToString @EqualsAndHashCode
@@ -42,6 +28,12 @@ public class TournamentMatch {
     @ManyToOne
     @JoinColumn(name = "song_winner")
     private Song songWinner;
+
+    @Column(name = "song_1_vote_count")
+    private Integer song1VoteCount;
+    
+    @Column(name = "song_2_vote_count")
+    private Integer song2VoteCount;
 
     @ToString.Exclude
     @JsonIgnore

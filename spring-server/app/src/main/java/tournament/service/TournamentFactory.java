@@ -74,10 +74,10 @@ public class TournamentFactory {
     }
     
     public Tournament buildDefaulTournament(String name) {
-        int songCount = 64;
+        int songCount = 16;
         int levelCount = (int) Math.round(Math.log(songCount) / Math.log(2));
-        int matchesPerRound = 8;
-        int roundLengthMinutes = 3;
+        int matchesPerRound = 4;
+        int roundLengthMinutes = 1;
 
         // Build tournament
         Tournament tournament = new Tournament();

@@ -212,6 +212,13 @@ public class TournamentService {
         tournamentVoterRepository.saveAll(newVoters.values());
     }
 
+    public void fillVoteCounts(Tournament tournament) {
+        tournament = voteService.fillVoteCounts(tournament);
+        if (tournament != null) {
+            tournamentRepository.save(tournament);
+        }
+    }
+
     private void resolveRound(Tournament tournament, TournamentRound round) {
         // Get TournamentLevel to ensure round is in tournament
         List<TournamentLevel> levels = tournament.getLevels();

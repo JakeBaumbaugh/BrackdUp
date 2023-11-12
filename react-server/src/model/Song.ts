@@ -6,3 +6,11 @@ export default interface Song {
     youtube?: string;
     activeRound?: boolean;
 }
+
+
+export interface BracketSong extends Song {
+    parent1VoteCount?: number;
+    parent2VoteCount?: number;
+    receivedVoteCount?: number;
+    totalVoteCount?: number;
+}

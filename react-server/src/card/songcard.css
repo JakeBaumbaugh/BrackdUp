@@ -11,7 +11,7 @@
     transition: filter, background-color 220ms;
 }
 
-.song-card > * {
+.song-card > div {
     padding: 3px 10px 3px 3px;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -20,21 +20,21 @@
     transition: background-color 220ms;
 }
 
-.song-card > *:after {
+.song-card > div:after {
     content: "\200b";
 }
 
-.song-card > *:last-child {
+.song-card > div:last-child {
     filter: brightness(94%) saturate(130%);
 }
 
-.song-card.active > * {
+.song-card.active > div {
     /* background-color: #cfdef5; */
     background-color: #fcf1c0;
     /* background-color: #ebd7f7; */
 }
 
-.song-card.selected > * {
+.song-card.selected > div {
     background-color: #d7f7da;
 }
 
@@ -64,4 +64,37 @@
 .song-card.clickable.selectable:hover > *,
 .song-card.clickable.selectable:active > * {
     background-color: #d7f7da;
+}
+
+.song-card-wrapper {
+    position: relative;
+}
+
+.song-card-wrapper .tag {
+    position: absolute;
+}
+
+.song-card-wrapper .tag.top-tag {
+    bottom: 50%;
+    right: 100%;
+}
+
+.song-card-wrapper .tag.bottom-tag {
+    top: 100%;
+}
+
+.left-column .song-card-wrapper .tag.after-tag {
+    left: calc(100% + 1px);
+}
+
+.right-column .song-card-wrapper .tag.after-tag {
+    right: calc(100% + 1px);
+}
+
+.song-card-wrapper:nth-child(2n) .tag.after-tag {
+    top: 50%;
+}
+
+.song-card-wrapper:nth-child(2n+1) .tag.after-tag {
+    bottom: 50%;
 }

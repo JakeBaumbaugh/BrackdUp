@@ -6,14 +6,12 @@ interface MatchConnectorColumnProps {
 export default function MatchConnectorColun({left, right}: MatchConnectorColumnProps) {
     const greater = Math.max(left, right);
     const lesser = Math.min(left, right);
-    const height = `${100/greater}%`
+    const height = `${100/greater}%`;
+
+    const connector = left === right ? <StraightConnector/> : <MatchConnector ltr={left > right} height={height}/>
 
     return <div className="column">
-        { Array.apply(null, new Array(lesser)).map(() => (left == right ? <>
-            <StraightConnector/>
-        </> : <>
-            <MatchConnector ltr={left > right} height={height}/>
-        </>)) }
+        { Array(lesser).fill(connector) }
     </div>
 }
 
