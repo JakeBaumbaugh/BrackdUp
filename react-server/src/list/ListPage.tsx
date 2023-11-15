@@ -6,16 +6,19 @@ import SpotifyLogo from "../images/spotify_logo.svg";
 import "./list.css";
 import CountdownTimer from "./CountdownTimer";
 import { useTournamentContext } from "../context/TournamentContext";
-import { ClipLoader } from "react-spinners"
+import { ClipLoader } from "react-spinners";
 import { useProfileContext } from "../context/ProfileContext";
+import { useLoadingScreenContext } from "../context/LoadingScreenContext";
 
 export default function ListPage() {
     const [tournaments, setTournaments] = useState<TournamentSummary[]>([]);
-    const [_, setTournament] = useTournamentContext();
+    const [, setTournament] = useTournamentContext();
     const {profile: [profile]} = useProfileContext();
+    const [, setLoading] = useLoadingScreenContext();
     const navigate = useNavigate();
 
     useEffect(() => {
+        setLoading(true);
         setTournament(null);
         getTournamentSummaries();
     }, []);
@@ -30,7 +33,7 @@ export default function ListPage() {
             activeTourmaments.sort((t1, t2) => t1.votingEndDate!.valueOf() - t2.votingEndDate!.valueOf());
             futureTournaments.sort((t1, t2) => t2.startDate.valueOf() - t1.startDate.valueOf());
             setTournaments([...activeTourmaments, ...futureTournaments, ...expiredTournaments]);
-        });
+        }).then(() => setLoading(false));
     };
 
     const redirect = (id: number) => {

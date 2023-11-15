@@ -36,8 +36,8 @@ export default function Bracket({tournament}: BracketProps) {
         const songs = matches.map((level, levelIndex) =>
             level.flatMap((match, matchIndex) => {
                 if(match) {
-                    const song1 = match.song1 as BracketSong;
-                    const song2 = match.song2 as BracketSong;
+                    const song1 = {...match.song1} as BracketSong;
+                    const song2 = {...match.song2} as BracketSong;
                     if(levelIndex > 0) {
                         const match1Index = matchIndex * 2;
                         const match2Index = matchIndex * 2 + 1;
@@ -52,6 +52,9 @@ export default function Bracket({tournament}: BracketProps) {
                     const totalVoteCount = (match.song1VoteCount ?? 0) + (match.song2VoteCount ?? 0);
                     song1.totalVoteCount = totalVoteCount;
                     song2.totalVoteCount = totalVoteCount;
+                    // Clear activeRound boolean on original song object
+                    match.song1.activeRound = undefined;
+                    match.song2.activeRound = undefined;
                     return [song1, song2];
                 } else {
                     return [null, null];

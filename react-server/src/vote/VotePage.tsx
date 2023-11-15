@@ -6,11 +6,13 @@ import { getTournament, getVotes, submitVote } from "../service/TournamentServic
 import "./vote.css";
 import Song from "../model/Song";
 import { TournamentMatch } from "../model/Tournament";
+import { useLoadingScreenContext } from "../context/LoadingScreenContext";
 
 export default function VotePage() {
     const [searchParams] = useSearchParams();
     const navigate = useNavigate();
     const [tournament, setTournament] = useTournamentContext();
+    const [, setLoading] = useLoadingScreenContext();
     const [votedSongs, setVotedSongs] = useState<Set<number>>(new Set([]));
     const [saving, setSaving] = useState(false);
 
@@ -19,8 +21,10 @@ export default function VotePage() {
     const matches = useMemo(() => {
         // Setup votedSongs
         if(tournament?.id) {
+            setLoading(true);
             getVotes(tournament.id)
-                .then(songIds => setVotedSongs(new Set(songIds)));
+                .then(songIds => setVotedSongs(new Set(songIds)))
+                .then(() => setLoading(false));
         }
         // Setup matches
         let matches = currentRound?.matches ?? [];
@@ -38,10 +42,14 @@ export default function VotePage() {
     useEffect(() => {
         const id = Number.parseInt(searchParams.get("id") ?? "");
         if(tournament?.id !== id) {
+            setLoading(true);
             getTournament(id).then(tournament => {
                 console.log("Retrieved tournament:", tournament);
                 setTournament(tournament);
-            }).catch(() => setTournament(null));
+            }).catch(() => {
+                setTournament(null);
+                setLoading(false);
+            });
         }
     }, [searchParams.get("id")]);
 
