@@ -11,7 +11,7 @@ export function getTournament(id: number): Promise<Tournament|undefined> {
         .then(res => res.json())
         .then(res => Tournament.fromJson(res))
         .catch(() => {
-            console.log("Failed to retrieve tournament.");
+            console.error(`Failed to retrieve tournament ${id}`);
             return undefined;
         });
 }

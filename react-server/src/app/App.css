@@ -5,6 +5,7 @@
 .App {
     --vh100: calc(var(--vh, 1vh) * 100);
     --dark-color: #282c34;
+    --header-height: 80px;
 
     background-color: #e6e3df;
     height: var(--vh100, 100vh);
@@ -14,9 +15,7 @@
     font-family: Calibri, sans-serif;
 }
 
-header {
-    --header-height: 80px;
-    
+header {    
     background-color: var(--dark-color);
     flex: 0 0 var(--header-height);
     display: flex;
@@ -115,7 +114,7 @@ main {
 
 @media only screen and (max-width: 600px) {
 
-    header {
+    .App {
         --header-height: 50px;
     }
 

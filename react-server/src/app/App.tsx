@@ -14,11 +14,14 @@ import TournamentCreationPage from "../creation/TournamentCreationPage";
 import "./App.css";
 import "react-datetime/css/react-datetime.css";
 import TournamentSettingsPage from "../settings/TournamentSettingsPage";
+import { LoadingScreenContext } from "../context/LoadingScreenContext";
+import LoadingScreen from "./LoadingScreen";
 
 function App() {
     const tournamentState = useState<Tournament|null>();
     const profileState = useState<Profile|undefined|null>(undefined);
     const useOneTapState = useState<boolean>(false);
+    const loadingScreenState = useState<boolean>(false);
     const [profile, setProfile] = profileState;
 
     useEffect(() => {
@@ -34,16 +37,19 @@ function App() {
     return (
         <ProfileContext.Provider value={profileContext}>
             <TournamentContext.Provider value={tournamentState}>
-                <div className="App">
-                    <Header/>
-                    <Routes>
-                        <Route path="/" Component={ListPage}/>
-                        <Route path="/tournament" Component={BracketPage} />
-                        <Route path="/tournament/vote" Component={profile ? VotePage : LoginPage} />
-                        <Route path="/tournament/settings" Component={TournamentSettingsPage} />
-                        <Route path="/tournament/new" Component={TournamentCreationPage} />
-                    </Routes>
-                </div>
+                <LoadingScreenContext.Provider value={loadingScreenState}>
+                    <div className="App">
+                        <Header/>
+                        <Routes>
+                            <Route path="/" Component={ListPage}/>
+                            <Route path="/tournament" Component={BracketPage} />
+                            <Route path="/tournament/vote" Component={profile ? VotePage : LoginPage} />
+                            <Route path="/tournament/settings" Component={TournamentSettingsPage} />
+                            <Route path="/tournament/new" Component={TournamentCreationPage} />
+                        </Routes>
+                        <LoadingScreen loading={loadingScreenState[0]}/>
+                    </div>
+                </LoadingScreenContext.Provider>
             </TournamentContext.Provider>
         </ProfileContext.Provider>
     );

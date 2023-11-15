@@ -1,35 +1,42 @@
+import { Tooltip } from "@mui/material";
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
+import VoterCard from "../card/VoterCard";
 import { useTournamentContext } from "../context/TournamentContext";
+import TournamentSettings from "../model/TournamentSettings";
 import TournamentVoter from "../model/TournamentVoter";
 import { deleteTournament, getTournament, getTournamentSettings, saveTournamentSettings } from "../service/TournamentService";
 import "./settings.css";
-import VoterCard from "../card/VoterCard";
-import TournamentSettings from "../model/TournamentSettings";
-import Profile from "../model/Profile";
-import { Tooltip } from "@mui/material";
+import { useLoadingScreenContext } from "../context/LoadingScreenContext";
 
 export default function TournamentSettingsPage() {
     const [searchParams] = useSearchParams();
     const navigate = useNavigate();
     const [tournament, setTournament] = useTournamentContext();
+    const [, setLoading] = useLoadingScreenContext();
     const [settings, setSettings] = useState<TournamentSettings|null>();
     const [voterInput, setVoterInput] = useState("");
 
     useEffect(() => {
         const id = Number.parseInt(searchParams.get("id") ?? "");
         if(tournament?.id !== id) {
+            setLoading(true);
             getTournament(id).then(tournament => {
                 console.log("Retrieved tournament:", tournament);
                 setTournament(tournament);
-            }).catch(() => setTournament(null));
+            }).catch(() => {
+                setTournament(null);
+                setLoading(false);
+            });
         }
     }, [searchParams.get("id")]);
 
     useEffect(() => {
         if(tournament?.id) {
+            setLoading(true);
             getTournamentSettings(tournament.id)
-                .then(settings => setSettings(settings));
+                .then(settings => setSettings(settings))
+                .then(() => setLoading(false));
         }
     }, [tournament?.id]);
 

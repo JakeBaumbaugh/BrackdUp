@@ -6,6 +6,7 @@ import { useTournamentContext } from "../context/TournamentContext";
 import MadnessLogo from "../images/icon.png";
 import SpotifyLogo from "../images/spotify_logo.svg";
 import { login } from "../service/ProfileService";
+import { useLoadingScreenContext } from "../context/LoadingScreenContext";
 
 export default function Header() {
     const navigate = useNavigate();

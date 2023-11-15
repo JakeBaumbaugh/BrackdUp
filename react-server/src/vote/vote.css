@@ -67,7 +67,11 @@
         top: 1.3em;
     }
 
-    .vote-page .song-card  {
+    .vote-page .song-card-wrapper  {
+        width: 100%;
+    }
+
+    .vote-page .song-card-wrapper .song-card {
         width: 100%;
     }
 }
