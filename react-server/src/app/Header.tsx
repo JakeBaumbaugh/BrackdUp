@@ -1,3 +1,4 @@
+import { Tooltip } from "@mui/material";
 import { CredentialResponse, GoogleLogin } from "@react-oauth/google";
 import { MdSettings } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
@@ -5,8 +6,7 @@ import { useProfileContext } from "../context/ProfileContext";
 import { useTournamentContext } from "../context/TournamentContext";
 import MadnessLogo from "../images/icon.png";
 import SpotifyLogo from "../images/spotify_logo.svg";
-import { login } from "../service/ProfileService";
-import { useLoadingScreenContext } from "../context/LoadingScreenContext";
+import { login, logout } from "../service/ProfileService";
 
 export default function Header() {
     const navigate = useNavigate();
@@ -21,36 +21,55 @@ export default function Header() {
         }
     };
 
+    const onLogout = () => {
+        logout()
+            .then(() => setProfile(null))
+            .catch(() => console.log("Failed to log out."));
+    };
+
     const activeRound = tournament?.getActiveRound();
 
     return (
         <header className={tournament ? "with-tournament" : ""}>
-            <h1 onClick={() => navigate("/")}>
-                <img src={MadnessLogo} alt="Music Madness"/>    
+            <h1 className="clickable darken-hover" onClick={() => navigate("/")}>
+                <img src={MadnessLogo} alt="Music Madness" className="rotate-hover"/>    
                 Music Madness
             </h1>
             {tournament && (
                 <div className="tournament-info">
-                    <h2 onClick={() => navigate(`/tournament?id=${tournament.id}`)}>{tournament.name}</h2>
+                    <h2 className="clickable darken-hover" onClick={() => navigate(`/tournament?id=${tournament.id}`)}>
+                        {tournament.name}
+                    </h2>
                     {tournament.spotifyPlaylist && (
                         <a href={tournament.spotifyPlaylist} target="_blank">
-                            <img src={SpotifyLogo} alt="Spotify Button"/>
+                            <img src={SpotifyLogo} alt="Spotify Button" className="clickable darken-hover rotate-hover"/>
                         </a>
                     )}
                     {activeRound && (
                         <button 
-                            className="red-button"
+                            className="red-button darken-hover"
                             onClick={() => navigate(`/tournament/vote?id=${tournament.id}`)}
                             disabled={!activeRound.isDateInRange(new Date())}
                         >VOTE</button>
                     )}
                     {profile?.canEditTournament(tournament) && (
-                        <MdSettings onClick={() => navigate(`tournament/settings?id=${tournament.id}`)}/>
+                        <MdSettings
+                            className="clickable darken-hover rotate-hover"
+                            onClick={() => navigate(`tournament/settings?id=${tournament.id}`)}
+                        />
                     )}
                 </div>
             )}
-            { !profile && (
-                <div className="profile-wrapper">
+            <div className="profile-wrapper">
+                { profile ? (
+                    <Tooltip title="Logout" placement="left" arrow>
+                        <img
+                            src={profile.pictureLink}
+                            className="clickable darken-hover rotate-hover"
+                            onClick={onLogout}
+                        />
+                    </Tooltip>
+                ) : (
                     <GoogleLogin
                         onSuccess={onLoginSuccess}
                         onError={() => console.log("Google Login failed.")}
@@ -59,8 +78,8 @@ export default function Header() {
                         useOneTap={useOneTap}
                         cancel_on_tap_outside={false}
                     />
-                </div>
-            )}
+                )}
+            </div>
         </header>
     );
 }

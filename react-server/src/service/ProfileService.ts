@@ -7,6 +7,10 @@ export function login(jwt: string): Promise<Profile> {
         .then(res => Profile.fromJson(res));
 }
 
+export function logout(): Promise<Response> {
+    return post("/logout")
+}
+
 export function checkCookies(): Promise<Profile> {
     return post("/login")
         .then(res => res.json())

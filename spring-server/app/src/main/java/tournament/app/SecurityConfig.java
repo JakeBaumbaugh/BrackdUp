@@ -16,6 +16,7 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import jakarta.servlet.http.HttpServletResponse;
 import tournament.service.ProfileService;
 
 @Configuration
@@ -37,11 +38,15 @@ public class SecurityConfig {
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
             .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(requests -> requests
-            .requestMatchers("/tournament/vote").authenticated()
-            .requestMatchers("/admin/**").authenticated()
-            .requestMatchers(HttpMethod.POST).authenticated()
-            .requestMatchers(HttpMethod.DELETE).authenticated()
-            .requestMatchers(HttpMethod.GET).permitAll()
+                .requestMatchers("/tournament/vote").authenticated()
+                .requestMatchers("/admin/**").authenticated()
+                .requestMatchers(HttpMethod.POST).authenticated()
+                .requestMatchers(HttpMethod.DELETE).authenticated()
+                .requestMatchers(HttpMethod.GET).permitAll()
+            )
+            .logout(logout -> logout
+                .deleteCookies("jwt")
+                .logoutSuccessHandler((request, response, authentication) -> response.setStatus(200))
             )
             .addFilterBefore(new JwtTokenFilter(profileService), UsernamePasswordAuthenticationFilter.class)
             .build();
