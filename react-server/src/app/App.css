@@ -15,6 +15,10 @@
     font-family: Calibri, sans-serif;
 }
 
+main {
+    background-color: #e6e3df;
+}
+
 header {    
     background-color: var(--dark-color);
     flex: 0 0 var(--header-height);
@@ -42,34 +46,39 @@ header h1, header h2 {
     transition: all 220ms;
 }
 
-header h1:hover, header h1:focus, header h2:hover, header h2:focus {
-    /* color: #bbb; */
-    filter: brightness(72%);
-}
-
 header h1 > img {
     width: 1em;
     height: 1em;
-    transition: all 220ms;
 }
 
-header h1:hover img, header h1:focus img {
-    transform: rotate(10deg);
+header .profile-wrapper {
+    display: flex;
 }
 
-main {
-    background-color: #e6e3df;
+header .profile-wrapper > img {
+    width: 2.5em;
+    height: 2.5em;
+    border-radius: 50%;
 }
 
-.tournament-info img, .tournament-info svg {
-    width: 2em;
-    height: 2em;
+header .clickable {
     cursor: pointer;
-    transition: all 220ms;
 }
 
-.tournament-info img:hover, .tournament-info img:active, .tournament-info svg:hover, .tournament-info svg:active {
-    filter: brightness(65%);
+header .darken-hover,
+header .rotate-hover {
+    transition: filter 220ms, transform 220ms;
+}
+
+header .darken-hover:hover,
+header .darken-hover:focus {
+    filter: brightness(68%);
+}
+
+header .rotate-hover:hover,
+header .rotate-hover:focus,
+header h1:hover .rotate-hover,
+header h1:focus .rotate-hover {
     transform: rotate(10deg);
 }
 
@@ -84,6 +93,11 @@ main {
 
 .tournament-info h2 {
     margin: 0 auto 0 0;
+}
+
+.tournament-info img, .tournament-info svg {
+    width: 2em;
+    height: 2em;
 }
 
 .red-button {
@@ -112,6 +126,23 @@ main {
     filter: saturate(60%);
 }
 
+#g_a11y_announcement {
+    display: none;
+}
+
+/* Desktop */
+@media only screen and (min-width: 600px) {
+    .mobile-only {
+        display: none;
+    }
+
+    header .profile-wrapper {
+        border-left: solid 1px #556;
+        padding: 14px 1em 14px 2em;
+    }
+}
+
+/* Mobile */
 @media only screen and (max-width: 600px) {
 
     .App {
@@ -148,19 +179,4 @@ main {
         height: 3em;
         flex-shrink: 0;
     }
-}
-
-@media only screen and (min-width: 600px) {
-    .mobile-only {
-        display: none;
-    }
-
-    header .profile-wrapper {
-        border-left: solid 1px #556;
-        padding: 14px 1em 14px 2em;
-    }
-}
-
-#g_a11y_announcement {
-    display: none;
 }
