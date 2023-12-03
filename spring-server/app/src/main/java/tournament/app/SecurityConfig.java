@@ -16,7 +16,7 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-import jakarta.servlet.http.HttpServletResponse;
+import tournament.service.GoogleService;
 import tournament.service.ProfileService;
 
 @Configuration
@@ -25,10 +25,12 @@ public class SecurityConfig {
     private static final Logger logger = LoggerFactory.getLogger(SecurityConfig.class);
 
     private ProfileService profileService;
+    private GoogleService googleService;
 
     @Autowired
-    public SecurityConfig(ProfileService profileService) {
+    public SecurityConfig(ProfileService profileService, GoogleService googleService) {
         this.profileService = profileService;
+        this.googleService = googleService;
     }
     
     @Bean
@@ -45,10 +47,17 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.GET).permitAll()
             )
             .logout(logout -> logout
+                .logoutSuccessHandler((request, response, authentication) -> {
+                    JwtTokenFilter.getCookieJwt(request)
+                            .ifPresent(jwt -> {
+                                profileService.revokeJwt(jwt);
+                                logger.info("Revoking JWT {}", jwt);
+                            });
+                    response.setStatus(200);
+                })
                 .deleteCookies("jwt")
-                .logoutSuccessHandler((request, response, authentication) -> response.setStatus(200))
             )
-            .addFilterBefore(new JwtTokenFilter(profileService), UsernamePasswordAuthenticationFilter.class)
+            .addFilterBefore(new JwtTokenFilter(profileService, googleService), UsernamePasswordAuthenticationFilter.class)
             .build();
     }
 

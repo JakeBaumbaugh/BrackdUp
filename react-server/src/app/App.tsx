@@ -20,7 +20,7 @@ import LoadingScreen from "./LoadingScreen";
 function App() {
     const tournamentState = useState<Tournament|null>();
     const profileState = useState<Profile|undefined|null>(undefined);
-    const useOneTapState = useState<boolean>(false);
+    const forceLoginState = useState<boolean>(false);
     const loadingScreenState = useState<boolean>(false);
     const [profile, setProfile] = profileState;
 
@@ -31,8 +31,8 @@ function App() {
     }, []);
 
     const profileContext = useMemo(() => ({
-        profile: profileState, useOneTap: useOneTapState
-    }), [profileState, useOneTapState]);
+        profile: profileState, forceLogin: forceLoginState
+    }), [profileState, forceLoginState]);
 
     return (
         <ProfileContext.Provider value={profileContext}>

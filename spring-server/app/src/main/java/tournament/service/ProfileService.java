@@ -11,9 +11,11 @@ import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken.Payload;
 
 import tournament.model.Profile;
 import tournament.model.ProfileRole;
+import tournament.model.RevokedJwt;
 import tournament.model.TournamentVoter;
 import tournament.model.TournamentVoterId;
 import tournament.repository.ProfileRepository;
+import tournament.repository.RevokedJwtRepository;
 import tournament.repository.TournamentVoterRepository;
 
 @Service
@@ -24,11 +26,15 @@ public class ProfileService {
 
     ProfileRepository profileRepository;
     TournamentVoterRepository tournamentVoterRepository;
+    RevokedJwtRepository revokedJwtRepository;
 
     @Autowired
-    public ProfileService(ProfileRepository profileRepository, TournamentVoterRepository tournamentVoterRepository) {
+    public ProfileService(ProfileRepository profileRepository,
+                          TournamentVoterRepository tournamentVoterRepository,
+                          RevokedJwtRepository revokedJwtRepository) {
         this.profileRepository = profileRepository;
         this.tournamentVoterRepository = tournamentVoterRepository;
+        this.revokedJwtRepository = revokedJwtRepository;
     }
     
     public Profile getProfileFromPayload(Payload payload) {
@@ -62,5 +68,13 @@ public class ProfileService {
 
     public boolean profileCanEdit(Profile profile) {
         return profile.isAdmin();
+    }
+
+    public boolean isJwtRevoked(String jwt) {
+        return revokedJwtRepository.findById(jwt).isPresent();
+    }
+
+    public void revokeJwt(String jwt) {
+        revokedJwtRepository.save(new RevokedJwt(jwt));
     }
 }
