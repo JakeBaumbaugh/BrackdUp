@@ -55,7 +55,8 @@ header .profile-wrapper {
     display: flex;
 }
 
-header .profile-wrapper > img {
+.profile-wrapper > img,
+.login-button {
     width: 2.5em;
     height: 2.5em;
     border-radius: 50%;
@@ -80,6 +81,18 @@ header .rotate-hover:focus,
 header h1:hover .rotate-hover,
 header h1:focus .rotate-hover {
     transform: rotate(10deg);
+}
+
+header .login-button {
+    background-color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+header .login-button > svg {
+    width: 75%;
+    height: 75%;
 }
 
 .tournament-info {
@@ -138,7 +151,7 @@ header h1:focus .rotate-hover {
 
     header .profile-wrapper {
         border-left: solid 1px #556;
-        padding: 14px 1em 14px 2em;
+        padding: 10px 1em 10px 2em;
     }
 }
 
@@ -147,6 +160,10 @@ header h1:focus .rotate-hover {
 
     .App {
         --header-height: 50px;
+    }
+
+    header {
+        font-size: 8pt;
     }
 
     header.with-tournament {
@@ -167,14 +184,16 @@ header h1:focus .rotate-hover {
         height: calc(var(--header-height) / 2);
         overflow: hidden;
         border-left: none;
-        font-size: 8pt;
     }
 
     .tournament-info .vote-button {
         font-size: 10pt;
     }
 
-    .tournament-info img, .tournament-info svg {
+    .tournament-info img,
+    .tournament-info svg,
+    .profile-wrapper > img,
+    header .login-button {
         width: 3em;
         height: 3em;
         flex-shrink: 0;

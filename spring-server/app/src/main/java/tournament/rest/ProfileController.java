@@ -11,11 +11,11 @@ import tournament.model.Profile;
 @RestController
 public class ProfileController {
     private static final Logger logger = LoggerFactory.getLogger(ProfileController.class);
-    
+
     @PostMapping("/login")
     public Profile login(Authentication authentication) {
         Profile profile = (Profile) authentication.getPrincipal();
-        logger.info("POST request for login from {}", profile.getEmail());
+        logger.info("POST request to login from user {}", profile.getName());
         return profile;
     }
 }

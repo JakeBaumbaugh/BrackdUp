@@ -1,5 +1,7 @@
 import { Tooltip } from "@mui/material";
-import { CredentialResponse, GoogleLogin } from "@react-oauth/google";
+import { CodeResponse, useGoogleLogin } from "@react-oauth/google";
+import { useEffect } from "react";
+import { FcGoogle } from "react-icons/fc";
 import { MdSettings } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
 import { useProfileContext } from "../context/ProfileContext";
@@ -11,14 +13,13 @@ import { login, logout } from "../service/ProfileService";
 export default function Header() {
     const navigate = useNavigate();
     const [tournament] = useTournamentContext();
-    const {profile: [profile, setProfile], useOneTap: [useOneTap]} = useProfileContext();
+    const {profile: [profile, setProfile], forceLogin: [forceLogin]} = useProfileContext();
 
-    const onLoginSuccess = (credentialResponse: CredentialResponse) => {
-        if(credentialResponse.credential) {
-            login(credentialResponse.credential)
-                .then(profile => setProfile(profile))
-                .catch(() => setProfile(null));
-        }
+    const onLogin = (codeResponse: CodeResponse) => {
+        console.log(codeResponse);
+        login(codeResponse.code)
+            .then(profile => setProfile(profile))
+            .catch(() => setProfile(null));
     };
 
     const onLogout = () => {
@@ -27,12 +28,24 @@ export default function Header() {
             .catch(() => console.log("Failed to log out."));
     };
 
+    const googleLogin = useGoogleLogin({
+        flow: "auth-code",
+        onSuccess: onLogin
+    });
+
+    // Force login popup without user interact
+    useEffect(() => {
+        if(forceLogin && !profile) {
+            googleLogin();
+        }
+    }, [profile, forceLogin]);
+
     const activeRound = tournament?.getActiveRound();
 
     return (
         <header className={tournament ? "with-tournament" : ""}>
             <h1 className="clickable darken-hover" onClick={() => navigate("/")}>
-                <img src={MadnessLogo} alt="Music Madness" className="rotate-hover"/>    
+                <img src={MadnessLogo} alt="Music Madness" className="rotate-hover"/>
                 Music Madness
             </h1>
             {tournament && (
@@ -70,14 +83,12 @@ export default function Header() {
                         />
                     </Tooltip>
                 ) : (
-                    <GoogleLogin
-                        onSuccess={onLoginSuccess}
-                        onError={() => console.log("Google Login failed.")}
-                        type="icon"
-                        shape="circle"
-                        useOneTap={useOneTap}
-                        cancel_on_tap_outside={false}
-                    />
+                    <div
+                        className="login-button clickable darken-hover rotate-hover"
+                        onClick={() => googleLogin()}
+                    >
+                        <FcGoogle/>
+                    </div>
                 )}
             </div>
         </header>

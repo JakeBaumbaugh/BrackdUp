@@ -3,12 +3,12 @@ import { useProfileContext } from "../context/ProfileContext";
 import "./login.css";
 
 export default function LoginPage() {
-    const {profile: [profile], useOneTap: [_, setUseOneTap]} = useProfileContext();
+    const {profile: [profile], forceLogin: [_, setForceLogin]} = useProfileContext();
 
     useEffect(() => {
         if(profile === null) {
-            setUseOneTap(true);
-            return () => setUseOneTap(false);
+            setForceLogin(true);
+            return () => setForceLogin(false);
         }
     }, [profile]);
 
