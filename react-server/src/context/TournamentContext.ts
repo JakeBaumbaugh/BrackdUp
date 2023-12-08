@@ -1,7 +1,18 @@
-import { createContext, useContext, useState } from "react";
+import { Dispatch, SetStateAction, createContext, useContext } from "react";
 import { Tournament } from "../model/Tournament";
 
-type StateType = ReturnType<typeof useState<Tournament|null|undefined>>;
-export const TournamentContext = createContext<StateType>([undefined, () => {}]);
+type SetState<T> = Dispatch<SetStateAction<T>>;
+type StateType = {
+    tournament: Tournament|null|undefined;
+    setTournament: SetState<Tournament|null|undefined>;
+    userVotes: Set<number>|null;
+    setUserVotes: SetState<Set<number>|null>;
+};
+export const TournamentContext = createContext<StateType>({
+    tournament: undefined,
+    setTournament: () => {},
+    userVotes: null,
+    setUserVotes: () => {}
+});
 
 export const useTournamentContext = () => useContext(TournamentContext);

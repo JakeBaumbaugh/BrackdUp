@@ -113,32 +113,6 @@ header .login-button > svg {
     height: 2em;
 }
 
-.red-button {
-    background-color: #f01d1d;
-    border: none;
-    color: white;
-    font-weight: 600;
-    font-size: 12pt;
-    border-radius: 8px;
-    box-shadow: 0 3px 5px rgba(0, 0, 0, 0.18);
-
-    display: inline-flex;
-    justify-content: center;
-    align-items: center;
-    padding: 8px;
-
-    cursor: pointer;
-    transition: background-color 220ms;
-}
-
-.red-button:hover, .red-button:active {
-    background-color: #b50d0d;
-}
-
-.red-button:disabled {
-    filter: saturate(60%);
-}
-
 #g_a11y_announcement {
     display: none;
 }
@@ -186,8 +160,9 @@ header .login-button > svg {
         border-left: none;
     }
 
-    .tournament-info .vote-button {
-        font-size: 10pt;
+    .tournament-info h2 {
+        font-size: 1.6em;
+        font-weight: 600;
     }
 
     .tournament-info img,

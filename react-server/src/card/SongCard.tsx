@@ -11,7 +11,7 @@ interface SongCardProps {
 }
 
 export default function SongCard({song, final, votedFor, onClick, deletable, selectable}: SongCardProps) {
-    let cardClass = "card song-card";
+    let cardClass = "custom-card song-card";
     if (final) {
         cardClass += " final";
     }
@@ -31,7 +31,7 @@ export default function SongCard({song, final, votedFor, onClick, deletable, sel
         cardClass += " selectable";
     }
 
-    return <>
+    return (
         <div className="song-card-wrapper">
             <div className={cardClass} onClick={onClick}>
                 <div>{song?.title}</div>
@@ -41,5 +41,5 @@ export default function SongCard({song, final, votedFor, onClick, deletable, sel
                 <span className="tag after-tag">{Math.round(100 * song.receivedVoteCount / song.totalVoteCount)}%</span>
             )}
         </div>
-    </>;
+    );
 }

@@ -37,6 +37,10 @@
     text-align: center;
 }
 
+.tournament-card .tournament-card-content > * {
+    margin-top: 1em;
+}
+
 .tournament-card .tournament-card-content, 
 .tournament-card.create-tournament-card {
     transition: background-color 220ms;

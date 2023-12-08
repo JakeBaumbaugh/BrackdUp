@@ -38,21 +38,21 @@
     background-color: #d7f7da;
 }
 
-.card.clickable {
+.custom-card.clickable {
     cursor: pointer;
 }
 
-.card.clickable:hover, .card.clickable:active {
+.custom-card.clickable:hover, .custom-card.clickable:active {
     filter: brightness(92%) saturate(120%);
 }
 
-.card.clickable.deletable:hover,
-.card.clickable.deletable:active {
+.custom-card.clickable.deletable:hover,
+.custom-card.clickable.deletable:active {
     background-color: #D88;
 }
 
-.card.clickable.deletable:hover > *,
-.card.clickable.deletable:active > * {
+.custom-card.clickable.deletable:hover > *,
+.custom-card.clickable.deletable:active > * {
     background-color: #FAA;
 }
 

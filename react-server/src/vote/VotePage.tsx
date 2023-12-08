@@ -1,61 +1,42 @@
-import { useEffect, useMemo, useState } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useMemo, useState } from "react";
+import { Button } from "react-bootstrap";
+import { useNavigate } from "react-router-dom";
 import SongCard from "../card/SongCard";
 import { useTournamentContext } from "../context/TournamentContext";
-import { getTournament, getVotes, submitVote } from "../service/TournamentService";
-import "./vote.css";
+import TournamentManager from "../context/TournamentManager";
 import Song from "../model/Song";
 import { TournamentMatch } from "../model/Tournament";
-import { useLoadingScreenContext } from "../context/LoadingScreenContext";
+import { submitVote } from "../service/TournamentService";
+import "./vote.css";
 
 export default function VotePage() {
-    const [searchParams] = useSearchParams();
     const navigate = useNavigate();
-    const [tournament, setTournament] = useTournamentContext();
-    const [, setLoading] = useLoadingScreenContext();
-    const [votedSongs, setVotedSongs] = useState<Set<number>>(new Set([]));
+    const {tournament, userVotes, setUserVotes} = useTournamentContext();
     const [saving, setSaving] = useState(false);
 
     const currentRound = tournament?.getVotableRound();
-    
+
     const matches = useMemo(() => {
-        // Setup votedSongs
-        if(tournament?.id) {
-            setLoading(true);
-            getVotes(tournament.id)
-                .then(songIds => setVotedSongs(new Set(songIds)))
-                .then(() => setLoading(false));
+        // Empty if no permission, userVotes null if forbidden
+        if(!userVotes) {
+            return [];
         }
         // Setup matches
         let matches = currentRound?.matches ?? [];
         matches =  matches.map(match => match.copy());
         matches.forEach(match => {
-            if(votedSongs.has(match.song1.id)) {
+            if(userVotes.has(match.song1.id)) {
                 match.songWinner = match.song1;
-            } else if(votedSongs.has(match.song2.id)) {
+            } else if(userVotes.has(match.song2.id)) {
                 match.songWinner = match.song2;
             }
         });
         return matches;
-    }, [currentRound]);
-    
-    useEffect(() => {
-        const id = Number.parseInt(searchParams.get("id") ?? "");
-        if(tournament?.id !== id) {
-            setLoading(true);
-            getTournament(id).then(tournament => {
-                console.log("Retrieved tournament:", tournament);
-                setTournament(tournament);
-            }).catch(() => {
-                setTournament(null);
-                setLoading(false);
-            });
-        }
-    }, [searchParams.get("id")]);
+    }, [currentRound, userVotes]);
 
     const vote = (match: TournamentMatch, song: Song) => {
-        setVotedSongs(votedSongs => {
-            const newVotedSongs = new Set(votedSongs);
+        setUserVotes(userVotes => {
+            const newVotedSongs = new Set(userVotes);
             if(newVotedSongs.has(song.id)) {
                 newVotedSongs.delete(song.id);
             } else {
@@ -68,9 +49,9 @@ export default function VotePage() {
     }
 
     const submit = () => {
-        if(tournament) {
+        if(tournament && userVotes) {
             setSaving(true);
-            submitVote(tournament.id, [...votedSongs])
+            submitVote(tournament.id, [...userVotes])
                 .then(() => {
                     setSaving(false);
                     navigate(`/tournament?id=${tournament.id}`);
@@ -81,6 +62,13 @@ export default function VotePage() {
         }
     }
 
+    if(userVotes === null) {
+        return (
+            <main className="vote-page">
+                Forbidden.
+            </main>);
+    }
+
     return (
         <main className="vote-page">
             <div className="match-container">
@@ -88,7 +76,7 @@ export default function VotePage() {
                     <div key={match.id} className="match">
                         <SongCard
                             song={match.song1}
-                            votedFor={votedSongs.has(match.song1.id)}
+                            votedFor={userVotes.has(match.song1.id)}
                             onClick={() => vote(match, match.song1)}
                         />
                         <div className="match-connector">
@@ -98,16 +86,16 @@ export default function VotePage() {
                         </div>
                         <SongCard
                             song={match.song2}
-                            votedFor={votedSongs.has(match.song2.id)}
+                            votedFor={userVotes.has(match.song2.id)}
                             onClick={() => vote(match, match.song2)}
                         />
                     </div>
                 ))}
-                <button
+                <Button
+                    variant="danger"
                     onClick={submit}
-                    className="red-button"
                     disabled={saving}
-                >SUBMIT</button>
+                >SUBMIT</Button>
             </div>
         </main>
     );

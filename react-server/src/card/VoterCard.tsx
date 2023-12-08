@@ -8,7 +8,7 @@ interface VoterCardProps {
 }
 
 export default function VoterCard({voter, onClick, deletable}: VoterCardProps) {
-    let cardClass = "card voter-card";
+    let cardClass = "custom-card voter-card";
     if (onClick) {
         cardClass += " clickable";
     }

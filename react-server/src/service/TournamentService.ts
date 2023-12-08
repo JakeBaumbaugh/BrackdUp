@@ -3,7 +3,6 @@ import { Tournament } from "../model/Tournament";
 import TournamentBuilder from "../model/TournamentBuilder";
 import TournamentSettings from "../model/TournamentSettings";
 import TournamentSummary from "../model/TournamentSummary";
-import TournamentVoter from "../model/TournamentVoter";
 import { delet, get, post } from "./ServiceUtil";
 
 export function getTournament(id: number): Promise<Tournament|undefined> {
@@ -33,12 +32,12 @@ export function submitVote(tournamentId: number, songIds: number[]): Promise<Res
     });
 }
 
-export function getVotes(tournamentId: number): Promise<number[]> {
+export function getVotes(tournamentId: number): Promise<number[]|null> {
     return get(`/tournament/vote?tournamentId=${tournamentId}`)
         .then(res => res.json())
         .catch(() => {
             console.log("Failed to retrieve votes.");
-            return [];
+            return null;
         });
 }
 

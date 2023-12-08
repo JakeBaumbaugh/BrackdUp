@@ -50,6 +50,10 @@
     grid-column: 1 / -1;
 }
 
+.voting-status > p {
+    margin: 1em 0;
+}
+
 .voting-status > .voter-profiles {
     display: flex;
     flex-wrap: wrap;

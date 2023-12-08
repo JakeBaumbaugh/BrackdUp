@@ -1,6 +1,7 @@
-import { Tooltip } from "@mui/material";
-import { CodeResponse, useGoogleLogin } from "@react-oauth/google";
 import { useEffect } from "react";
+import { Button, OverlayTrigger, Tooltip } from "react-bootstrap";
+import { OverlayInjectedProps } from "react-bootstrap/esm/Overlay";
+import { CodeResponse, useGoogleLogin } from "@react-oauth/google";
 import { FcGoogle } from "react-icons/fc";
 import { MdSettings } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
@@ -12,7 +13,7 @@ import { login, logout } from "../service/ProfileService";
 
 export default function Header() {
     const navigate = useNavigate();
-    const [tournament] = useTournamentContext();
+    const {tournament} = useTournamentContext();
     const {profile: [profile, setProfile], forceLogin: [forceLogin]} = useProfileContext();
 
     const onLogin = (codeResponse: CodeResponse) => {
@@ -42,6 +43,11 @@ export default function Header() {
 
     const activeRound = tournament?.getActiveRound();
 
+    const renderLogoutTooltip = (props: OverlayInjectedProps) => {
+        console.log("TOOLTIIIIIP");
+        return <Tooltip id="logout-tooltip" {...props}>Logout</Tooltip>
+    }
+
     return (
         <header className={tournament ? "with-tournament" : ""}>
             <h1 className="clickable darken-hover" onClick={() => navigate("/")}>
@@ -59,11 +65,11 @@ export default function Header() {
                         </a>
                     )}
                     {activeRound && (
-                        <button 
-                            className="red-button darken-hover"
+                        <Button
+                            variant="danger"
                             onClick={() => navigate(`/tournament/vote?id=${tournament.id}`)}
                             disabled={!activeRound.isDateInRange(new Date())}
-                        >VOTE</button>
+                        >VOTE</Button>
                     )}
                     {profile?.canEditTournament(tournament) && (
                         <MdSettings
@@ -75,13 +81,13 @@ export default function Header() {
             )}
             <div className="profile-wrapper">
                 { profile ? (
-                    <Tooltip title="Logout" placement="left" arrow>
+                    <OverlayTrigger placement="left" overlay={renderLogoutTooltip}>
                         <img
                             src={profile.pictureLink}
                             className="clickable darken-hover rotate-hover"
                             onClick={onLogout}
                         />
-                    </Tooltip>
+                    </OverlayTrigger>
                 ) : (
                     <div
                         className="login-button clickable darken-hover rotate-hover"
