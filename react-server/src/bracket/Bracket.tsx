@@ -96,7 +96,7 @@ export default function Bracket({tournament}: BracketProps) {
                                 <SongCard
                                     song={song}
                                     final={index == (songColumns.length - 1) / 2}
-                                    key={`${song?.title}-${song?.artist}`}
+                                    // key={`${song?.title}-${song?.artist}`}
                                 />
                             )}
                         </div>

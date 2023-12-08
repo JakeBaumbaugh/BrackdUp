@@ -1,4 +1,3 @@
-import { Tooltip } from "@mui/material";
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import VoterCard from "../card/VoterCard";
@@ -8,11 +7,12 @@ import TournamentVoter from "../model/TournamentVoter";
 import { deleteTournament, getTournament, getTournamentSettings, saveTournamentSettings } from "../service/TournamentService";
 import "./settings.css";
 import { useLoadingScreenContext } from "../context/LoadingScreenContext";
+import { OverlayTrigger, Tooltip } from "react-bootstrap";
 
 export default function TournamentSettingsPage() {
     const [searchParams] = useSearchParams();
     const navigate = useNavigate();
-    const [tournament, setTournament] = useTournamentContext();
+    const {tournament, setTournament} = useTournamentContext();
     const [, setLoading] = useLoadingScreenContext();
     const [settings, setSettings] = useState<TournamentSettings|null>();
     const [voterInput, setVoterInput] = useState("");
@@ -78,27 +78,21 @@ export default function TournamentSettingsPage() {
                         <p>Has Voted:</p>
                         <div className="voter-profiles">
                             {votersWithProfiles?.filter(voter => voter.hasVoted).map(voter => (
-                                <Tooltip
-                                    key={voter.email}
-                                    title={voter.profile!.getName()}
-                                    placement="right"
-                                    arrow
-                                >
+                                <OverlayTrigger placement="right" key={voter.email} overlay={
+                                    <Tooltip id={`${voter.email}-tooltip`}>{voter.profile!.getName()}</Tooltip>
+                                }>
                                     <img src={voter.profile!.pictureLink}/>
-                                </Tooltip>
+                                </OverlayTrigger>
                             ))}
                         </div>
                         <p>Has Not Voted:</p>
                         <div className="voter-profiles">
                             {votersWithProfiles?.filter(voter => voter.hasVoted === false).map(voter => (
-                                <Tooltip
-                                    key={voter.email}
-                                    title={voter.profile!.getName()}
-                                    placement="right"
-                                    arrow
-                                >
+                                <OverlayTrigger placement="right" key={voter.email} overlay={
+                                    <Tooltip id={`${voter.email}-tooltip`}>{voter.profile!.getName()}</Tooltip>
+                                }>
                                     <img src={voter.profile!.pictureLink}/>
-                                </Tooltip>
+                                </OverlayTrigger>
                             ))}
                         </div>
                     </div>

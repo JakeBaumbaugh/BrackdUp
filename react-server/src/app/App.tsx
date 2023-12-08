@@ -11,14 +11,18 @@ import VotePage from "../vote/VotePage";
 import Header from "./Header";
 import LoginPage from "./LoginPage";
 import TournamentCreationPage from "../creation/TournamentCreationPage";
-import "./App.css";
-import "react-datetime/css/react-datetime.css";
 import TournamentSettingsPage from "../settings/TournamentSettingsPage";
 import { LoadingScreenContext } from "../context/LoadingScreenContext";
 import LoadingScreen from "./LoadingScreen";
+import "./App.css";
+import "react-datetime/css/react-datetime.css";
+import "bootstrap/dist/css/bootstrap.min.css";
+import TournamentManager from "../context/TournamentManager";
 
 function App() {
-    const tournamentState = useState<Tournament|null>();
+    const [tournament, setTournament] = useState<Tournament|null>();
+    const [userVotes, setUserVotes] = useState<Set<number>|null>(null);
+    const tournamentContextState = useMemo(() => ({tournament, setTournament, userVotes, setUserVotes}), [tournament, setTournament, userVotes, setUserVotes]);
     const profileState = useState<Profile|undefined|null>(undefined);
     const forceLoginState = useState<boolean>(false);
     const loadingScreenState = useState<boolean>(false);
@@ -36,7 +40,7 @@ function App() {
 
     return (
         <ProfileContext.Provider value={profileContext}>
-            <TournamentContext.Provider value={tournamentState}>
+            <TournamentContext.Provider value={tournamentContextState}>
                 <LoadingScreenContext.Provider value={loadingScreenState}>
                     <div className="App">
                         <Header/>
@@ -49,6 +53,7 @@ function App() {
                         </Routes>
                         <LoadingScreen loading={loadingScreenState[0]}/>
                     </div>
+                    <TournamentManager/>
                 </LoadingScreenContext.Provider>
             </TournamentContext.Provider>
         </ProfileContext.Provider>

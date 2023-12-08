@@ -9,10 +9,11 @@ import { useTournamentContext } from "../context/TournamentContext";
 import { ClipLoader } from "react-spinners";
 import { useProfileContext } from "../context/ProfileContext";
 import { useLoadingScreenContext } from "../context/LoadingScreenContext";
+import { Button } from "react-bootstrap";
 
 export default function ListPage() {
     const [tournaments, setTournaments] = useState<TournamentSummary[]>([]);
-    const [, setTournament] = useTournamentContext();
+    const {setTournament} = useTournamentContext();
     const {profile: [profile]} = useProfileContext();
     const [, setLoading] = useLoadingScreenContext();
     const navigate = useNavigate();
@@ -57,7 +58,7 @@ export default function ListPage() {
                             )}
                             { t.votingEndDate && (
                                 <div onClick={() => navigate(`/tournament/vote?id=${t.id}`)}>
-                                    <button className="red-button">VOTE</button>
+                                    <Button variant="danger">VOTE</Button>
                                 </div>
                             )}
                         </div>
