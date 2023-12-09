@@ -1,7 +1,6 @@
 package tournament.model;
 
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -21,16 +20,14 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OrderBy;
 import jakarta.persistence.Transient;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+import tournament.util.DateUtil;
 
 @Entity
-@Getter @Setter @ToString @EqualsAndHashCode
+@Getter @Setter @ToString
 public class TournamentRound {
-    private static final ZoneId EASTERN = ZoneId.of("America/New_York");
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
@@ -39,6 +36,9 @@ public class TournamentRound {
     
     @Enumerated(EnumType.STRING)
     private RoundStatus status;
+
+    @ToString.Exclude
+    private String description;
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "round_id", nullable = false)
@@ -50,19 +50,31 @@ public class TournamentRound {
     }
 
     public ZonedDateTime getStartDate() {
-        return startDate != null ? startDate.atZone(EASTERN) : null;
+        return DateUtil.localToZoned(startDate);
     }
 
     public void setStartDate(ZonedDateTime startDate) {
-        this.startDate = startDate.withZoneSameInstant(EASTERN).toLocalDateTime();
+        this.startDate = DateUtil.zonedToLocal(startDate);
+    }
+
+    public void setStartDate(LocalDateTime startDate) {
+        this.startDate = startDate;
     }
 
     public ZonedDateTime getEndDate() {
-        return endDate != null ? endDate.atZone(EASTERN) : null;
+        return DateUtil.localToZoned(endDate);
     }
 
     public void setEndDate(ZonedDateTime endDate) {
-        this.endDate = endDate.withZoneSameInstant(EASTERN).toLocalDateTime();
+        this.endDate = DateUtil.zonedToLocal(endDate);
+    }
+
+    public void setEndDate(LocalDateTime endDate) {
+        this.endDate = endDate;
+    }
+
+    public String getDescription() {
+        return description != null ? description : "";
     }
 
     public void addMatch(TournamentMatch match) {
@@ -87,7 +99,7 @@ public class TournamentRound {
     @Transient
     @JsonIgnore
     public boolean isDateInRange(ZonedDateTime zdt) {
-        LocalDateTime ldt = zdt.withZoneSameInstant(EASTERN).toLocalDateTime();
+        LocalDateTime ldt = DateUtil.zonedToLocal(zdt);
         if(startDate == null || endDate == null) {
             return false;
         }

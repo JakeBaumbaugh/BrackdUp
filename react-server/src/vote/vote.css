@@ -1,14 +1,10 @@
 .vote-page {
     flex: 1 0 0;
     overflow-y: auto;
-}
 
-.vote-page .match-container {
-    min-height: 100%;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-evenly;
-    user-select: none;
+    display: grid;
+    grid-template-rows: 1fr auto;
+    gap: 1em;
 }
 
 .match-container .match {
@@ -40,31 +36,70 @@
     flex: 1 0 0;
 }
 
-.match-container > button {
-    width: 40%;
-    margin: 0 auto;
+.match-container > p {
+    margin: 0;
 }
 
+.vote-page > .action-buttons {
+    display: flex;
+    justify-content: space-between;
+}
+
+.vote-page .action-buttons .btn {
+    width: 5em;
+}
+
+.vote-page .match-container .round-description {
+    grid-column: -1 / 1;
+    grid-row: -1 / 1;
+    display: flex;
+    align-items: center;
+    text-align: center;
+}
+
+/* Desktop */
 @media only screen and (min-width: 600px) {
-    .match-container {
-        padding: 0 30%;
+    .vote-page {
+        padding: 4em 30%;
+    }
+
+    .vote-page .match-container {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        grid-template-rows: 1fr auto 1fr;
+        gap: 2em 4em;
+    }
+
+    .vote-page .match-container > .match {
+        grid-column: -1 / 1;
+        grid-row: 2 / 3;
+    }
+
+    .vote-page .match-container > p {
+        grid-row: 1 / 2;
+        text-align: justify;
+    }
+
+    .vote-page .match-container .round-description {
+        padding: 0 20%;
     }
 }
 
+/* Mobile */
 @media only screen and (max-width: 600px) {
-    .vote-page .match-container {
+    .vote-page {
         padding: 8px;
-        gap: 4em;
+    }
+
+    .vote-page .match-container {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-around;
+        user-select: none;
     }
 
     .vote-page .match {
         flex-wrap: wrap;
-    }
-
-    .vote-page .match::after {
-        content: ". . . . . . .";
-        position: relative;
-        top: 1.3em;
     }
 
     .vote-page .song-card-wrapper  {

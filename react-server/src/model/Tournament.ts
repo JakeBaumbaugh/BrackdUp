@@ -85,6 +85,14 @@ export class Tournament {
         const activeRound = this.getActiveRound();
         return activeRound?.isDateInRange(now) ? activeRound : undefined;
     }
+
+    getCurrentOrNextRound(): TournamentRound|undefined {
+        const now = new Date();
+        return this.levels
+            .flatMap(level => level.rounds)
+            .filter(round => round.endDate > now)
+            .at(0);
+    }
 }
 
 export class TournamentLevel {
@@ -114,20 +122,22 @@ export class TournamentRound {
     id: number;
     startDate: Date;
     endDate: Date;
-    matches: TournamentMatch[];
     status: RoundStatus;
+    description: string;
+    matches: TournamentMatch[];
 
-    constructor(id: number, startDate: Date, endDate: Date, matches: TournamentMatch[], status?: RoundStatus) {
+    constructor(id: number, startDate: Date, endDate: Date, matches: TournamentMatch[], status?: RoundStatus, description?: string) {
         this.id = id;
         this.startDate = startDate;
         this.endDate = endDate;
         this.matches = matches;
+        this.description = description ?? "";
         this.status = status ?? "CREATED";
     }
 
     static fromJson(data: any): TournamentRound {
         const matches = data.matches.map((matchData: any) => TournamentMatch.fromJson(matchData));
-        return new TournamentRound(data.id, new Date(data.startDate), new Date(data.endDate), matches, data.status);
+        return new TournamentRound(data.id, new Date(data.startDate), new Date(data.endDate), matches, data.status, data.description);
     }
 
     getSongs(): Song[] {
@@ -156,18 +166,22 @@ export class TournamentMatch {
     songWinner?: Song;
     song1VoteCount?: number;
     song2VoteCount?: number;
+    song1Description: string;
+    song2Description: string;
 
-    constructor(id: number, song1: Song, song2: Song, songWinner?: Song, song1VoteCount?: number, song2VoteCount?: number) {
+    constructor(id: number, song1: Song, song2: Song, songWinner?: Song, song1VoteCount?: number, song2VoteCount?: number, song1Description?: string, song2Description?: string) {
         this.id = id;
         this.song1 = song1;
         this.song2 = song2;
         this.songWinner = songWinner;
         this.song1VoteCount = song1VoteCount;
         this.song2VoteCount = song2VoteCount;
+        this.song1Description = song1Description ?? "";
+        this.song2Description = song2Description ?? "";
     }
 
     static fromJson(data: any): TournamentMatch {
-        return new TournamentMatch(data.id, data.song1, data.song2, data.songWinner, data.song1VoteCount, data.song2VoteCount);
+        return new TournamentMatch(data.id, data.song1, data.song2, data.songWinner, data.song1VoteCount, data.song2VoteCount, data.song1Description, data.song2Description);
     }
 
     getSongs(): Song[] {
@@ -175,6 +189,6 @@ export class TournamentMatch {
     }
 
     copy(): TournamentMatch {
-        return new TournamentMatch(this.id, this.song1, this.song2, this.songWinner);
+        return new TournamentMatch(this.id, this.song1, this.song2, this.songWinner, this.song1VoteCount, this.song2VoteCount, this.song1Description, this.song2Description);
     }
 }

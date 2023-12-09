@@ -24,7 +24,7 @@ export default function ListPage() {
         getTournamentSummaries();
     }, []);
 
-    const getTournamentSummaries = () => {
+    const getTournamentSummaries = () =>
         getTournaments().then(tournaments => {
             const expiredTournaments: TournamentSummary[] = [];
             const activeTourmaments: TournamentSummary[] = [];
@@ -35,7 +35,6 @@ export default function ListPage() {
             futureTournaments.sort((t1, t2) => t2.startDate.valueOf() - t1.startDate.valueOf());
             setTournaments([...activeTourmaments, ...futureTournaments, ...expiredTournaments]);
         }).then(() => setLoading(false));
-    };
 
     const redirect = (id: number) => {
         navigate(`/tournament?id=${id}`);
@@ -76,47 +75,40 @@ export default function ListPage() {
 
 interface TournamentCardProps {
     summary: TournamentSummary;
-    refreshSummary: () => void;
+    refreshSummary: () => Promise<any>;
 }
 
 function TournamentCardContent({summary, refreshSummary}: TournamentCardProps) {
     const [loading, setLoading] = useState(false);
     const date = new Date();
 
-    useEffect(() => {
-        setLoading(!summary.votingEndDate || summary.votingEndDate < date);
-    }, [summary.votingEndDate]);
-
     // Tournament over
     if(summary.songWinner) {
-        return <>
-            <p>Winner: {summary.songWinner.title}</p>
-        </>
+        return <p>Winner: {summary.songWinner.title}</p>
     }
 
     // Tournament yet to begin
     if(date < summary.startDate) {
-        return <>
-            <p>Tournament begins: {summary.startDate.toLocaleDateString()}</p>
-        </>
+        return <p>Tournament begins: {summary.startDate.toLocaleDateString()}</p>
     }
 
     // Tournament in progress
 
     // Round end processing
     if(loading) {
-        return <>
-            <ClipLoader/>
-        </>
+        return <ClipLoader/>
     }
 
     const onComplete = () => {
         setLoading(true);
-        setTimeout(() => refreshSummary(), 15000);
+        setTimeout(() => {
+            refreshSummary().then(() => setLoading(false));
+        }, 15000);
     };
 
-    // Voting open
-    return <>
-        <CountdownTimer endDate={summary.votingEndDate!} onComplete={onComplete}/>
-    </>
+    if(summary.votingEndDate) {
+        return <CountdownTimer endDate={summary.votingEndDate} onComplete={onComplete}/>
+    } else {
+        return <CountdownTimer endDate={summary.votingStartDate!} onComplete={onComplete} voteDescription="starts"/>
+    }
 }

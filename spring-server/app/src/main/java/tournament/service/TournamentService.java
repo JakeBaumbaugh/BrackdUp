@@ -19,6 +19,8 @@ import org.springframework.stereotype.Service;
 import io.micrometer.common.util.StringUtils;
 import jakarta.transaction.Transactional;
 import tournament.model.*;
+import tournament.model.TournamentSettings.MatchDescription;
+import tournament.model.TournamentSettings.RoundDate;
 import tournament.repository.SongRepository;
 import tournament.repository.TournamentRepository;
 import tournament.repository.TournamentVoterRepository;
@@ -70,10 +72,9 @@ public class TournamentService {
                                 logger.info("Scheduling initial resolve for round {} in tournament {}.", round.getId(), tournament.getId());
                                 scheduleRoundResolve(tournament, round);
                             });
-                    if (tournament.getStartDate().isAfter(now)) {
+                    TournamentRound firstRound = tournament.getLevels().get(0).getRounds().get(0);
+                    if (tournament.getStartDate().isAfter(now) || firstRound.getStatus() == RoundStatus.CREATED) {
                         scheduleTournamentStart(tournament);
-                    } else if (tournament.getLevels().get(0).getRounds().get(0).getStatus() == RoundStatus.CREATED) {
-                        startTournament(tournament);
                     }
                 });
     }
@@ -104,11 +105,7 @@ public class TournamentService {
         logger.info("Created tournament: {}", tournament);
         if(tournament != null) {
             tournament = tournamentRepository.save(tournament);
-            if (tournament.getRoundByCurrentDate().isPresent()) {
-                startTournament(tournament);
-            } else {
-                scheduleTournamentStart(tournament);
-            }
+            scheduleTournamentStart(tournament);
         }
     }
 
@@ -174,7 +171,28 @@ public class TournamentService {
 
     public TournamentSettings getTournamentSettings(Integer tournamentId) {
         List<TournamentVoter> voters = getVotersForTournament(tournamentId);
-        return new TournamentSettings(tournamentId, voters);
+        Optional<Tournament> optionalTournament = getTournament(tournamentId);
+        Optional<TournamentRound> currentRound = optionalTournament
+                .map(tournament -> tournament.getRoundByCurrentDate().orElse(null));
+        String roundDescription = currentRound
+                .map(TournamentRound::getDescription)
+                .orElse(null);
+        List<MatchDescription> matchDescriptions = currentRound
+                .map(round -> round.getMatches()
+                        .stream()
+                        .map(match -> new MatchDescription(match.getSong1Title(), match.getSong1Description(), match.getSong2Title(), match.getSong2Description()))
+                        .toList()
+                )
+                .orElse(null);
+        List<RoundDate> roundDates = optionalTournament
+                .map(Tournament::getLevels)
+                .orElse(List.of())
+                .stream()
+                .flatMap(level -> level.getRounds().stream())
+                .map(RoundDate::new)
+                .toList();
+        
+        return new TournamentSettings(tournamentId, voters, roundDescription, matchDescriptions, roundDates);
     }
 
     public void saveTournamentSettings(TournamentSettings settings) {
@@ -182,34 +200,9 @@ public class TournamentService {
         if (tournamentId == null) {
             return;
         }
-        // Build maps
-        Map<String, TournamentVoter> oldVoters = new HashMap<>();
-        getVotersForTournament(tournamentId).forEach(voter -> oldVoters.put(voter.getEmail(), voter));
-        Map<String, TournamentVoter> newVoters = new HashMap<>();
-        settings.getVoters().forEach(voter -> newVoters.put(voter.getEmail(), voter));
-
-        // Delete removed voters
-        List<TournamentVoter> removedVoters = oldVoters
-                .values()
-                .stream()
-                .filter(voter -> !newVoters.containsKey(voter.getEmail()))
-                .toList();
-        logger.debug("Removing tournament voters: {}", removedVoters);
-        tournamentVoterRepository.deleteAll(removedVoters);
-
-        // Map newVoters to database entities or add profiles
-        newVoters.keySet().forEach(key -> 
-            newVoters.compute(key, (email, voter) -> {
-                if (oldVoters.containsKey(email)) {
-                    return oldVoters.get(email);
-                } else {
-                    profileService.findByEmail(email).ifPresent(voter::setProfile);
-                    return voter;
-                }
-            })
-        );
-        logger.debug("Saving tournament voters: {}", newVoters.values());
-        tournamentVoterRepository.saveAll(newVoters.values());
+        saveTournamentVoters(tournamentId, settings.getVoters());
+        saveRoundDescriptions(tournamentId, settings.getCurrentRoundDescription(), settings.getMatchDescriptions());
+        saveRoundDates(tournamentId, settings.getRoundDates());
     }
 
     public void fillVoteCounts(Tournament tournament) {
@@ -219,14 +212,25 @@ public class TournamentService {
         }
     }
 
-    private void resolveRound(Tournament tournament, TournamentRound round) {
+    private void resolveRound(Integer tournamentId, Integer roundId) {
+        // Get tournament and round
+        Tournament tournament;
+        TournamentRound round;
+        try {
+            tournament = getTournament(tournamentId).orElseThrow();
+            round = tournament.getRound(roundId).orElseThrow();
+        } catch (Exception e) {
+            logger.error("Encountered exception trying to resolve round {} from tournament {}", roundId, tournamentId, e);
+            return;
+        }
+
         // Get TournamentLevel to ensure round is in tournament
         List<TournamentLevel> levels = tournament.getLevels();
         TournamentLevel level = levels.stream()
                 .filter(l -> l.getRounds().contains(round))
                 .findFirst()
                 .orElseThrow(() -> {
-                    logger.error("Could not find round {} in tournament {}", round.getId(), tournament.getId());
+                    logger.error("Could not find round {} in tournament {}", roundId, tournamentId);
                     return new IllegalArgumentException("Given round not in tournament");
                 });
         
@@ -257,23 +261,10 @@ public class TournamentService {
 
         // Update status of resolved round and newly starting round
         round.setStatus(RoundStatus.RESOLVED);
-        tournament.getRoundByCurrentDate().ifPresent(startingRound -> {
-            logger.debug("Starting round {} for tournament {}.", startingRound.getId(), tournament.getId());
-            startingRound.setStatus(RoundStatus.ACTIVE);
-            scheduleRoundResolve(tournament, startingRound);
-        });
+        tournament = tournamentRepository.save(tournament);
 
-        tournamentRepository.save(tournament);
-    }
-
-    private void resolveRound(Integer tournamentId, Integer roundId) {
-        try {
-            Tournament tournament = getTournament(tournamentId).orElseThrow();
-            TournamentRound round = tournament.getRound(roundId).orElseThrow();
-            resolveRound(tournament, round);
-        } catch (Exception e) {
-            logger.error("Encountered exception trying to resolve round {} from tournament {}: {}", roundId, tournamentId, e);
-        }
+        final Tournament finalTournament = tournament;
+        tournament.getCurrentOrNextRound().ifPresent(nextRound -> scheduleRoundStart(finalTournament, nextRound));
     }
 
     private void scheduleRoundResolve(Tournament tournament, TournamentRound round) {
@@ -282,40 +273,135 @@ public class TournamentService {
         threadPoolTaskScheduler.schedule(() -> {
             logger.info("Attempting to resolve round {} for tournament {}.", round.getId(), tournament.getId());
             resolveRound(tournament.getId(), round.getId());
+            logger.info("Completed resolving round {} for tournament {}.", round.getId(), tournament.getId());
         }, scheduleTime.toInstant());
     }
 
-    private boolean startTournament(Tournament tournament) {
-        TournamentRound firstRound = tournament.getLevels().get(0).getRounds().get(0);
-        if (firstRound.getStatus() == RoundStatus.CREATED) {
-            firstRound.setStatus(RoundStatus.ACTIVE);
-            tournamentRepository.save(tournament);
-            logger.info("Successfully started first round of tournament {}", tournament.getId());
-            scheduleRoundResolve(tournament, firstRound);
-            return true;
-        } else {
-            logger.warn("Cannot start tournament {}, tournament has already been started.", tournament.getId());
-            return false;
+    private void startRound(Integer tournamentId, Integer roundId) {
+        try {
+            Tournament tournament = getTournament(tournamentId).orElseThrow();
+            TournamentRound round = tournament.getRound(roundId).orElseThrow();
+            if (round.getStatus() == RoundStatus.CREATED) {
+                round.setStatus(RoundStatus.ACTIVE);
+                tournament = tournamentRepository.save(tournament);
+                logger.info("Started round {} for tournament {}.", roundId, tournamentId);
+                scheduleRoundResolve(tournament, round);
+            } else {
+                logger.warn("Could not start round {} for tournament {}, round was already started.", roundId, tournamentId);
+            }
+        } catch (Exception e) {
+            logger.error("Encountered exception trying to start round {} from tournament {}", roundId, tournamentId, e);
         }
     }
 
-    private boolean startTournament(Integer tournamentId) {
-        try {
-            Tournament tournament = getTournament(tournamentId).orElseThrow();
-            return startTournament(tournament);
-        } catch (Exception e) {
-            logger.error("Encountered exception trying to begin the first round of tournament {}: {}", tournamentId, e);
-            return false;
-        }
+    private void scheduleRoundStart(Tournament tournament, TournamentRound round) {
+        ZonedDateTime scheduleTime = round.getStartDate().plusSeconds(startDelaySeconds);
+        logger.info("Scheduling start of round {} for tournament {} at {}.", round.getId(), tournament.getId(), scheduleTime);
+        threadPoolTaskScheduler.schedule(() -> {
+            logger.info("Attempting to start round {} for tournament {}.", round.getId(), tournament.getId());
+            startRound(tournament.getId(), round.getId());
+            logger.info("Completed starting round {} for tournament {}.", round.getId(), tournament.getId());
+        }, scheduleTime.toInstant());
     }
 
     private void scheduleTournamentStart(Tournament tournament) {
         TournamentRound firstRound = tournament.getLevels().get(0).getRounds().get(0);
-        ZonedDateTime scheduleTime = firstRound.getStartDate().plusSeconds(startDelaySeconds);
-        logger.info("Scheduling start of tournament {} at {}.", tournament.getId(), scheduleTime);
-        threadPoolTaskScheduler.schedule(() -> {
-            logger.info("Attempting to start tournament {}.", tournament.getId());
-            startTournament(tournament.getId());
-        }, scheduleTime.toInstant());
+        scheduleRoundStart(tournament, firstRound);
+    }
+
+    private void saveTournamentVoters(Integer tournamentId, List<TournamentVoter> voters) {
+        // Build maps
+        Map<String, TournamentVoter> oldVoters = new HashMap<>();
+        getVotersForTournament(tournamentId).forEach(voter -> oldVoters.put(voter.getEmail(), voter));
+        Map<String, TournamentVoter> newVoters = new HashMap<>();
+        voters.forEach(voter -> newVoters.put(voter.getEmail(), voter));
+
+        // Delete removed voters
+        List<TournamentVoter> removedVoters = oldVoters
+                .values()
+                .stream()
+                .filter(voter -> !newVoters.containsKey(voter.getEmail()))
+                .toList();
+        logger.debug("Removing tournament voters: {}", removedVoters);
+        tournamentVoterRepository.deleteAll(removedVoters);
+
+        // Map newVoters to database entities or add profiles
+        newVoters.keySet().forEach(key -> 
+            newVoters.compute(key, (email, voter) -> {
+                if (oldVoters.containsKey(email)) {
+                    return oldVoters.get(email);
+                } else {
+                    profileService.findByEmail(email).ifPresent(voter::setProfile);
+                    return voter;
+                }
+            })
+        );
+        logger.debug("Saving tournament voters: {}", newVoters.values());
+        tournamentVoterRepository.saveAll(newVoters.values());
+    }
+
+    private void saveRoundDescriptions(Integer tournamentId, String roundDescription, List<MatchDescription> matchDescriptions) {
+        Tournament tournament = getTournament(tournamentId).orElse(null);
+        if (tournament == null) {
+            return;
+        }
+        getTournament(tournamentId)
+                .flatMap(Tournament::getRoundByCurrentDate)
+                .ifPresent(currentRound -> {
+                    logger.info("Setting round descriptions on round {} of tournament {}", currentRound.getId(), tournament.getId());
+                    List<TournamentMatch> matches = currentRound.getMatches();
+                    if (matches.size() != matchDescriptions.size()) {
+                        logger.warn("Failing to set round descriptions, round length did not match: {} matches and {} matches",
+                                matches.size(), matchDescriptions.size());
+                        return;
+                    }
+                    for (int i = 0; i < matches.size(); i++) {
+                        TournamentMatch match = matches.get(i);
+                        MatchDescription matchDescription = matchDescriptions.get(i);
+                        if (!match.getSong1Title().equals(matchDescription.getSong1Title())) {
+                            logger.warn("Failing to set round descriptions, song titles did not match: \"{}\" and \"{}\"",
+                                    match.getSong1Title(), matchDescription.getSong1Title());
+                            return;
+                        }
+
+                        if (!match.getSong2Title().equals(matchDescription.getSong2Title())) {
+                            logger.warn("Failing to set round descriptions, song titles did not match: \"{}\" and \"{}\"",
+                                    match.getSong2Title(), matchDescription.getSong2Title());
+                            return;
+                        }
+                        match.setSong1Description(matchDescription.getSong1Description());
+                        match.setSong2Description(matchDescription.getSong2Description());
+                    }
+                    currentRound.setDescription(roundDescription);
+                    logger.info("Saving round descriptions on round {} of tournament {}", currentRound.getId(), tournamentId);
+                    tournamentRepository.save(tournament);
+                });
+    }
+
+    private void saveRoundDates(Integer tournamentId, List<RoundDate> roundDates) {
+        Tournament tournament = getTournament(tournamentId).orElse(null);
+        if (tournament == null) {
+            return;
+        }
+        List<TournamentRound> rounds = getTournament(tournamentId)
+                .map(Tournament::getLevels)
+                .orElse(List.of())
+                .stream()
+                .flatMap(level -> level.getRounds().stream())
+                .toList();
+        // Check that length matches
+        if(rounds.size() != roundDates.size()) {
+            logger.warn("Failing to set round dates, rounds length did not match: {} rounds and {} rounds",
+                    rounds.size(), roundDates.size());
+            return;
+        }
+        for (int i = 0; i < rounds.size(); i++) {
+            TournamentRound round = rounds.get(i);
+            RoundDate roundDate = roundDates.get(i);
+            round.setStartDate(roundDate.getStartDate());
+            round.setEndDate(roundDate.getEndDate());
+        }
+        logger.info("Saving round dates for tournament {}", tournamentId);
+        tournamentRepository.save(tournament);
     }
 }

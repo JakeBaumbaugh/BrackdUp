@@ -77,7 +77,8 @@ public class TournamentFactory {
         int songCount = 16;
         int levelCount = (int) Math.round(Math.log(songCount) / Math.log(2));
         int matchesPerRound = 4;
-        int roundLengthMinutes = 1;
+        int roundLengthMinutes = 2;
+        int roundDelayMinutes = 1;
 
         // Build tournament
         Tournament tournament = new Tournament();
@@ -100,6 +101,7 @@ public class TournamentFactory {
                 round.setStartDate(startDate);
                 startDate = startDate.plusMinutes(roundLengthMinutes);
                 round.setEndDate(startDate);
+                startDate = startDate.plusMinutes(roundDelayMinutes);
                 rounds.add(round);
             }
             logger.debug("Generated {} rounds for level index {}", rounds.size(), levelIndex);
