@@ -77,6 +77,7 @@ public class VoteService {
         
         match.setSong1VoteCount(song1Votes.size());
         match.setSong2VoteCount(song2Votes.size());
+        logger.info("Found {} votes for song 1 and {} votes for song 2 for match {}", song1Votes.size(), song2Votes.size(), match.getId());
 
         Song winner;
         if (song1Votes.size() > song2Votes.size()) {

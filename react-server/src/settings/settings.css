@@ -65,3 +65,13 @@
     height: 2.5em;
     border-radius: 50%;
 }
+
+.round-descriptions textarea {
+    width: 100%;
+    resize: vertical;
+}
+
+.settings-page .round-date {
+    display: flex;
+    justify-content: space-between;
+}

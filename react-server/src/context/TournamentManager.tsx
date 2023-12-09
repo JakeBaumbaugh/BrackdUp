@@ -28,6 +28,9 @@ export default function TournamentManager() {
     
     useEffect(() => {
         const id = Number.parseInt(searchParams.get("id") ?? "");
+        if(Number.isNaN(id)) {
+            return;
+        }
         // Start loading
         if(tournament?.id !== id || currentRound) {
             setLoading(true);
@@ -36,8 +39,10 @@ export default function TournamentManager() {
         retrieveTournamentData(id)
             .then(() => setLoading(false));
         // Refresh when new round has begun
-        if(currentRound) {
-            const timeoutTriggerEpoch = currentRound?.endDate.valueOf() + refreshDelayMs;
+        const currentOrNextRound = tournament?.getCurrentOrNextRound();
+        if(currentOrNextRound) {
+            const targetDate = currentOrNextRound.status === "ACTIVE" ? currentOrNextRound.endDate : currentOrNextRound.startDate;
+            const timeoutTriggerEpoch = targetDate.valueOf() + refreshDelayMs;
             const timeoutId = setTimeout(() => {retrieveTournamentData(id);}, timeoutTriggerEpoch - Date.now());
             return () => clearTimeout(timeoutId);
         }

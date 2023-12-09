@@ -8,7 +8,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
-@Getter @Setter @NoArgsConstructor @ToString @EqualsAndHashCode
+@Getter @Setter @NoArgsConstructor @ToString
 public class TournamentMatch {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -36,6 +36,13 @@ public class TournamentMatch {
     private Integer song2VoteCount;
 
     @ToString.Exclude
+    @Column(name = "song_1_description")
+    private String song1Description;
+    @ToString.Exclude
+    @Column(name = "song_2_description")
+    private String song2Description;
+
+    @ToString.Exclude
     @JsonIgnore
     @OneToMany(mappedBy="match", cascade = CascadeType.ALL)
     @OrderBy("timestamp ASC")
@@ -60,5 +67,13 @@ public class TournamentMatch {
     @JsonIgnore
     public String getSongWinnerTitle() {
         return songWinner != null ? songWinner.getTitle() : null;
+    }
+
+    public String getSong1Description() {
+        return song1Description != null ? song1Description : "";
+    }
+
+    public String getSong2Description() {
+        return song2Description != null ? song2Description : "";
     }
 }

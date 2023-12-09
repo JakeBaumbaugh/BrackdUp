@@ -15,14 +15,13 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OrderBy;
 import jakarta.persistence.Transient;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
 @Entity
-@Getter @Setter @NoArgsConstructor @ToString @EqualsAndHashCode
+@Getter @Setter @NoArgsConstructor @ToString
 public class Tournament {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -52,6 +51,13 @@ public class Tournament {
             TournamentMatch finalMatch = lastRound.getMatches().get(0);
             summary.setSongWinner(finalMatch.getSongWinner());
         }
+        getCurrentOrNextRound().ifPresent(round -> {
+            if (round.getStatus() == RoundStatus.CREATED) {
+                summary.setVotingStartDate(round.getStartDate());
+            } else if (round.getStatus() == RoundStatus.ACTIVE) {
+                summary.setVotingEndDate(round.getEndDate());
+            }
+        });
         getActiveRound().ifPresent(activeRound ->
             summary.setVotingEndDate(activeRound.getEndDate())
         );
@@ -102,5 +108,15 @@ public class Tournament {
     public ZonedDateTime getStartDate() {
         TournamentRound firstRound = levels.get(0).getRounds().get(0);
         return firstRound.getStartDate();
+    }
+
+    @Transient
+    @JsonIgnore
+    public Optional<TournamentRound> getCurrentOrNextRound() {
+        ZonedDateTime now = ZonedDateTime.now();
+        return levels.stream()
+                .flatMap(level -> level.getRounds().stream())
+                .filter(round -> round.getEndDate().isAfter(now))
+                .findFirst();
     }
 }

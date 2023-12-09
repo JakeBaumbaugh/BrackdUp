@@ -1,9 +1,8 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Button } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import SongCard from "../card/SongCard";
 import { useTournamentContext } from "../context/TournamentContext";
-import TournamentManager from "../context/TournamentManager";
 import Song from "../model/Song";
 import { TournamentMatch } from "../model/Tournament";
 import { submitVote } from "../service/TournamentService";
@@ -13,6 +12,7 @@ export default function VotePage() {
     const navigate = useNavigate();
     const {tournament, userVotes, setUserVotes} = useTournamentContext();
     const [saving, setSaving] = useState(false);
+    const [pageIndex, setPageIndex] = useState(0);
 
     const currentRound = tournament?.getVotableRound();
 
@@ -34,7 +34,9 @@ export default function VotePage() {
         return matches;
     }, [currentRound, userVotes]);
 
-    const vote = (match: TournamentMatch, song: Song) => {
+    useEffect(() => setPageIndex(currentRound?.description ? 0 : 1), [currentRound]);
+
+    const onVote = (match: TournamentMatch, song: Song) => {
         setUserVotes(userVotes => {
             const newVotedSongs = new Set(userVotes);
             if(newVotedSongs.has(song.id)) {
@@ -48,7 +50,7 @@ export default function VotePage() {
         });
     }
 
-    const submit = () => {
+    const onSubmit = () => {
         if(tournament && userVotes) {
             setSaving(true);
             submitVote(tournament.id, [...userVotes])
@@ -62,41 +64,86 @@ export default function VotePage() {
         }
     }
 
-    if(userVotes === null) {
-        return (
-            <main className="vote-page">
-                Forbidden.
-            </main>);
+    const matchIsVoted = (pageIndex > 0 && matches.length > 0) ? matches[pageIndex - 1].songWinner !== undefined : true;
+
+    const minPageIndex = currentRound?.description ? 0 : 1;
+    const maxPageIndex = matches.length;
+
+    if(!currentRound || !userVotes) {
+        return <main className="vote-page">Forbidden.</main>;
     }
 
     return (
         <main className="vote-page">
             <div className="match-container">
-                { matches.map(match => (
-                    <div key={match.id} className="match">
-                        <SongCard
-                            song={match.song1}
-                            votedFor={userVotes.has(match.song1.id)}
-                            onClick={() => vote(match, match.song1)}
-                        />
-                        <div className="match-connector">
-                            <hr/>
-                            <p>VS</p>
-                            <hr/>
-                        </div>
-                        <SongCard
-                            song={match.song2}
-                            votedFor={userVotes.has(match.song2.id)}
-                            onClick={() => vote(match, match.song2)}
-                        />
-                    </div>
-                ))}
+                {pageIndex === 0 ? (
+                    <DescriptionPage roundDescription={currentRound.description}/>
+                ) : (
+                    <SingleVotePage match={matches[pageIndex - 1]} votedSongs={userVotes} onVote={onVote} />
+                )}
+            </div>
+            <div className="action-buttons">
                 <Button
                     variant="danger"
-                    onClick={submit}
-                    disabled={saving}
-                >SUBMIT</Button>
+                    onClick={() => setPageIndex(index => index - 1)}
+                    disabled={pageIndex === minPageIndex}
+                >PREV</Button>
+                {pageIndex === maxPageIndex ? (
+                    <Button
+                        variant={matchIsVoted ? "danger" : "secondary"}
+                        onClick={onSubmit}
+                    >SUBMIT</Button>
+                ) : (
+                    <Button
+                        variant={matchIsVoted ? "danger" : "secondary"}
+                        onClick={() => setPageIndex(index => index + 1)}
+                    >
+                        {pageIndex === 0 ? "BEGIN" : matchIsVoted ? "NEXT" : "SKIP"}
+                    </Button>
+                )}
             </div>
         </main>
     );
+}
+
+interface DescriptionPageProps {
+    roundDescription: string;
+}
+
+function DescriptionPage({roundDescription}: DescriptionPageProps) {
+    return (
+        <div className="round-description">
+            <p>{roundDescription}</p>
+        </div>
+    );
+}
+
+interface SingleVotePageProps {
+    match: TournamentMatch;
+    votedSongs: Set<number>;
+    onVote: (match: TournamentMatch, song: Song) => void;
+}
+
+function SingleVotePage({match, votedSongs, onVote}: SingleVotePageProps) {
+    return <>
+        {match.song1Description && <p>{match.song1Description}</p>}
+        <div key={match.id} className="match">
+            <SongCard
+                song={match.song1}
+                votedFor={votedSongs.has(match.song1.id)}
+                onClick={() => onVote(match, match.song1)}
+            />
+            <div className="match-connector">
+                <hr/>
+                <p>VS</p>
+                <hr/>
+            </div>
+            <SongCard
+                song={match.song2}
+                votedFor={votedSongs.has(match.song2.id)}
+                onClick={() => onVote(match, match.song2)}
+            />
+        </div>
+        {match.song2Description && <p>{match.song2Description}</p>}
+    </>
 }
