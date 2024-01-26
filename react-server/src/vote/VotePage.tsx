@@ -65,24 +65,26 @@ export default function VotePage() {
         }
     }
 
-    const matchIsVoted = (pageIndex > 0 && matches.length > 0) ? matches[pageIndex - 1].songWinner !== undefined : true;
-
     const minPageIndex = currentRound?.description ? 0 : 1;
-    const maxPageIndex = matches.length;
+    const maxPageIndex = matches.length + 1;
+    const matchIsVoted = (pageIndex > 0 && pageIndex < maxPageIndex && matches.length > 0) ? matches[pageIndex - 1].songWinner !== undefined : true;
 
     if(!currentRound || !userVotes) {
         return <main className="vote-page">Forbidden.</main>;
     }
 
+    let pageContent;
+    if (pageIndex === 0) {
+        pageContent = <DescriptionPage roundDescription={currentRound.description} />;
+    } else if (pageIndex === maxPageIndex) {
+        pageContent = <ReviewPage matches={matches} votedSongs={userVotes} onVote={onVote}/>;
+    } else {
+        pageContent = <SingleVotePage match={matches[pageIndex - 1]} votedSongs={userVotes} onVote={onVote} />;
+    }
+
     return (
         <main className="vote-page">
-            <div className="match-container">
-                {pageIndex === 0 ? (
-                    <DescriptionPage roundDescription={currentRound.description}/>
-                ) : (
-                    <SingleVotePage match={matches[pageIndex - 1]} votedSongs={userVotes} onVote={onVote} />
-                )}
-            </div>
+            {pageContent}
             <div className="action-buttons">
                 <Button
                     variant="danger"
@@ -113,8 +115,10 @@ interface DescriptionPageProps {
 
 function DescriptionPage({roundDescription}: DescriptionPageProps) {
     return (
-        <div className="round-description">
-            <p>{roundDescription}</p>
+        <div className="match-container">
+            <div className="round-description">
+                <p>{roundDescription}</p>
+            </div>
         </div>
     );
 }
@@ -125,51 +129,95 @@ interface SingleVotePageProps {
     onVote: (match: TournamentMatch, song: Song) => void;
 }
 
-function SingleVotePage({match, votedSongs, onVote}: SingleVotePageProps) {
+function SingleVotePage(props: SingleVotePageProps) {
     const isDesktop = useMediaQuery({ minWidth: 600 });
+    return isDesktop ? <DesktopSingleVotePage {...props}/> : <MobileSingleVotePage {...props}/>;
+}
 
-    return isDesktop ? <>
-        <div className="match-descriptions">
-            <p>{match.song1Description}</p>
-            <p>{match.song2Description}</p>
-        </div>
-        <div key={match.id} className="match">
-            <SongCard
-                song={match.song1}
-                votedFor={votedSongs.has(match.song1.id)}
-                onClick={() => onVote(match, match.song1)}
-            />
-            <div className="match-connector">
-                <hr/>
-                <p>VS</p>
-                <hr/>
+function DesktopSingleVotePage({match, votedSongs, onVote}: SingleVotePageProps) {
+    return (
+        <div className="match-container">
+            <div className="match-descriptions">
+                <p>{match.song1Description}</p>
+                <p>{match.song2Description}</p>
             </div>
-            <SongCard
-                song={match.song2}
-                votedFor={votedSongs.has(match.song2.id)}
-                onClick={() => onVote(match, match.song2)}
-            />
-        </div>
-        <div className="filler"/>
-    </> : <>
-        {match.song1Description && <p>{match.song1Description}</p>}
-        <div key={match.id} className="match">
-            <SongCard
-                song={match.song1}
-                votedFor={votedSongs.has(match.song1.id)}
-                onClick={() => onVote(match, match.song1)}
-            />
-            <div className="match-connector">
-                <hr/>
-                <p>VS</p>
-                <hr/>
+            <div key={match.id} className="match">
+                <SongCard
+                    song={match.song1}
+                    votedFor={votedSongs.has(match.song1.id)}
+                    onClick={() => onVote(match, match.song1)}
+                />
+                <div className="match-connector">
+                    <hr/>
+                    <p>VS</p>
+                    <hr/>
+                </div>
+                <SongCard
+                    song={match.song2}
+                    votedFor={votedSongs.has(match.song2.id)}
+                    onClick={() => onVote(match, match.song2)}
+                />
             </div>
-            <SongCard
-                song={match.song2}
-                votedFor={votedSongs.has(match.song2.id)}
-                onClick={() => onVote(match, match.song2)}
-            />
+            <div className="filler"/>
         </div>
-        {match.song2Description && <p>{match.song2Description}</p>}
-    </>
+    );
+}
+
+function MobileSingleVotePage({match, votedSongs, onVote}: SingleVotePageProps) {
+    return (
+        <div className="match-container">
+            {match.song1Description && <p>{match.song1Description}</p>}
+            <div key={match.id} className="match">
+                <SongCard
+                    song={match.song1}
+                    votedFor={votedSongs.has(match.song1.id)}
+                    onClick={() => onVote(match, match.song1)}
+                />
+                <div className="match-connector">
+                    <hr/>
+                    <p>VS</p>
+                    <hr/>
+                </div>
+                <SongCard
+                    song={match.song2}
+                    votedFor={votedSongs.has(match.song2.id)}
+                    onClick={() => onVote(match, match.song2)}
+                />
+            </div>
+            {match.song2Description && <p>{match.song2Description}</p>}
+        </div>
+    );
+}
+
+interface ReviewPageProps {
+    matches: TournamentMatch[];
+    votedSongs: Set<number>;
+    onVote: (match: TournamentMatch, song: Song) => void;
+}
+
+function ReviewPage({matches, votedSongs, onVote}: ReviewPageProps) {
+    return (
+        <div className="review-container">
+            <h2>Review your Vote{matches.length === 1 ? "" : "s"}</h2>
+            {matches.map(match => (
+                <div key={match.id} className="match">
+                    <SongCard
+                        song={match.song1}
+                        votedFor={votedSongs.has(match.song1.id)}
+                        onClick={() => onVote(match, match.song1)}
+                    />
+                    <div className="match-connector">
+                        <hr/>
+                        <p>VS</p>
+                        <hr/>
+                    </div>
+                    <SongCard
+                        song={match.song2}
+                        votedFor={votedSongs.has(match.song2.id)}
+                        onClick={() => onVote(match, match.song2)}
+                    />
+                </div>
+            ))}
+        </div>
+    );
 }
