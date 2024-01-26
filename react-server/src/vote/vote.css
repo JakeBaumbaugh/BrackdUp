@@ -7,7 +7,7 @@
     gap: 1em;
 }
 
-.match-container .match {
+.match {
     --item-gap: 8px;
 
     display: flex;
@@ -57,6 +57,10 @@
     text-align: center;
 }
 
+.vote-page h2 {
+    text-align: center;
+}
+
 /* Desktop */
 @media only screen and (min-width: 600px) {
     .vote-page {
@@ -88,6 +92,12 @@
     .vote-page .match-container .round-description {
         padding: 0 20%;
     }
+
+    .review-container {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
 }
 
 /* Mobile */
@@ -115,5 +125,26 @@
 
     .vote-page .song-card-wrapper .song-card {
         width: 100%;
+    }
+
+    .review-container {
+        display: flex;
+        flex-direction: column;
+        gap: 4em;
+        min-width: 100%;
+    }
+    
+    .review-container h2 {
+        margin-top: 8px;
+        margin-bottom: -14px;
+    }
+
+    .review-container .match {
+        margin: -2em -8px;
+        padding: 2em 8px;
+    }
+
+    .review-container .match:nth-last-of-type(2n) {
+        background-color: #CACCD0;
     }
 }

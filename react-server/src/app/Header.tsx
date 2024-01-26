@@ -44,7 +44,6 @@ export default function Header() {
     const activeRound = tournament?.getActiveRound();
 
     const renderLogoutTooltip = (props: OverlayInjectedProps) => {
-        console.log("TOOLTIIIIIP");
         return <Tooltip id="logout-tooltip" {...props}>Logout</Tooltip>
     }
 
