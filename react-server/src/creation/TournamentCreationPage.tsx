@@ -1,13 +1,16 @@
-import { Dispatch, FormEvent, SetStateAction, useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import DateTime from "react-datetime";
 import { Moment } from "moment";
-import TournamentBuilder from "../model/TournamentBuilder";
+import { Dispatch, FormEvent, SetStateAction, useEffect, useState } from "react";
+import { ButtonGroup, ToggleButton } from "react-bootstrap";
+import DateTime from "react-datetime";
+import { MdLockOutline, MdLockOpen, MdOutlineRemoveRedEye } from "react-icons/md";
+import { useNavigate } from "react-router-dom";
 import SongCard from "../card/SongCard";
 import Song from "../model/Song";
-import { createTournament, searchSongs } from "../service/TournamentService";
 import { TournamentRound } from "../model/Tournament";
+import TournamentBuilder from "../model/TournamentBuilder";
+import { createTournament, searchSongs } from "../service/TournamentService";
 import "./tournament-creation.css";
+import TournamentPrivacyButtons from "./TournamentPrivacyButtons";
 
 export default function TournamentCreationPage() {
     const [builder, setBuilder] = useState(new TournamentBuilder());
@@ -103,6 +106,7 @@ function SetupPage({builder, setBuilder}: PageProps) {
                     onChange={e => setBuilder(builder.setSpotifyPlaylist(e.target.value))}
                 />
             </label>
+            <TournamentPrivacyButtons value={builder.privacy} onSelect={privacy => setBuilder(builder.setPrivacy(privacy))} />
         </div>
     );
 }

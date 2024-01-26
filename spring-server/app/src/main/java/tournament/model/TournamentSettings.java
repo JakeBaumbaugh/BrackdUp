@@ -17,6 +17,7 @@ public class TournamentSettings {
     private String currentRoundDescription;
     private List<MatchDescription> matchDescriptions;
     private List<RoundDate> roundDates;
+    private TournamentPrivacy privacy;
 
     public boolean hasVoter(String email) {
         return voters.stream().anyMatch(voter -> voter.getEmail().equals(email));

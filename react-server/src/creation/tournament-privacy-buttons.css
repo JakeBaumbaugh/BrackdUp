@@ -1,0 +1,12 @@
+.tournament-privacy-buttons label {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    gap: 5px;
+}
+
+.tournament-privacy-buttons label > p {
+    transform: translateY(-1px);
+    margin: 0;
+}

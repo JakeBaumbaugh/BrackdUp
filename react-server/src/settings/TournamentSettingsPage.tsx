@@ -11,6 +11,7 @@ import TournamentSettings from "../model/TournamentSettings";
 import TournamentVoter from "../model/TournamentVoter";
 import { deleteTournament, getTournament, getTournamentSettings, saveTournamentSettings } from "../service/TournamentService";
 import "./settings.css";
+import TournamentPrivacyButtons from "../creation/TournamentPrivacyButtons";
 
 export default function TournamentSettingsPage() {
     const [searchParams] = useSearchParams();
@@ -66,6 +67,8 @@ export default function TournamentSettingsPage() {
                 <SetupRoundDescriptions settings={settings} setSettings={setSettings} />
                 <RoundDates settings={settings} setSettings={setSettings} />
                 <VoterList tournament={tournament} settings={settings} setSettings={setSettings} />
+                <h3>Tournament Privacy</h3>
+                <TournamentPrivacyButtons value={settings.privacy} onSelect={privacy => setSettings(settings.setPrivacy(privacy))}/>
                 <div className="button-row">
                     <button onClick={onSave}>SAVE</button>
                     <button onClick={onDelete}>DELETE</button>

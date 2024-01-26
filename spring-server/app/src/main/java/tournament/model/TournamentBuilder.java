@@ -16,4 +16,5 @@ public class TournamentBuilder {
     private String spotifyPlaylist;
     private List<Song> songs;
     private List<TournamentLevel> levels;
+    private TournamentPrivacy privacy;
 }

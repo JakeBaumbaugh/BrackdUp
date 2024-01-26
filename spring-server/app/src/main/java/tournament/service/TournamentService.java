@@ -87,9 +87,10 @@ public class TournamentService {
         return tournamentRepository.findByName(name);
     }
 
-    public List<TournamentSummary> getTournaments() {
+    public List<TournamentSummary> getTournaments(Profile profile) {
         return tournamentRepository.findAll()
             .stream()
+            .filter(tournament -> profileService.profileCanView(profile, tournament.getId()))
             .map(Tournament::getTournamentSummary)
             .toList();
     }
@@ -191,8 +192,11 @@ public class TournamentService {
                 .flatMap(level -> level.getRounds().stream())
                 .map(RoundDate::new)
                 .toList();
+        TournamentPrivacy privacy = optionalTournament
+                .map(Tournament::getPrivacy)
+                .orElse(null);
         
-        return new TournamentSettings(tournamentId, voters, roundDescription, matchDescriptions, roundDates);
+        return new TournamentSettings(tournamentId, voters, roundDescription, matchDescriptions, roundDates, privacy);
     }
 
     public void saveTournamentSettings(TournamentSettings settings) {
@@ -203,6 +207,7 @@ public class TournamentService {
         saveTournamentVoters(tournamentId, settings.getVoters());
         saveRoundDescriptions(tournamentId, settings.getCurrentRoundDescription(), settings.getMatchDescriptions());
         saveRoundDates(tournamentId, settings.getRoundDates());
+        saveTournamentPrivacy(tournamentId, settings.getPrivacy());
     }
 
     public void fillVoteCounts(Tournament tournament) {
@@ -403,5 +408,13 @@ public class TournamentService {
         }
         logger.info("Saving round dates for tournament {}", tournamentId);
         tournamentRepository.save(tournament);
+    }
+
+    private void saveTournamentPrivacy(Integer tournamentId, TournamentPrivacy privacy) {
+        getTournament(tournamentId).ifPresent(tournament -> {
+            tournament.setPrivacy(privacy);
+            logger.info("Saving tournament privacy {} for tournament {}", privacy, tournamentId);
+            tournamentRepository.save(tournament);
+        });
     }
 }
