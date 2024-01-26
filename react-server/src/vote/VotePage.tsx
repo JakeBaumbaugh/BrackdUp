@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Button } from "react-bootstrap";
+import { useMediaQuery } from "react-responsive";
 import { useNavigate } from "react-router-dom";
 import SongCard from "../card/SongCard";
 import { useTournamentContext } from "../context/TournamentContext";
@@ -125,7 +126,32 @@ interface SingleVotePageProps {
 }
 
 function SingleVotePage({match, votedSongs, onVote}: SingleVotePageProps) {
-    return <>
+    const isDesktop = useMediaQuery({ minWidth: 600 });
+
+    return isDesktop ? <>
+        <div className="match-descriptions">
+            <p>{match.song1Description}</p>
+            <p>{match.song2Description}</p>
+        </div>
+        <div key={match.id} className="match">
+            <SongCard
+                song={match.song1}
+                votedFor={votedSongs.has(match.song1.id)}
+                onClick={() => onVote(match, match.song1)}
+            />
+            <div className="match-connector">
+                <hr/>
+                <p>VS</p>
+                <hr/>
+            </div>
+            <SongCard
+                song={match.song2}
+                votedFor={votedSongs.has(match.song2.id)}
+                onClick={() => onVote(match, match.song2)}
+            />
+        </div>
+        <div className="filler"/>
+    </> : <>
         {match.song1Description && <p>{match.song1Description}</p>}
         <div key={match.id} className="match">
             <SongCard
