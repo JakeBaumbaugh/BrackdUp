@@ -1,5 +1,5 @@
 import Song from "./Song";
-import { TournamentLevel, TournamentRound } from "./Tournament";
+import { TournamentLevel, TournamentPrivacy, TournamentRound } from "./Tournament";
 
 export default class TournamentBuilder {
     name: string;
@@ -8,6 +8,7 @@ export default class TournamentBuilder {
     spotifyPlaylist: string;
     songs: Song[];
     levels: TournamentLevel[];
+    privacy: TournamentPrivacy;
 
     constructor() {
         this.name = "";
@@ -16,6 +17,7 @@ export default class TournamentBuilder {
         this.spotifyPlaylist = "";
         this.songs = [];
         this.levels = this.buildLevels();
+        this.privacy = "VISIBLE";
     }
 
     copy(): TournamentBuilder {
@@ -26,6 +28,7 @@ export default class TournamentBuilder {
         newBuilder.spotifyPlaylist = this.spotifyPlaylist;
         newBuilder.songs = this.songs;
         newBuilder.levels = this.levels;
+        newBuilder.privacy = this.privacy;
         return newBuilder;
     }
 
@@ -72,6 +75,12 @@ export default class TournamentBuilder {
     setSpotifyPlaylist(spotifyPlaylist: string): TournamentBuilder {
         const newBuilder = this.copy();
         newBuilder.spotifyPlaylist = spotifyPlaylist;
+        return newBuilder;
+    }
+
+    setPrivacy(privacy: TournamentPrivacy): TournamentBuilder {
+        const newBuilder = this.copy();
+        newBuilder.privacy = privacy;
         return newBuilder;
     }
 

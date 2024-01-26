@@ -57,20 +57,12 @@ public class TournamentRound {
         this.startDate = DateUtil.zonedToLocal(startDate);
     }
 
-    public void setStartDate(LocalDateTime startDate) {
-        this.startDate = startDate;
-    }
-
     public ZonedDateTime getEndDate() {
         return DateUtil.localToZoned(endDate);
     }
 
     public void setEndDate(ZonedDateTime endDate) {
         this.endDate = DateUtil.zonedToLocal(endDate);
-    }
-
-    public void setEndDate(LocalDateTime endDate) {
-        this.endDate = endDate;
     }
 
     public String getDescription() {

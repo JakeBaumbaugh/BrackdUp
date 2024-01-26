@@ -1,5 +1,7 @@
 import Song, { BracketSong } from "./Song";
 
+export type TournamentPrivacy = "PUBLIC" | "VISIBLE" | "PRIVATE";
+
 export class Tournament {
     id: number;
     name: string;

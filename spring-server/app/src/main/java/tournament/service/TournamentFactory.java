@@ -69,6 +69,7 @@ public class TournamentFactory {
         tournament.setMatchesPerRound(builder.getMatchesPerRound());
         tournament.setSpotifyPlaylist(builder.getSpotifyPlaylist());
         tournament.setLevels(levels);
+        tournament.setPrivacy(builder.getPrivacy());
 
         return tournament;
     }

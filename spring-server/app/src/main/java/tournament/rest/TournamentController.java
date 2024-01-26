@@ -1,7 +1,6 @@
 package tournament.rest;
 
 import java.util.List;
-import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,23 +40,24 @@ public class TournamentController {
     }
     
     @GetMapping("/tournament")
-    public Tournament get(@RequestParam(required = false) Integer id, @RequestParam(required = false) String name) {
-        logger.info("GET request for tournament id={}, name={}", id, name);
-        Optional<Tournament> tournament;
-        if (id != null) {
-            logger.info("Finding tournament by id {}", id);
-            tournament = tournamentService.getTournament(id);
-        } else {
-            logger.info("Finding tournament by name {}", name);
-            tournament = tournamentService.getTournament(name);
+    public Tournament get(Authentication authentication, @RequestParam Integer id) {
+        Profile profile = authentication != null ? (Profile) authentication.getPrincipal() : null;
+        logger.info("GET request for tournament id={} from user {}", id, profile != null ? profile.getName() : null);
+
+        if (!profileService.profileCanView(profile, id)) {
+            throw create404("Tournament not found.");
         }
-        return tournament.orElseThrow(() -> create404("Tournament not found."));
+
+        return tournamentService.getTournament(id)
+                .orElseThrow(() -> create404("Tournament not found."));
     }
 
     @GetMapping("/tournaments")
-    public List<TournamentSummary> get() {
-        logger.info("GET request for all tournaments");
-        return tournamentService.getTournaments();
+    public List<TournamentSummary> get(Authentication authentication) {
+        Profile profile = authentication != null ? (Profile) authentication.getPrincipal() : null;
+        logger.info("GET request for all tournaments from user {}", profile != null ? profile.getName() : null);
+
+        return tournamentService.getTournaments(profile);
     }
 
     @PostMapping("/tournament/vote")

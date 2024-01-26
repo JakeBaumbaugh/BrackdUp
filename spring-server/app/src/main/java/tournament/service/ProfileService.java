@@ -12,10 +12,13 @@ import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken.Payload;
 import tournament.model.Profile;
 import tournament.model.ProfileRole;
 import tournament.model.RevokedJwt;
+import tournament.model.Tournament;
+import tournament.model.TournamentPrivacy;
 import tournament.model.TournamentVoter;
 import tournament.model.TournamentVoterId;
 import tournament.repository.ProfileRepository;
 import tournament.repository.RevokedJwtRepository;
+import tournament.repository.TournamentRepository;
 import tournament.repository.TournamentVoterRepository;
 
 @Service
@@ -25,14 +28,17 @@ public class ProfileService {
     List<String> admins;
 
     ProfileRepository profileRepository;
+    TournamentRepository tournamentRepository;
     TournamentVoterRepository tournamentVoterRepository;
     RevokedJwtRepository revokedJwtRepository;
 
     @Autowired
     public ProfileService(ProfileRepository profileRepository,
+                          TournamentRepository tournamentRepository,
                           TournamentVoterRepository tournamentVoterRepository,
                           RevokedJwtRepository revokedJwtRepository) {
         this.profileRepository = profileRepository;
+        this.tournamentRepository = tournamentRepository;
         this.tournamentVoterRepository = tournamentVoterRepository;
         this.revokedJwtRepository = revokedJwtRepository;
     }
@@ -57,17 +63,57 @@ public class ProfileService {
         return profileRepository.findByEmail(email);
     }
 
+    public boolean profileCanView(Profile profile, Integer tournamentId) {
+        Optional<Tournament> tournament = tournamentRepository.findById(tournamentId);
+        if (tournament.isEmpty()) {
+            return false;
+        }
+        // If tournament is not private, profile can view
+        boolean isPrivate = tournament
+                .map(t -> t.getPrivacy() == TournamentPrivacy.PRIVATE)
+                .orElse(false);
+        if (!isPrivate) {
+            return true;
+        }
+        // Anonymous users then cannot view
+        if (profile == null) {
+            return false;
+        }
+        // Admins can view all tournaments
+        if (profile.isAdmin()) {
+            return true;
+        }
+        // Otherwise must check if profile is a voter
+        TournamentVoterId voterId = new TournamentVoterId(tournamentId, profile.getEmail());
+        return tournamentVoterRepository.findById(voterId).isPresent();
+    }
+
     public boolean profileCanVote(Profile profile, Integer tournamentId) {
+        Optional<Tournament> tournament = tournamentRepository.findById(tournamentId);
+        if (tournament.isEmpty()) {
+            return false;
+        }
+        // If tournament is public, profile can vote
+        boolean isPublic = tournament
+                .map(t -> t.getPrivacy() == TournamentPrivacy.PUBLIC)
+                .orElse(false);
+        if (isPublic) {
+            return true;
+        }
+        // Otherwise, must check if profile is a voter
+        if (profile == null) {
+            return false;
+        }
         TournamentVoterId voterId = new TournamentVoterId(tournamentId, profile.getEmail());
         return tournamentVoterRepository.findById(voterId).isPresent();
     }
 
     public boolean profileCanCreate(Profile profile) {
-        return profile.isAdmin();
+        return profile != null && profile.isAdmin();
     }
 
     public boolean profileCanEdit(Profile profile) {
-        return profile.isAdmin();
+        return profile != null && profile.isAdmin();
     }
 
     public boolean isJwtRevoked(String jwt) {
