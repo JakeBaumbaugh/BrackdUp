@@ -64,20 +64,25 @@
     }
 
     .vote-page .match-container {
+        display: flex;
+        flex-direction: column;
+        gap: 1em;
+    }
+
+    .vote-page .match-descriptions {
+        flex: 1 0 0;
+
         display: grid;
         grid-template-columns: 1fr 1fr;
-        grid-template-rows: 1fr auto 1fr;
-        gap: 2em 4em;
+        gap: 4em;
     }
 
-    .vote-page .match-container > .match {
-        grid-column: -1 / 1;
-        grid-row: 2 / 3;
-    }
-
-    .vote-page .match-container > p {
-        grid-row: 1 / 2;
+    .vote-page .match-descriptions p {
         text-align: justify;
+    }
+
+    .vote-page .filler {
+        flex: 1 1 0;
     }
 
     .vote-page .match-container .round-description {
@@ -96,6 +101,8 @@
         flex-direction: column;
         justify-content: space-around;
         user-select: none;
+        min-width: 100%;
+        gap: 1em;
     }
 
     .vote-page .match {

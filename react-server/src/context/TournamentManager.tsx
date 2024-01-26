@@ -3,6 +3,7 @@ import { useSearchParams } from "react-router-dom";
 import { useTournamentContext } from "./TournamentContext";
 import { useLoadingScreenContext } from "./LoadingScreenContext";
 import { getTournament, getVotes } from "../service/TournamentService";
+import { useProfileContext } from "./ProfileContext";
 
 const refreshDelayMs = 1000 * 15; // 15 seconds
 
@@ -10,6 +11,7 @@ export default function TournamentManager() {
     const [searchParams] = useSearchParams();
     const {tournament, setTournament, setUserVotes} = useTournamentContext();
     const [, setLoading] = useLoadingScreenContext();
+    const {profile: [profile]} = useProfileContext();
 
     const currentRound = tournament?.getVotableRound();
 
@@ -46,7 +48,7 @@ export default function TournamentManager() {
             const timeoutId = setTimeout(() => {retrieveTournamentData(id);}, timeoutTriggerEpoch - Date.now());
             return () => clearTimeout(timeoutId);
         }
-    }, [searchParams.get("id"), currentRound?.id]);
+    }, [searchParams.get("id"), currentRound?.id, profile]);
 
     return <></>;
 }
