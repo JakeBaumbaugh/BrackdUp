@@ -11,4 +11,5 @@ public interface TournamentVoterRepository extends ListCrudRepository<Tournament
     List<TournamentVoter> findAllByTournamentId(Integer tournamentId);
     List<TournamentVoter> findAllByEmail(String email);
     long deleteByTournamentId(Integer tournamentId);
+    long deleteAllByProfileId(Integer profileId);
 }

@@ -1,6 +1,6 @@
 import { Tournament } from "./Tournament";
 
-type ProfileRole = "USER" | "ADMIN";
+export type ProfileRole = "USER" | "ADMIN";
 
 export default class Profile {
     id: number;
@@ -23,6 +23,10 @@ export default class Profile {
         return new Profile(data.id, data.email, data.role, data.firstName, data.lastName, data.pictureLink);
     }
 
+    copy(): Profile {
+        return new Profile(this.id, this.email, this.role, this.firstName, this.lastName, this.pictureLink);
+    }
+
     getName(): string {
         if(!this.lastName) {
             return this.firstName!;
@@ -43,6 +47,7 @@ export default class Profile {
     }
 
     canCreateTournament(): boolean {
+        // TODO: check for creator role
         return this.isAdmin();
     }
 }

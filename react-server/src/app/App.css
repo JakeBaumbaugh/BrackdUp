@@ -51,10 +51,6 @@ header h1 > img {
     height: 1em;
 }
 
-header .profile-wrapper {
-    display: flex;
-}
-
 .profile-wrapper > img,
 .login-button {
     width: 2.5em;
@@ -97,18 +93,23 @@ header .login-button > svg {
 
 .tournament-info {
     flex-grow: 1;
-    display: flex;
-    gap: 1.5em;
     border-left: solid 1px #556;
     padding: 12px 1em;
-    align-items: center;
 }
 
-.tournament-info h2 {
+.tournament-info, .profile-wrapper {
+    display: flex;
+    gap: 1.5em;
+    align-items: center
+}
+
+header h2 {
     margin: 0 auto 0 0;
 }
 
-.tournament-info img, .tournament-info svg {
+.tournament-info img,
+.tournament-info svg,
+.profile-wrapper > svg {
     width: 2em;
     height: 2em;
 }
@@ -168,6 +169,7 @@ header .login-button > svg {
     .tournament-info img,
     .tournament-info svg,
     .profile-wrapper > img,
+    .profile-wrapper > svg,
     header .login-button {
         width: 3em;
         height: 3em;

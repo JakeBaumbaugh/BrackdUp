@@ -18,6 +18,7 @@ import "./App.css";
 import "react-datetime/css/react-datetime.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 import TournamentManager from "../context/TournamentManager";
+import AdminPage from "../admin/AdminPage";
 
 function App() {
     const [tournament, setTournament] = useState<Tournament|null>();
@@ -50,6 +51,7 @@ function App() {
                             <Route path="/tournament/vote" Component={profile ? VotePage : LoginPage} />
                             <Route path="/tournament/settings" Component={TournamentSettingsPage} />
                             <Route path="/tournament/new" Component={TournamentCreationPage} />
+                            <Route path="/admin" Component={AdminPage} />
                         </Routes>
                         <LoadingScreen loading={loadingScreenState[0]}/>
                     </div>

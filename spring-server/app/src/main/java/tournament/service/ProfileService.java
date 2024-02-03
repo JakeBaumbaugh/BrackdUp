@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken.Payload;
 
+import jakarta.transaction.Transactional;
 import tournament.model.Profile;
 import tournament.model.ProfileRole;
 import tournament.model.RevokedJwt;
@@ -20,6 +21,7 @@ import tournament.repository.ProfileRepository;
 import tournament.repository.RevokedJwtRepository;
 import tournament.repository.TournamentRepository;
 import tournament.repository.TournamentVoterRepository;
+import tournament.repository.VoteRepository;
 
 @Service
 public class ProfileService {
@@ -30,17 +32,24 @@ public class ProfileService {
     ProfileRepository profileRepository;
     TournamentRepository tournamentRepository;
     TournamentVoterRepository tournamentVoterRepository;
+    VoteRepository voteRepository;
     RevokedJwtRepository revokedJwtRepository;
 
     @Autowired
     public ProfileService(ProfileRepository profileRepository,
                           TournamentRepository tournamentRepository,
                           TournamentVoterRepository tournamentVoterRepository,
+                          VoteRepository voteRepository,
                           RevokedJwtRepository revokedJwtRepository) {
         this.profileRepository = profileRepository;
         this.tournamentRepository = tournamentRepository;
         this.tournamentVoterRepository = tournamentVoterRepository;
+        this.voteRepository = voteRepository;
         this.revokedJwtRepository = revokedJwtRepository;
+    }
+
+    public List<Profile> getProfiles() {
+        return profileRepository.findAll();
     }
     
     public Profile getProfileFromPayload(Payload payload) {
@@ -61,6 +70,22 @@ public class ProfileService {
 
     public Optional<Profile> findByEmail(String email) {
         return profileRepository.findByEmail(email);
+    }
+
+    public Optional<Profile> updateProfile(Profile profile) {
+        return profileRepository.findById(profile.getId()).map(oldProfile -> {
+            oldProfile.setFirstName(profile.getFirstName());
+            oldProfile.setLastName(profile.getLastName());
+            oldProfile.setRole(profile.getRole());
+            return profileRepository.save(oldProfile);
+        });
+    }
+
+    @Transactional
+    public void deleteProfile(Integer id) {
+        voteRepository.deleteAllByProfileId(id);
+        tournamentVoterRepository.deleteAllByProfileId(id);
+        profileRepository.deleteById(id);
     }
 
     public boolean profileCanView(Profile profile, Integer tournamentId) {
