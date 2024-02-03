@@ -9,6 +9,7 @@ import tournament.model.Vote;
 import tournament.model.VoteId;
 
 public interface VoteRepository extends ListCrudRepository<Vote, VoteId> {
-    public List<Vote> findByMatch(TournamentMatch match);
-    public List<Vote> findByMatchIn(List<TournamentMatch> matches);
+    List<Vote> findByMatch(TournamentMatch match);
+    List<Vote> findByMatchIn(List<TournamentMatch> matches);
+    long deleteAllByProfileId(Integer profileId);
 }

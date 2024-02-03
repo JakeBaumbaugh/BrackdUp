@@ -1,0 +1,52 @@
+.admin-page {
+    padding: 2em 20%;
+}
+
+.admin-page .rdt_Table img {
+    width: 3em;
+    border-radius: 50%;
+}
+
+.profile-modal .modal-header {
+    display: flex;
+    flex-direction: column;
+}
+
+.profile-modal .modal-header button {
+    position: absolute;
+    top: 1em;
+    right: 1em;
+}
+
+.profile-modal .modal-header img {
+    border-radius: 50%;
+}
+
+.profile-modal .modal-body {
+    display: flex;
+    flex-direction: column;
+    gap: 1em;
+}
+
+.profile-modal label {
+    display: flex;
+    flex-direction: column;
+}
+
+.profile-modal label span {
+    font-size: 10pt;
+    font-weight: bold;
+    color: #555;
+}
+
+.profile-modal .action-buttons {
+    display: flex;
+    justify-content: space-evenly;
+}
+
+.profile-modal .action-buttons > button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 8px 16px;
+}
