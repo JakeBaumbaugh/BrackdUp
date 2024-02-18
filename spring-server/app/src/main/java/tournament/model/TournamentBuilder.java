@@ -17,4 +17,5 @@ public class TournamentBuilder {
     private List<Song> songs;
     private List<TournamentLevel> levels;
     private TournamentPrivacy privacy;
+    private Profile creator;
 }

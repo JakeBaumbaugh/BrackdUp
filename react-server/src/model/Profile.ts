@@ -1,6 +1,6 @@
 import { Tournament } from "./Tournament";
 
-export type ProfileRole = "USER" | "ADMIN";
+export type ProfileRole = "USER" | "CREATOR" | "ADMIN";
 
 export default class Profile {
     id: number;
@@ -42,12 +42,12 @@ export default class Profile {
     }
 
     canEditTournament(tournament: Tournament): boolean {
-        // TODO: tournament managers that can delete the tournament
-        return this.isAdmin();
+        // TODO: tournament managers that can edit the tournament
+        return this.isAdmin() || this.id === tournament.creatorId;
     }
 
     canCreateTournament(): boolean {
         // TODO: check for creator role
-        return this.isAdmin();
+        return this.isAdmin() || this.role === "CREATOR";
     }
 }
