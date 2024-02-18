@@ -11,7 +11,7 @@ import "./vote.css";
 
 export default function VotePage() {
     const navigate = useNavigate();
-    const {tournament, userVotes, setUserVotes} = useTournamentContext();
+    const {tournament, userVotes, setUserVotes, loadData} = useTournamentContext();
     const [saving, setSaving] = useState(false);
     const [pageIndex, setPageIndex] = useState(0);
 
@@ -55,8 +55,11 @@ export default function VotePage() {
         if(tournament && userVotes) {
             setSaving(true);
             submitVote(tournament.id, [...userVotes])
-                .then(() => {
+                .then(response => {
                     setSaving(false);
+                    if (response.roundEnded) {
+                        loadData();
+                    }
                     navigate(`/tournament?id=${tournament.id}`);
                 });
             console.log("Submitted vote.");

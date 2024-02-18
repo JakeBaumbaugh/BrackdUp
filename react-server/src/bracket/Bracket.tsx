@@ -12,7 +12,7 @@ interface BracketProps {
 export default function Bracket({tournament}: BracketProps) {
     const matches = useMemo(() => {
         const matches: (TournamentMatch|null)[][] = tournament.levels.map(level => level.rounds.flatMap(round => {
-            const isActive = round.isActive();
+            const isActive = tournament.getVotableRound()?.id === round.id;
             round.matches.forEach(match => {
                 match.song1.activeRound = isActive;
                 match.song2.activeRound = isActive;

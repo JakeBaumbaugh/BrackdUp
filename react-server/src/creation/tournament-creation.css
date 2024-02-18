@@ -93,3 +93,15 @@
 .creation-page .song-select .song-card {
     width: auto;
 }
+
+.creation-page .disabled-message {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    padding: 2em;
+}
+
+.creation-page .disabled-message.hidden {
+    display: none;
+}

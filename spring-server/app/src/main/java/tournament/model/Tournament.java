@@ -35,6 +35,8 @@ public class Tournament {
 
     @Enumerated(EnumType.STRING)
     private TournamentPrivacy privacy;
+    @Enumerated(EnumType.STRING)
+    private TournamentMode mode;
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "tournament_id", nullable = false)
@@ -98,7 +100,7 @@ public class Tournament {
         ZonedDateTime now = ZonedDateTime.now();
         return levels.stream()
                 .flatMap(level -> level.getRounds().stream())
-                .filter(round -> round.getStatus() == RoundStatus.ACTIVE && round.isDateInRange(now))
+                .filter(round -> round.getStatus() == RoundStatus.ACTIVE && (mode == TournamentMode.INSTANT || round.isDateInRange(now)))
                 .findFirst();
     }
 
@@ -121,10 +123,31 @@ public class Tournament {
     @Transient
     @JsonIgnore
     public Optional<TournamentRound> getCurrentOrNextRound() {
-        ZonedDateTime now = ZonedDateTime.now();
-        return levels.stream()
+        if (mode == TournamentMode.SCHEDULED) {
+            ZonedDateTime now = ZonedDateTime.now();
+            return levels.stream()
+                    .flatMap(level -> level.getRounds().stream())
+                    .filter(round -> round.getEndDate().isAfter(now))
+                    .findFirst();
+        } else {
+            return levels.stream()
+                    .flatMap(level -> level.getRounds().stream())
+                    .filter(round -> round.getStatus() != RoundStatus.RESOLVED)
+                    .findFirst();
+        }
+    }
+
+    @Transient
+    @JsonIgnore
+    public Optional<TournamentRound> getRoundAfter(TournamentRound round) {
+        List<TournamentRound> rounds = levels.stream()
                 .flatMap(level -> level.getRounds().stream())
-                .filter(round -> round.getEndDate().isAfter(now))
-                .findFirst();
+                .toList();
+        for (int i = 0; i < rounds.size() - 1; i++) {
+            if (rounds.get(i).getId().equals(round.getId())) {
+                return Optional.of(rounds.get(i + 1));
+            }
+        }
+        return Optional.empty();
     }
 }

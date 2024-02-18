@@ -21,13 +21,14 @@ import TournamentManager from "../context/TournamentManager";
 import AdminPage from "../admin/AdminPage";
 
 function App() {
-    const [tournament, setTournament] = useState<Tournament|null>();
-    const [userVotes, setUserVotes] = useState<Set<number>|null>(null);
-    const tournamentContextState = useMemo(() => ({tournament, setTournament, userVotes, setUserVotes}), [tournament, setTournament, userVotes, setUserVotes]);
     const profileState = useState<Profile|undefined|null>(undefined);
     const forceLoginState = useState<boolean>(false);
     const loadingScreenState = useState<boolean>(false);
+
     const [profile, setProfile] = profileState;
+    const profileContext = useMemo(() => ({
+        profile: profileState, forceLogin: forceLoginState
+    }), [profileState, forceLoginState]);
 
     useEffect(() => {
         checkCookies()
@@ -35,13 +36,9 @@ function App() {
             .catch(() => setProfile(null));
     }, []);
 
-    const profileContext = useMemo(() => ({
-        profile: profileState, forceLogin: forceLoginState
-    }), [profileState, forceLoginState]);
-
     return (
         <ProfileContext.Provider value={profileContext}>
-            <TournamentContext.Provider value={tournamentContextState}>
+            <TournamentManager>
                 <LoadingScreenContext.Provider value={loadingScreenState}>
                     <div className="App">
                         <Header/>
@@ -55,9 +52,8 @@ function App() {
                         </Routes>
                         <LoadingScreen loading={loadingScreenState[0]}/>
                     </div>
-                    <TournamentManager/>
                 </LoadingScreenContext.Provider>
-            </TournamentContext.Provider>
+            </TournamentManager>
         </ProfileContext.Provider>
     );
 }

@@ -1,15 +1,10 @@
-import { useEffect } from "react";
-import { Button, OverlayTrigger, Tooltip } from "react-bootstrap";
-import { OverlayInjectedProps } from "react-bootstrap/esm/Overlay";
-import { CodeResponse, useGoogleLogin } from "@react-oauth/google";
-import { FcGoogle } from "react-icons/fc";
+import { Button } from "react-bootstrap";
 import { MdOutlineAdminPanelSettings, MdSettings } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
 import { useProfileContext } from "../context/ProfileContext";
 import { useTournamentContext } from "../context/TournamentContext";
 import MadnessLogo from "../images/icon.png";
 import SpotifyLogo from "../images/spotify_logo.svg";
-import { login, logout } from "../service/ProfileService";
 import ProfileButton from "./ProfileButton";
 
 export default function Header() {
@@ -18,6 +13,7 @@ export default function Header() {
     const {profile: [profile]} = useProfileContext();
 
     const activeRound = tournament?.getActiveRound();
+    const votableRound = tournament?.getVotableRound();
 
     return (
         <header className={tournament ? "with-tournament" : ""}>
@@ -39,7 +35,7 @@ export default function Header() {
                         <Button
                             variant="danger"
                             onClick={() => navigate(`/tournament/vote?id=${tournament.id}`)}
-                            disabled={!activeRound.isDateInRange(new Date())}
+                            disabled={activeRound !== votableRound}
                         >VOTE</Button>
                     )}
                     {profile?.canEditTournament(tournament) && (

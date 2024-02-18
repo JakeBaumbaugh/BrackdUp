@@ -1,12 +1,12 @@
-.tournament-privacy-buttons label {
+.tournament-settings-button-group label {
     display: flex;
-    flex-direction: row;
+    flex-direction: row !important;
     justify-content: center;
     align-items: center;
     gap: 5px;
 }
 
-.tournament-privacy-buttons label > p {
+.tournament-settings-button-group label > p {
     transform: translateY(-1px);
     margin: 0;
 }

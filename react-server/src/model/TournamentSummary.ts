@@ -3,7 +3,7 @@ import Song from "./Song";
 export default class TournamentSummary {
     id: number;
     name: string;
-    startDate: Date;
+    startDate?: Date;
     endDate?: Date;
     songWinner?: Song;
     votingStartDate?: Date;
@@ -12,7 +12,7 @@ export default class TournamentSummary {
 
     constructor(id: number,
                 name: string,
-                startDate: Date,
+                startDate?: Date,
                 endDate?: Date,
                 songWinner?: Song,
                 votingStartDate?: Date,
@@ -29,7 +29,7 @@ export default class TournamentSummary {
     }
 
     static fromJson(data: any): TournamentSummary {
-        const startDate = new Date(data.startDate);
+        const startDate = data.startDate ? new Date(data.startDate) : undefined;
         const endDate = data.endDate ? new Date(data.endDate) : undefined;
         const votingStartDate = data.votingStartDate ? new Date(data.votingStartDate) : undefined;
         const votingEndDate = data.votingEndDate ? new Date(data.votingEndDate) : undefined;

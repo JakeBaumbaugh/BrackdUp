@@ -67,14 +67,16 @@ public class TournamentService {
         // Schedule initial starts and resolves
         tournamentRepository.findAll()
                 .forEach(tournament -> {
-                    tournament.getVotableRound()
-                            .ifPresent(round -> {
-                                logger.info("Scheduling initial resolve for round {} in tournament {}.", round.getId(), tournament.getId());
-                                scheduleRoundResolve(tournament, round);
-                            });
-                    TournamentRound firstRound = tournament.getLevels().get(0).getRounds().get(0);
-                    if (tournament.getStartDate().isAfter(now) || firstRound.getStatus() == RoundStatus.CREATED) {
-                        scheduleTournamentStart(tournament);
+                    if (tournament.getMode() == TournamentMode.SCHEDULED) {
+                        tournament.getVotableRound()
+                                .ifPresent(round -> {
+                                    logger.info("Scheduling initial resolve for round {} in tournament {}.", round.getId(), tournament.getId());
+                                    scheduleRoundResolve(tournament, round);
+                                });
+                        TournamentRound firstRound = tournament.getLevels().get(0).getRounds().get(0);
+                        if (tournament.getStartDate().isAfter(now) || firstRound.getStatus() == RoundStatus.CREATED) {
+                            scheduleTournamentStart(tournament);
+                        }
                     }
                 });
     }
@@ -149,18 +151,40 @@ public class TournamentService {
                 .toList();
     }
 
-    public void vote(Profile profile, TournamentRound round, List<Song> songs) {
+    /**
+     * Saves the user profile's submitted votes. Also resolves the round
+     * if it was the final voter for the round on an instant tournament
+     * @param profile       The user profile that submitted the votes
+     * @param round         The round containing the matches being voted on
+     * @param songs         The songs which the user voted for
+     * @param tournament    The tournament containing the matches being voted on
+     * @return              Whether the round ended as a result of the vote
+     */
+    public boolean vote(Profile profile, TournamentRound round, List<Song> songs, Tournament tournament) {
         voteService.submitVotes(profile, round, songs);
+        // Resolve round if necessary
+        if (tournament.getMode() == TournamentMode.INSTANT) {
+            boolean allVoted = getVotersForTournament(tournament)
+                    .stream()
+                    .allMatch(TournamentVoter::getHasVoted);
+            if (allVoted) {
+                resolveRound(tournament.getId(), round.getId());
+                return true;
+            }
+        }
+        return false;
     }
 
     public List<TournamentVoter> getVotersForTournament(Integer tournamentId) {
-        Optional<Tournament> optionalTournament = getTournament(tournamentId);
-        if (optionalTournament.isEmpty()) {
-            return List.of();
-        }
-        List<TournamentVoter> voters = tournamentVoterRepository.findAllByTournamentId(tournamentId);
+        return getTournament(tournamentId)
+                .map(this::getVotersForTournament)
+                .orElse(List.of());
+    }
+
+    public List<TournamentVoter> getVotersForTournament(Tournament tournament) {
+        List<TournamentVoter> voters = tournamentVoterRepository.findAllByTournamentId(tournament.getId());
         // Check if voters have voted for the current votable round
-        optionalTournament.get().getVotableRound().ifPresent(round -> {
+        tournament.getVotableRound().ifPresent(round -> {
             List<Vote> roundVotes = voteService.findByRound(round);
             voters.forEach(voter -> {
                 Profile profile = voter.getProfile();
@@ -175,6 +199,9 @@ public class TournamentService {
         Optional<Tournament> optionalTournament = getTournament(tournamentId);
         Optional<TournamentRound> currentRound = optionalTournament
                 .map(tournament -> tournament.getRoundByCurrentDate().orElse(null));
+        TournamentMode mode = optionalTournament
+                .map(Tournament::getMode)
+                .orElse(null);
         String roundDescription = currentRound
                 .map(TournamentRound::getDescription)
                 .orElse(null);
@@ -185,13 +212,18 @@ public class TournamentService {
                         .toList()
                 )
                 .orElse(null);
-        List<RoundDate> roundDates = optionalTournament
-                .map(Tournament::getLevels)
-                .orElse(List.of())
-                .stream()
-                .flatMap(level -> level.getRounds().stream())
-                .map(RoundDate::new)
-                .toList();
+        List<RoundDate> roundDates;
+        if (mode == TournamentMode.INSTANT) {
+            roundDates = null;
+        } else {
+            roundDates = optionalTournament
+                    .map(Tournament::getLevels)
+                    .orElse(List.of())
+                    .stream()
+                    .flatMap(level -> level.getRounds().stream())
+                    .map(RoundDate::new)
+                    .toList();
+        }
         TournamentPrivacy privacy = optionalTournament
                 .map(Tournament::getPrivacy)
                 .orElse(null);
@@ -269,17 +301,22 @@ public class TournamentService {
         tournament = tournamentRepository.save(tournament);
 
         final Tournament finalTournament = tournament;
-        tournament.getCurrentOrNextRound().ifPresent(nextRound -> scheduleRoundStart(finalTournament, nextRound));
+        tournament.getRoundAfter(round).ifPresent(nextRound -> scheduleRoundStart(finalTournament, nextRound));
     }
 
     private void scheduleRoundResolve(Tournament tournament, TournamentRound round) {
-        ZonedDateTime scheduleTime = round.getEndDate().plusSeconds(resolveDelaySeconds);
-        logger.info("Scheduling resolution of round {} for tournament {} at {}.", round.getId(), tournament.getId(), scheduleTime);
-        threadPoolTaskScheduler.schedule(() -> {
-            logger.info("Attempting to resolve round {} for tournament {}.", round.getId(), tournament.getId());
-            resolveRound(tournament.getId(), round.getId());
-            logger.info("Completed resolving round {} for tournament {}.", round.getId(), tournament.getId());
-        }, scheduleTime.toInstant());
+        if (tournament.getMode() == TournamentMode.INSTANT) {
+            // Nothing to schedule
+            logger.info("Skipping scheduling resolution of round {} for instant tournament {}.", round.getId(), tournament.getId());
+        } else {
+            ZonedDateTime scheduleTime = round.getEndDate().plusSeconds(resolveDelaySeconds);
+            logger.info("Scheduling resolution of round {} for tournament {} at {}.", round.getId(), tournament.getId(), scheduleTime);
+            threadPoolTaskScheduler.schedule(() -> {
+                logger.info("Attempting to resolve round {} for tournament {}.", round.getId(), tournament.getId());
+                resolveRound(tournament.getId(), round.getId());
+                logger.info("Completed resolving round {} for tournament {}.", round.getId(), tournament.getId());
+            }, scheduleTime.toInstant());
+        }
     }
 
     private void startRound(Integer tournamentId, Integer roundId) {
@@ -300,13 +337,20 @@ public class TournamentService {
     }
 
     private void scheduleRoundStart(Tournament tournament, TournamentRound round) {
-        ZonedDateTime scheduleTime = round.getStartDate().plusSeconds(startDelaySeconds);
-        logger.info("Scheduling start of round {} for tournament {} at {}.", round.getId(), tournament.getId(), scheduleTime);
-        threadPoolTaskScheduler.schedule(() -> {
-            logger.info("Attempting to start round {} for tournament {}.", round.getId(), tournament.getId());
+        if (tournament.getMode() == TournamentMode.INSTANT) {
+            // Start round immediately
+            logger.info("Starting round {} for tournament {}.", round.getId(), tournament.getId());
             startRound(tournament.getId(), round.getId());
-            logger.info("Completed starting round {} for tournament {}.", round.getId(), tournament.getId());
-        }, scheduleTime.toInstant());
+        } else {
+            // Schedule start of round
+            ZonedDateTime scheduleTime = round.getStartDate().plusSeconds(startDelaySeconds);
+            logger.info("Scheduling start of round {} for tournament {} at {}.", round.getId(), tournament.getId(), scheduleTime);
+            threadPoolTaskScheduler.schedule(() -> {
+                logger.info("Attempting to start round {} for tournament {}.", round.getId(), tournament.getId());
+                startRound(tournament.getId(), round.getId());
+                logger.info("Completed starting round {} for tournament {}.", round.getId(), tournament.getId());
+            }, scheduleTime.toInstant());
+        }
     }
 
     private void scheduleTournamentStart(Tournament tournament) {
@@ -385,7 +429,7 @@ public class TournamentService {
 
     private void saveRoundDates(Integer tournamentId, List<RoundDate> roundDates) {
         Tournament tournament = getTournament(tournamentId).orElse(null);
-        if (tournament == null) {
+        if (tournament == null || roundDates == null) {
             return;
         }
         List<TournamentRound> rounds = getTournament(tournamentId)

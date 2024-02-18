@@ -2,37 +2,22 @@ import { Moment } from "moment";
 import { Dispatch, SetStateAction, useEffect, useMemo, useState } from "react";
 import { OverlayTrigger, Tooltip } from "react-bootstrap";
 import DateTime from "react-datetime";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import VoterCard from "../card/VoterCard";
 import { useLoadingScreenContext } from "../context/LoadingScreenContext";
 import { useTournamentContext } from "../context/TournamentContext";
+import TournamentPrivacyButtons from "../creation/TournamentPrivacyButtons";
 import { Tournament } from "../model/Tournament";
 import TournamentSettings from "../model/TournamentSettings";
 import TournamentVoter from "../model/TournamentVoter";
-import { deleteTournament, getTournament, getTournamentSettings, saveTournamentSettings } from "../service/TournamentService";
+import { deleteTournament, getTournamentSettings, saveTournamentSettings } from "../service/TournamentService";
 import "./settings.css";
-import TournamentPrivacyButtons from "../creation/TournamentPrivacyButtons";
 
 export default function TournamentSettingsPage() {
-    const [searchParams] = useSearchParams();
     const navigate = useNavigate();
-    const {tournament, setTournament} = useTournamentContext();
+    const {tournament} = useTournamentContext();
     const [, setLoading] = useLoadingScreenContext();
     const [settings, setSettings] = useState<TournamentSettings|null>();
-
-    useEffect(() => {
-        const id = Number.parseInt(searchParams.get("id") ?? "");
-        if(tournament?.id !== id) {
-            setLoading(true);
-            getTournament(id).then(tournament => {
-                console.log("Retrieved tournament:", tournament);
-                setTournament(tournament);
-            }).catch(() => {
-                setTournament(null);
-                setLoading(false);
-            });
-        }
-    }, [searchParams.get("id")]);
 
     useEffect(() => {
         if(tournament?.id) {
@@ -164,6 +149,10 @@ function RoundDates({settings, setSettings}: RoundDatesProps) {
             setSettings(settings => settings?.setRoundEndDate(index, date.toDate()));
         }
     };
+
+    if (settings.roundDates === null) {
+        return <></>;
+    }
 
     return (
         <div className="round-dates-container">

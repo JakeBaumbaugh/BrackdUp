@@ -23,6 +23,7 @@ import tournament.model.TournamentRound;
 import tournament.model.TournamentSettings;
 import tournament.model.TournamentSummary;
 import tournament.rest.request.VoteRequestBody;
+import tournament.rest.response.VoteResponseBody;
 import tournament.service.ProfileService;
 import tournament.service.TournamentService;
 
@@ -61,7 +62,7 @@ public class TournamentController {
     }
 
     @PostMapping("/tournament/vote")
-    public void vote(Authentication authentication, @RequestBody VoteRequestBody body) {
+    public VoteResponseBody vote(Authentication authentication, @RequestBody VoteRequestBody body) {
         Profile profile = (Profile) authentication.getPrincipal();
         logger.info("POST request to vote on tournament id={} from user {}", body.getTournament(), profile.getName());
         
@@ -78,7 +79,8 @@ public class TournamentController {
             throw create400("Songs did not match active round.");
         }
 
-        tournamentService.vote(profile, activeRound, songs);
+        boolean roundEnded = tournamentService.vote(profile, activeRound, songs, tournament);
+        return new VoteResponseBody(roundEnded);
     }
 
     @GetMapping("/tournament/vote")
