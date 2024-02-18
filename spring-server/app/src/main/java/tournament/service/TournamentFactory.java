@@ -2,6 +2,7 @@ package tournament.service;
 
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -16,6 +17,7 @@ import tournament.model.Tournament;
 import tournament.model.TournamentBuilder;
 import tournament.model.TournamentLevel;
 import tournament.model.TournamentMatch;
+import tournament.model.TournamentMode;
 import tournament.model.TournamentRound;
 import tournament.repository.SongRepository;
 import tournament.repository.TournamentRepository;
@@ -48,6 +50,18 @@ public class TournamentFactory {
             level.getRounds().forEach(round -> round.setId(null));
         });
 
+        // Clear dates for instant tournaments
+        if (builder.getMode() == TournamentMode.INSTANT) {
+            builder.getLevels()
+                    .stream()
+                    .map(TournamentLevel::getRounds)
+                    .flatMap(Collection::stream)
+                    .forEach(round -> {
+                        round.setStartDate(null);
+                        round.setEndDate(null);
+                    });
+        }
+
         // Shuffle songs
         songs = songRepository.saveAll(songs);
         Collections.shuffle(songs);
@@ -70,6 +84,7 @@ public class TournamentFactory {
         tournament.setSpotifyPlaylist(builder.getSpotifyPlaylist());
         tournament.setLevels(levels);
         tournament.setPrivacy(builder.getPrivacy());
+        tournament.setMode(builder.getMode());
         tournament.setCreatorId(builder.getCreator().getId());
 
         return tournament;

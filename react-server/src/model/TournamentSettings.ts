@@ -6,10 +6,10 @@ export default class TournamentSettings {
     voters: TournamentVoter[];
     currentRoundDescription: string;
     matchDescriptions: MatchDescription[];
-    roundDates: RoundDate[];
+    roundDates: RoundDate[]|null;
     privacy: TournamentPrivacy;
 
-    constructor(tournamentId: number, voters: TournamentVoter[], currentRoundDescription: string, matchDescriptions: MatchDescription[], roundDates: RoundDate[], privacy: TournamentPrivacy) {
+    constructor(tournamentId: number, voters: TournamentVoter[], currentRoundDescription: string, matchDescriptions: MatchDescription[], roundDates: RoundDate[]|null, privacy: TournamentPrivacy) {
         this.tournamentId = tournamentId;
         this.voters = voters;
         this.currentRoundDescription = currentRoundDescription;
@@ -21,7 +21,7 @@ export default class TournamentSettings {
     static fromJson(data: any): TournamentSettings {
         const voters = data.voters ? data.voters.map((voterData: any) => TournamentVoter.fromJson(voterData)) : [];
         const matchDescriptions = data.matchDescriptions ? data.matchDescriptions.map((matchData: any) => MatchDescription.fromJson(matchData)) : [];
-        const roundDates = data.roundDates ? data.roundDates.map((roundDate: any) => RoundDate.fromJson(roundDate)): [];
+        const roundDates = data.roundDates ? data.roundDates.map((roundDate: any) => RoundDate.fromJson(roundDate)): null;
         return new TournamentSettings(data.tournamentId, voters, data.currentRoundDescription, matchDescriptions, roundDates, data.privacy);
     }
 
@@ -55,12 +55,18 @@ export default class TournamentSettings {
     }
 
     setRoundStartDate(roundIndex: number, startDate: Date): TournamentSettings {
+        if (this.roundDates === null) {
+            return new TournamentSettings(this.tournamentId, this.voters, this.currentRoundDescription, this.matchDescriptions, null, this.privacy);
+        }
         const newRoundDate = this.roundDates[roundIndex].setStartDate(startDate);
         const roundDates = this.roundDates.toSpliced(roundIndex, 1, newRoundDate);
         return new TournamentSettings(this.tournamentId, this.voters, this.currentRoundDescription, this.matchDescriptions, roundDates, this.privacy);
     }
 
     setRoundEndDate(roundIndex: number, endDate: Date): TournamentSettings {
+        if (this.roundDates === null) {
+            return new TournamentSettings(this.tournamentId, this.voters, this.currentRoundDescription, this.matchDescriptions, null, this.privacy);
+        }
         const newRoundDate = this.roundDates[roundIndex].setEndDate(endDate);
         const roundDates = this.roundDates.toSpliced(roundIndex, 1, newRoundDate);
         return new TournamentSettings(this.tournamentId, this.voters, this.currentRoundDescription, this.matchDescriptions, roundDates, this.privacy);

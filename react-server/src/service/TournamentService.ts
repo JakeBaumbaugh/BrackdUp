@@ -1,3 +1,4 @@
+import { VoteResponseBody } from "../model/ResponseBodies";
 import Song from "../model/Song";
 import { Tournament } from "../model/Tournament";
 import TournamentBuilder from "../model/TournamentBuilder";
@@ -25,11 +26,12 @@ export function getTournaments(): Promise<TournamentSummary[]> {
         });
 }
 
-export function submitVote(tournamentId: number, songIds: number[]): Promise<Response> {
+export function submitVote(tournamentId: number, songIds: number[]): Promise<VoteResponseBody> {
     return post("/tournament/vote", {
         tournament: tournamentId,
         songs: songIds
-    });
+    })
+        .then(res => res.json())
 }
 
 export function getVotes(tournamentId: number): Promise<number[]|null> {

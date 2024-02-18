@@ -10,7 +10,7 @@ interface TournamentPrivacyButtonsProps {
 
 export default function TournamentPrivacyButtons({value, onSelect}: TournamentPrivacyButtonsProps) {
     return (
-        <ButtonGroup className="tournament-privacy-buttons">
+        <ButtonGroup className="tournament-settings-button-group">
             <ToggleButton
                 id="public-privacy-button"
                 type="radio"

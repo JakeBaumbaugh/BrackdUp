@@ -104,8 +104,8 @@ public class ProfileService {
         if (profile == null) {
             return false;
         }
-        // Admins can view all tournaments
-        if (profile.isAdmin()) {
+        // If profile can edit, profile can vew (this includes all admins)
+        if (profileCanEdit(profile, tournamentId)) {
             return true;
         }
         // Otherwise must check if profile is a voter

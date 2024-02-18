@@ -1,19 +1,22 @@
 import Song, { BracketSong } from "./Song";
 
 export type TournamentPrivacy = "PUBLIC" | "VISIBLE" | "PRIVATE";
+export type TournamentMode = "SCHEDULED" | "INSTANT";
 
 export class Tournament {
     id: number;
     name: string;
     levels: TournamentLevel[];
+    mode: TournamentMode;
     spotifyPlaylist?: string;
     matchesPerRound?: number;
     creatorId?: number;
 
-    constructor(id: number, name: string, levels: TournamentLevel[], spotifyPlaylist?: string, matchesPerRound?: number, creatorId?: number) {
+    constructor(id: number, name: string, levels: TournamentLevel[], mode: TournamentMode, spotifyPlaylist?: string, matchesPerRound?: number, creatorId?: number) {
         this.id = id;
         this.name = name;
         this.levels = levels;
+        this.mode = mode;
         this.spotifyPlaylist = spotifyPlaylist;
         this.matchesPerRound = matchesPerRound ?? 8;
         this.creatorId = creatorId;
@@ -21,7 +24,7 @@ export class Tournament {
 
     static fromJson(data: any): Tournament {
         const levels = data.levels.map((levelData: any) => TournamentLevel.fromJson(levelData));
-        return new Tournament(data.id, data.name, levels, data.spotifyPlaylist, data.matchesPerRound, data.creatorId);
+        return new Tournament(data.id, data.name, levels, data.mode, data.spotifyPlaylist, data.matchesPerRound, data.creatorId);
     }
 
     getSongColumns(): (BracketSong|null)[][] {
@@ -86,15 +89,22 @@ export class Tournament {
     getVotableRound(): TournamentRound|undefined {
         const now = new Date();
         const activeRound = this.getActiveRound();
-        return activeRound?.isDateInRange(now) ? activeRound : undefined;
+        return (this.mode === "INSTANT" || activeRound?.isDateInRange(now)) ? activeRound : undefined;
     }
 
     getCurrentOrNextRound(): TournamentRound|undefined {
-        const now = new Date();
-        return this.levels
-            .flatMap(level => level.rounds)
-            .filter(round => round.endDate > now)
-            .at(0);
+        if (this.mode === "SCHEDULED") {
+            const now = new Date();
+            return this.levels
+                .flatMap(level => level.rounds)
+                .filter(round => round.endDate! > now)
+                .at(0);
+        } else {
+            return this.levels
+                    .flatMap(level => level.rounds)
+                    .filter(round => round.status !== "RESOLVED")
+                    .at(0);
+        }
     }
 }
 
@@ -123,13 +133,13 @@ export type RoundStatus = "CREATED" | "ACTIVE" | "RESOLVED";
 
 export class TournamentRound {
     id: number;
-    startDate: Date;
-    endDate: Date;
+    startDate: Date|null;
+    endDate: Date|null;
     status: RoundStatus;
     description: string;
     matches: TournamentMatch[];
 
-    constructor(id: number, startDate: Date, endDate: Date, matches: TournamentMatch[], status?: RoundStatus, description?: string) {
+    constructor(id: number, startDate: Date|null, endDate: Date|null, matches: TournamentMatch[], status?: RoundStatus, description?: string) {
         this.id = id;
         this.startDate = startDate;
         this.endDate = endDate;
@@ -139,8 +149,10 @@ export class TournamentRound {
     }
 
     static fromJson(data: any): TournamentRound {
+        const startDate = data.startDate ? new Date(data.startDate) : null;
+        const endDate = data.endDate ? new Date(data.endDate) : null;
         const matches = data.matches.map((matchData: any) => TournamentMatch.fromJson(matchData));
-        return new TournamentRound(data.id, new Date(data.startDate), new Date(data.endDate), matches, data.status, data.description);
+        return new TournamentRound(data.id, startDate, endDate, matches, data.status, data.description);
     }
 
     getSongs(): Song[] {
@@ -151,7 +163,8 @@ export class TournamentRound {
     }
 
     isActive(): boolean {
-        return this.status == "ACTIVE" && this.isDateInRange(new Date());
+        // return this.status == "ACTIVE" && this.isDateInRange(new Date());
+        return this.status == "ACTIVE";
     }
 
     isDateInRange(date: Date): boolean {

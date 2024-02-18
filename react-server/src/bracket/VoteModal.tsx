@@ -30,7 +30,7 @@ export default function VoteModal({tournament}: VoteDialogProps) {
         <Modal show={show && !loading} onHide={closeModal} centered className="vote-modal">
             <Modal.Header closeButton>
                 <Modal.Title>
-                    {votableRound && <VoteDialogText endDate={votableRound?.endDate} onCountdownComplete={closeModal}/>}
+                    {votableRound && <VoteDialogText endDate={votableRound.endDate} onCountdownComplete={closeModal}/>}
                 </Modal.Title>
             </Modal.Header>
             <Modal.Footer>
@@ -42,11 +42,15 @@ export default function VoteModal({tournament}: VoteDialogProps) {
 }
 
 interface VoteDialogTextProps {
-    endDate: Date;
+    endDate: Date|null;
     onCountdownComplete?: () => void;
 }
 
 function VoteDialogText({endDate, onCountdownComplete}: VoteDialogTextProps) {
+    if (endDate === null) {
+        return <>Voting is open!</>
+    }
+
     const effectiveEndDate = new Date(endDate.valueOf() - 60 * 1000);
     const currentDate = new Date(Date.now());
     const sameDay = currentDate.getDate() === effectiveEndDate.getDate()

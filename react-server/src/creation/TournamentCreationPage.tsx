@@ -1,16 +1,16 @@
 import { Moment } from "moment";
 import { Dispatch, FormEvent, SetStateAction, useEffect, useState } from "react";
-import { ButtonGroup, ToggleButton } from "react-bootstrap";
 import DateTime from "react-datetime";
-import { MdLockOutline, MdLockOpen, MdOutlineRemoveRedEye } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
 import SongCard from "../card/SongCard";
 import Song from "../model/Song";
 import { TournamentRound } from "../model/Tournament";
 import TournamentBuilder from "../model/TournamentBuilder";
 import { createTournament, searchSongs } from "../service/TournamentService";
-import "./tournament-creation.css";
+import TournamentModeButtons from "./TournamentModeButtons";
 import TournamentPrivacyButtons from "./TournamentPrivacyButtons";
+import "./tournament-creation.css";
+import { Card, CardBody } from "react-bootstrap";
 
 export default function TournamentCreationPage() {
     const [builder, setBuilder] = useState(new TournamentBuilder());
@@ -106,6 +106,7 @@ function SetupPage({builder, setBuilder}: PageProps) {
                     onChange={e => setBuilder(builder.setSpotifyPlaylist(e.target.value))}
                 />
             </label>
+            <TournamentModeButtons value={builder.mode} onSelect={mode => setBuilder(builder.setMode(mode))} />
             <TournamentPrivacyButtons value={builder.privacy} onSelect={privacy => setBuilder(builder.setPrivacy(privacy))} />
         </div>
     );
@@ -223,6 +224,8 @@ function SongSelectPage({builder, setBuilder}: PageProps) {
 
 function SchedulePage({builder, setBuilder}: PageProps) {
     const firstRound = builder.levels[0].rounds[0];
+    const disabled = builder.mode === "INSTANT";
+    const cardClassName = "disabled-message" + (disabled ? "" : " hidden");
 
     const setStartDate = (value: string | Moment) => {
         if(typeof value !== "string") {
@@ -239,20 +242,27 @@ function SchedulePage({builder, setBuilder}: PageProps) {
     return (
         <div className="bracket-schedule">
             <DateTime 
-                value={firstRound.startDate}
+                value={firstRound.startDate!}
                 onChange={setStartDate}
                 closeOnSelect
+                inputProps={{disabled}}
             />
             {builder.levels.map(level => <div key={level.name}>
                 {level.rounds.map((round, index) => <>
                     <p>{level.name}, Round {index + 1}</p>
                     <DateTime
-                        value={round.endDate}
+                        value={round.endDate!}
                         onChange={value => setEndDate(value, round)}
                         closeOnSelect
+                        inputProps={{disabled}}
                     />
                 </>)}
             </div>)}
+            <Card className={cardClassName}>
+                <CardBody>
+                    This page is disabled for INSTANT mode tournaments.
+                </CardBody>
+            </Card>
         </div>
     );
 }

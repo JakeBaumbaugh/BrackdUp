@@ -1,5 +1,5 @@
 import Song from "./Song";
-import { TournamentLevel, TournamentPrivacy, TournamentRound } from "./Tournament";
+import { TournamentLevel, TournamentMode, TournamentPrivacy, TournamentRound } from "./Tournament";
 
 export default class TournamentBuilder {
     name: string;
@@ -9,6 +9,7 @@ export default class TournamentBuilder {
     songs: Song[];
     levels: TournamentLevel[];
     privacy: TournamentPrivacy;
+    mode: TournamentMode;
 
     constructor() {
         this.name = "";
@@ -18,6 +19,7 @@ export default class TournamentBuilder {
         this.songs = [];
         this.levels = this.buildLevels();
         this.privacy = "VISIBLE";
+        this.mode = "SCHEDULED";
     }
 
     copy(): TournamentBuilder {
@@ -29,24 +31,32 @@ export default class TournamentBuilder {
         newBuilder.songs = this.songs;
         newBuilder.levels = this.levels;
         newBuilder.privacy = this.privacy;
+        newBuilder.mode = this.mode;
         return newBuilder;
     }
 
     isValid(): boolean {
         // Check name
-        if(!this.name) {
+        if (!this.name) {
             console.log("Missing tournament name.");
             return false;
         }
         // Check song count
-        if(this.songs.length !== this.songCount) {
+        if (this.songs.length !== this.songCount) {
             console.log("Incorrect song count.");
             return false;
         }
         // Check start/end date order
-        const rounds = this.levels.flatMap(level => level.rounds);
-        if(!rounds.every(round => round.startDate < round.endDate)) {
-            console.log("Round end date must be after round start date.");
+        if (this.mode === "SCHEDULED") {
+            const rounds = this.levels.flatMap(level => level.rounds);
+            if (!rounds.every(round => round.startDate! < round.endDate!)) {
+                console.log("Round end date must be after round start date.");
+                return false;
+            }
+        }
+        // Check privacy and mode
+        if (this.privacy === "PUBLIC" && this.mode === "INSTANT") {
+            console.log("Instant tournaments cannot be public.");
             return false;
         }
         return true;
@@ -81,6 +91,12 @@ export default class TournamentBuilder {
     setPrivacy(privacy: TournamentPrivacy): TournamentBuilder {
         const newBuilder = this.copy();
         newBuilder.privacy = privacy;
+        return newBuilder;
+    }
+
+    setMode(mode: TournamentMode): TournamentBuilder {
+        const newBuilder = this.copy();
+        newBuilder.mode = mode;
         return newBuilder;
     }
 
