@@ -134,11 +134,20 @@ public class ProfileService {
     }
 
     public boolean profileCanCreate(Profile profile) {
-        return profile != null && profile.isAdmin();
+        return profile != null && (profile.isAdmin() || profile.getRole() == ProfileRole.CREATOR);
     }
 
-    public boolean profileCanEdit(Profile profile) {
-        return profile != null && profile.isAdmin();
+    public boolean profileCanEdit(Profile profile, Integer tournamentId) {
+        if (profile == null) {
+            return false;
+        }
+        if (profile.isAdmin()) {
+            return true;
+        }
+        return tournamentRepository.findById(tournamentId)
+                .map(Tournament::getCreatorId)
+                .map(creatorId -> profile.getId().equals(creatorId))
+                .orElse(false);
     }
 
     public boolean isJwtRevoked(String jwt) {

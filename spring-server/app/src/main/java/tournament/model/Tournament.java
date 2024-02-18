@@ -14,6 +14,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OrderBy;
 import jakarta.persistence.Transient;
@@ -39,6 +40,8 @@ public class Tournament {
     @JoinColumn(name = "tournament_id", nullable = false)
     @OrderBy("id ASC")
     private List<TournamentLevel> levels;
+
+    private Integer creatorId;
 
     @Transient
     @JsonIgnore

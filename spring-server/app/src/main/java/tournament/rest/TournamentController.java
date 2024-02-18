@@ -107,22 +107,23 @@ public class TournamentController {
             throw new ResponseStatusException(HttpStatusCode.valueOf(403));
         }
 
+        builder.setCreator(profile);
         tournamentService.createTournament(builder);
     }
 
     @DeleteMapping("/tournament/delete")
-    public void deleteTournament(Authentication authentication, @RequestParam Integer id) {
+    public void deleteTournament(Authentication authentication, @RequestParam Integer tournamentId) {
         Profile profile = (Profile) authentication.getPrincipal();
-        logger.info("DELETE request to delete tournament id={} from user {}", id, profile.getName());
+        logger.info("DELETE request to delete tournament id={} from user {}", tournamentId, profile.getName());
 
-        if (!profileService.profileCanEdit(profile)) {
+        if (!profileService.profileCanEdit(profile, tournamentId)) {
             throw new ResponseStatusException(HttpStatusCode.valueOf(403));
         }
 
-        if (tournamentService.getTournament(id).isEmpty()) {
+        if (tournamentService.getTournament(tournamentId).isEmpty()) {
             throw create400("Tournament not found.");
         }
-        tournamentService.deleteTournament(id);
+        tournamentService.deleteTournament(tournamentId);
     }
 
     @GetMapping("/song/search")
@@ -136,7 +137,7 @@ public class TournamentController {
         Profile profile = (Profile) authentication.getPrincipal();
         logger.info("GET request to get settings for tournament {} from user {}", tournamentId, profile.getName());
 
-        if (!profileService.profileCanEdit(profile)) {
+        if (!profileService.profileCanEdit(profile, tournamentId)) {
             throw new ResponseStatusException(HttpStatusCode.valueOf(403));
         }
 
@@ -148,7 +149,7 @@ public class TournamentController {
         Profile profile = (Profile) authentication.getPrincipal();
         logger.info("POST request to save settings for tournament {} from user {}", settings.getTournamentId(), profile.getName());
 
-        if (!profileService.profileCanEdit(profile)) {
+        if (!profileService.profileCanEdit(profile, settings.getTournamentId())) {
             throw new ResponseStatusException(HttpStatusCode.valueOf(403));
         }
 

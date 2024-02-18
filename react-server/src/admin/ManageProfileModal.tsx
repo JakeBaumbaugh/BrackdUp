@@ -76,6 +76,7 @@ export default function ManageProfileModal({profile, show, onHide, replaceProfil
                     <span>Role</span>
                     <select value={role} onChange={e => setRole(e.target.value as ProfileRole)}>
                         <option value="USER">USER</option>
+                        <option value="CREATOR">CREATOR</option>
                         <option value="ADMIN">ADMIN</option>
                     </select>
                 </label>

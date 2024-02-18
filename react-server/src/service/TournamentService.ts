@@ -56,7 +56,7 @@ export function saveTournamentSettings(settings: TournamentSettings): Promise<Re
 }
 
 export function deleteTournament(tournamentId: number): Promise<Response> {
-    return delet(`/tournament/delete?id=${tournamentId}`);
+    return delet(`/tournament/delete?tournamentId=${tournamentId}`);
 }
 
 export function searchSongs(title: string, artist: string): Promise<Song[]> {

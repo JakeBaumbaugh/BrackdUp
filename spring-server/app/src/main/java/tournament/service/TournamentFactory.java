@@ -70,6 +70,7 @@ public class TournamentFactory {
         tournament.setSpotifyPlaylist(builder.getSpotifyPlaylist());
         tournament.setLevels(levels);
         tournament.setPrivacy(builder.getPrivacy());
+        tournament.setCreatorId(builder.getCreator().getId());
 
         return tournament;
     }

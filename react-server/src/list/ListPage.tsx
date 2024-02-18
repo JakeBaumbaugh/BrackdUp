@@ -64,7 +64,7 @@ export default function ListPage() {
                     )}
                 </div>
             ))}
-            {profile?.role === "ADMIN" && (
+            {profile?.canCreateTournament() && (
                 <div className="tournament-card create-tournament-card" onClick={() => navigate("/tournament/new")}>
                     <p>+</p>
                 </div>
