@@ -1,6 +1,6 @@
 import { Moment } from "moment";
 import { Dispatch, SetStateAction, useEffect, useMemo, useState } from "react";
-import { OverlayTrigger, Tooltip } from "react-bootstrap";
+import { Button, OverlayTrigger, Tooltip } from "react-bootstrap";
 import DateTime from "react-datetime";
 import { useNavigate } from "react-router-dom";
 import VoterCard from "../card/VoterCard";
@@ -55,8 +55,8 @@ export default function TournamentSettingsPage() {
                 <h3>Tournament Privacy</h3>
                 <TournamentPrivacyButtons value={settings.privacy} onSelect={privacy => setSettings(settings.setPrivacy(privacy))}/>
                 <div className="button-row">
-                    <button onClick={onSave}>SAVE</button>
-                    <button onClick={onDelete}>DELETE</button>
+                    <Button onClick={onDelete} variant="danger">DELETE</Button>
+                    <Button onClick={onSave}>SAVE</Button>
                 </div>
             </> : <p>Tournament not found.</p>}
         </main>
