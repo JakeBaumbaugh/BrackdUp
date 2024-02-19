@@ -19,7 +19,7 @@ export default function ListPage() {
     useEffect(() => {
         setLoading(true);
         getTournamentSummaries();
-    }, []);
+    }, [profile]);
 
     const getTournamentSummaries = () =>
         getTournaments().then(tournaments => {
@@ -96,7 +96,6 @@ interface TournamentCardProps {
 function TournamentCardContent({summary, refreshSummary}: TournamentCardProps) {
     const [loading, setLoading] = useState(false);
     const date = new Date();
-    console.log(summary.name, summary);
 
     // Tournament over
     if(summary.songWinner) {

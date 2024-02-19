@@ -1,5 +1,6 @@
 import { Moment } from "moment";
-import { Dispatch, FormEvent, SetStateAction, useEffect, useState } from "react";
+import { Dispatch, FormEvent, SetStateAction, useEffect, useMemo, useState } from "react";
+import { Button, Card, CardBody } from "react-bootstrap";
 import DateTime from "react-datetime";
 import { useNavigate } from "react-router-dom";
 import SongCard from "../card/SongCard";
@@ -10,16 +11,19 @@ import { createTournament, searchSongs } from "../service/TournamentService";
 import TournamentModeButtons from "./TournamentModeButtons";
 import TournamentPrivacyButtons from "./TournamentPrivacyButtons";
 import "./tournament-creation.css";
-import { Card, CardBody } from "react-bootstrap";
 
 export default function TournamentCreationPage() {
     const [builder, setBuilder] = useState(new TournamentBuilder());
     const [page, setPage] = useState(0);
+    const [saving, setSaving] = useState(false);
     const navigate = useNavigate();
 
+    const valid = useMemo(() => builder.isValid(), [builder]);
+
     const handleSubmit = (e: FormEvent) => {
+        setSaving(true);
         e.preventDefault();
-        if(builder.isValid()) {
+        if(valid) {
             createTournament(builder)
                 .then(() => navigate("/"));
         }
@@ -46,16 +50,25 @@ export default function TournamentCreationPage() {
             <form onSubmit={handleSubmit}>
                 {content}
                 <div className="button-row">
-                    <button
+                    <Button
                         type="button"
                         onClick={() => setPage(page => page - 1)}
                         disabled={page <= 0}
-                    >BACK</button>
-                    <button
-                        type={page === 2 ? "submit" : "button"}
-                        onClick={page === 2 ? undefined : () => setPage(page => page + 1)}
-                        key={page === 2 ? "submit-button" : "next-button"}
-                    >{page === 2 ? "SUBMIT" : "NEXT"}</button>
+                    >BACK</Button>
+                    {page === 2 ? (
+                        <Button
+                        type="submit"
+                        key="submit-button"
+                        variant={valid ? "success" : "danger"}
+                        disabled={saving || !valid}
+                    >SUBMIT</Button>
+                    ) : (
+                        <Button
+                            type="button"
+                            onClick={() => setPage(page => page + 1)}
+                            key="next-button"
+                        >NEXT</Button>
+                    )}
                 </div>
             </form>
         </main>
@@ -199,7 +212,7 @@ function SongSelectPage({builder, setBuilder}: PageProps) {
                     <p>Suggestions:</p>
                     {suggestions.length > 0 ? suggestions.map(song => (
                         <SongCard
-                            key={`${song.title}-${song.artist}`}
+                            key={`${song.id}-${song.title}-${song.artist}`}
                             song={song}
                             onClick={() => addSong(song)}
                             selectable

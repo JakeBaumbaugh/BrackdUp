@@ -34,11 +34,6 @@
     justify-content: space-evenly;
 }
 
-.settings-page .button-row button {
-    font-size: 12pt;
-    padding: 4px 8px;
-}
-
 .settings-page .voting-status {
     display: grid;
     grid-auto-rows: min-content;

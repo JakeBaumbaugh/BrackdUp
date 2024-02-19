@@ -40,6 +40,7 @@ export default function TournamentManager({children}: PropsWithChildren) {
         const id = Number.parseInt(searchParams.get("id") ?? "");
         if (Number.isNaN(id)) {
             clearData();
+            return;
         }
         // Start loading
         if (tournament?.id !== id || currentRound) {
