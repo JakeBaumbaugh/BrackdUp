@@ -1,7 +1,7 @@
 .song-card {
     border: solid 2px var(--dark-color);
     border-radius: 6px;
-    background-color: #282c3433;
+    background-color: #c0bfbc;
     color: var(--dark-color);
     display: flex;
     flex-direction: column;

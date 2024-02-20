@@ -2,6 +2,11 @@
     padding: 2em 20%;
 }
 
+.admin-page h3:not(:first-of-type) {
+    margin-top: 1em;
+}
+
+/* Profiles */
 .admin-page .rdt_Table img {
     width: 3em;
     border-radius: 50%;
@@ -50,3 +55,6 @@
     align-items: center;
     padding: 8px 16px;
 }
+
+/* Images */
+/* .admin-page  */

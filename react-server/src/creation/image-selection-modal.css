@@ -1,0 +1,18 @@
+.image-selection-modal .modal-body {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    grid-auto-rows: auto;
+    gap: 1em;
+}
+
+.image-selection-modal .modal-body > * {
+    aspect-ratio: 1;
+    padding: 12px;
+    font-size: 36pt;
+}
+
+.image-selection-modal img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}

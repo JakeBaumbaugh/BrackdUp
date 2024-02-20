@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatusCode;
+import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
+import tournament.model.Image;
 import tournament.model.Profile;
 import tournament.model.Song;
 import tournament.model.Tournament;
@@ -24,6 +26,7 @@ import tournament.model.TournamentSettings;
 import tournament.model.TournamentSummary;
 import tournament.rest.request.VoteRequestBody;
 import tournament.rest.response.VoteResponseBody;
+import tournament.service.ImageService;
 import tournament.service.ProfileService;
 import tournament.service.TournamentService;
 
@@ -33,11 +36,13 @@ public class TournamentController {
 
     private TournamentService tournamentService;
     private ProfileService profileService;
+    private ImageService imageService;
 
     @Autowired
-    public TournamentController(TournamentService tournamentService, ProfileService profileService) {
+    public TournamentController(TournamentService tournamentService, ProfileService profileService, ImageService imageService) {
         this.tournamentService = tournamentService;
         this.profileService = profileService;
+        this.imageService = imageService;
     }
     
     @GetMapping("/tournament")

@@ -10,6 +10,7 @@ export default class TournamentBuilder {
     levels: TournamentLevel[];
     privacy: TournamentPrivacy;
     mode: TournamentMode;
+    backgroundImage?: number;
 
     constructor() {
         this.name = "";
@@ -32,6 +33,7 @@ export default class TournamentBuilder {
         newBuilder.levels = this.levels;
         newBuilder.privacy = this.privacy;
         newBuilder.mode = this.mode;
+        newBuilder.backgroundImage = this.backgroundImage;
         return newBuilder;
     }
 
@@ -97,6 +99,12 @@ export default class TournamentBuilder {
     setMode(mode: TournamentMode): TournamentBuilder {
         const newBuilder = this.copy();
         newBuilder.mode = mode;
+        return newBuilder;
+    }
+
+    setBackgroundImage(backgroundImage?: number): TournamentBuilder {
+        const newBuilder = this.copy();
+        newBuilder.backgroundImage = backgroundImage;
         return newBuilder;
     }
 

@@ -1,10 +1,10 @@
-const baseUrl = process.env.REACT_APP_SERVER_URL ?? "";
+export const BASE_URL = process.env.REACT_APP_SERVER_URL ?? "";
 if(!process.env?.REACT_APP_SERVER_URL) {
     console.warn("Server URL not found, using empty default.");
 }
 
 export function get(url: string, jwt?: string): Promise<Response> {
-    const fullUrl = baseUrl + url;
+    const fullUrl = BASE_URL + url;
     return fetch(fullUrl, {
         method: "GET",
         credentials: "include",
@@ -17,7 +17,7 @@ export function get(url: string, jwt?: string): Promise<Response> {
 }
 
 export function post(url: string, body?: any, jwt?: string): Promise<Response> {
-    const fullUrl = baseUrl + url;
+    const fullUrl = BASE_URL + url;
     return fetch(fullUrl, {
         method: "POST",
         body: JSON.stringify(body),
@@ -31,7 +31,7 @@ export function post(url: string, body?: any, jwt?: string): Promise<Response> {
 }
 
 export function delet(url: string, jwt?: string): Promise<Response> {
-    const fullUrl = baseUrl + url;
+    const fullUrl = BASE_URL + url;
     return fetch(fullUrl, {
         method: "DELETE",
         credentials: "include",

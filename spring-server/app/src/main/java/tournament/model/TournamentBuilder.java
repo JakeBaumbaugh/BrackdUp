@@ -19,4 +19,5 @@ public class TournamentBuilder {
     private TournamentPrivacy privacy;
     private TournamentMode mode;
     private Profile creator;
+    private Integer backgroundImage;
 }

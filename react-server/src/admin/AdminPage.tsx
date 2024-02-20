@@ -1,10 +1,12 @@
+import { useEffect, useState } from "react";
+import { Button } from "react-bootstrap";
 import DataTable, { TableColumn } from "react-data-table-component";
 import { useProfileContext } from "../context/ProfileContext";
-import "./admin.css";
-import { useEffect, useState } from "react";
 import Profile from "../model/Profile";
-import { getProfiles } from "../service/AdminService";
+import { getProfiles, uploadImage } from "../service/AdminService";
+import FileUpload from "./FileUpload";
 import ManageProfileModal from "./ManageProfileModal";
+import "./admin.css";
 
 export default function AdminPage() {
     const {profile: [profile]} = useProfileContext();
@@ -43,6 +45,15 @@ const profileColumns: TableColumn<Profile>[] = [
 ];
 
 function AdminContent() {
+    return (
+        <main className="admin-page">
+            <ProfileManagement/>
+            <ImageManagement/>
+        </main>
+    );
+}
+
+function ProfileManagement() {
     const [profiles, setProfiles] = useState<Profile[]>([]);
     const [modalProfile, setModalProfile] = useState<Profile|null>(null);
     const [showModal, setShowModal] = useState(false);
@@ -70,25 +81,40 @@ function AdminContent() {
         setProfiles([...profiles.slice(0, replaceIndex), ...profiles.slice(replaceIndex + 1)]);
     };
 
-    return (
-        <main className="admin-page">
-            <h3>Profiles</h3>
-            <DataTable
-                columns={profileColumns}
-                data={profiles}
-                pagination
-                striped
-                onRowClicked={selectProfile}
-                highlightOnHover
-                pointerOnHover
-            />
-            <ManageProfileModal
-                profile={modalProfile}
-                show={showModal}
-                onHide={() => setShowModal(false)}
-                replaceProfile={replaceProfile}
-                removeProfile={removeProfile}
-            />
-        </main>
-    );
+    return <>
+        <h3>Profiles</h3>
+        <DataTable
+            columns={profileColumns}
+            data={profiles}
+            pagination
+            striped
+            onRowClicked={selectProfile}
+            highlightOnHover
+            pointerOnHover
+        />
+        <ManageProfileModal
+            profile={modalProfile}
+            show={showModal}
+            onHide={() => setShowModal(false)}
+            replaceProfile={replaceProfile}
+            removeProfile={removeProfile}
+        />
+    </>;
+}
+
+function ImageManagement() {
+    const [imageUpload, setImageUpload] = useState<File>();
+
+    const onUpload = () => {
+        if (imageUpload) {
+            uploadImage(imageUpload)
+                .then(() => setImageUpload(undefined));
+        }
+    };
+
+    return <>
+        <h3>Images</h3>
+        <FileUpload file={imageUpload} setFile={setImageUpload} />
+        <Button onClick={onUpload} disabled={!imageUpload}>UPLOAD</Button>
+    </>;
 }

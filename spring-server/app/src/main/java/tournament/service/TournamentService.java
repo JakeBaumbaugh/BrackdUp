@@ -18,9 +18,23 @@ import org.springframework.stereotype.Service;
 
 import io.micrometer.common.util.StringUtils;
 import jakarta.transaction.Transactional;
-import tournament.model.*;
+import tournament.model.Profile;
+import tournament.model.RoundStatus;
+import tournament.model.Song;
+import tournament.model.Tournament;
+import tournament.model.TournamentBuilder;
+import tournament.model.TournamentLevel;
+import tournament.model.TournamentMatch;
+import tournament.model.TournamentMode;
+import tournament.model.TournamentPrivacy;
+import tournament.model.TournamentRound;
+import tournament.model.TournamentSettings;
 import tournament.model.TournamentSettings.MatchDescription;
 import tournament.model.TournamentSettings.RoundDate;
+import tournament.model.TournamentSummary;
+import tournament.model.TournamentVoter;
+import tournament.model.Vote;
+import tournament.model.VoteId;
 import tournament.repository.SongRepository;
 import tournament.repository.TournamentRepository;
 import tournament.repository.TournamentVoterRepository;
@@ -45,16 +59,16 @@ public class TournamentService {
 
     @Autowired
     public TournamentService(ProfileService profileService,
+                             VoteService voteService,
                              TournamentRepository tournamentRepository,
                              SongRepository songRepository,
-                             VoteService voteService,
                              TournamentVoterRepository tournamentVoterRepository,
                              TournamentFactory tournamentFactory,
                              ThreadPoolTaskScheduler threadPoolTaskScheduler) {
         this.profileService = profileService;
+        this.voteService = voteService;
         this.tournamentRepository = tournamentRepository;
         this.songRepository = songRepository;
-        this.voteService = voteService;
         this.tournamentVoterRepository = tournamentVoterRepository;
         this.tournamentFactory = tournamentFactory;
         this.threadPoolTaskScheduler = threadPoolTaskScheduler;
@@ -104,6 +118,7 @@ public class TournamentService {
     }
 
     public void createTournament(TournamentBuilder builder) {
+        // Build tournament
         Tournament tournament = tournamentFactory.buildTournament(builder);
         logger.info("Created tournament: {}", tournament);
         if(tournament != null) {
