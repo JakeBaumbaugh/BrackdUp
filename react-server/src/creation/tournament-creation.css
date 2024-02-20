@@ -44,6 +44,22 @@
     gap: var(--input-gap);
 }
 
+.creation-page .setup .background-image-details {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    width: min-content;
+}
+
+.creation-page .setup .background-image-details .btn {
+    width: max-content;
+}
+
+.creation-page .setup .background-image-details img {
+    width: 100%;
+    aspect-ratio: 1;
+}
+
 /* Song Selection Page */
 .creation-page .song-select {
     padding: 0 10%;

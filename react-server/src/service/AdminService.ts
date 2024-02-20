@@ -6,7 +6,7 @@ export function getProfiles(): Promise<Profile[]> {
         .then(res => res.json())
         .then(res => res.map(Profile.fromJson))
         .catch(() => {
-            console.log("Failed to retrive all profiles.");
+            console.error("Failed to retrive all profiles.");
             return [];
         });
 }
@@ -16,7 +16,7 @@ export function updateProfile(profile: Profile): Promise<Profile|null> {
         .then(res => res.json())
         .then(res => Profile.fromJson(res))
         .catch(() => {
-            console.log(`Failed to update profile ${profile.id}.`);
+            console.error(`Failed to update profile ${profile.id}.`);
             return null;
         });
 }
@@ -24,7 +24,18 @@ export function updateProfile(profile: Profile): Promise<Profile|null> {
 export function deleteProfile(id: number): Promise<Response> {
     return delet(`/admin/deleteProfile?id=${id}`)
         .catch(res => {
-            console.log(`Failed to delete profile ${id}.`);
+            console.error(`Failed to delete profile ${id}.`);
             return res;
         });
+}
+
+export function uploadImage(image: File): Promise<Response> {
+    const backgroundImagePromise = new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = reject;
+        reader.readAsDataURL(image);
+    });
+    return backgroundImagePromise
+        .then(data => post("/admin/uploadImage", {data}));
 }

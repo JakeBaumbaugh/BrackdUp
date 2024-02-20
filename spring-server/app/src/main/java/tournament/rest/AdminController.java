@@ -18,6 +18,8 @@ import org.springframework.web.server.ResponseStatusException;
 
 import tournament.model.Profile;
 import tournament.model.Tournament;
+import tournament.rest.request.UploadImageRequestBody;
+import tournament.service.ImageService;
 import tournament.service.ProfileService;
 import tournament.service.TournamentService;
 
@@ -28,11 +30,13 @@ public class AdminController {
     
     private TournamentService tournamentService;
     private ProfileService profileService;
+    private ImageService imageService;
 
     @Autowired
-    public AdminController(TournamentService tournamentService, ProfileService profileService) {
+    public AdminController(TournamentService tournamentService, ProfileService profileService, ImageService imageService) {
         this.tournamentService = tournamentService;
         this.profileService = profileService;
+        this.imageService = imageService;
     }
 
     @GetMapping("/randomTournament")
@@ -86,6 +90,16 @@ public class AdminController {
         requireAdmin(profile);
 
         profileService.deleteProfile(id);
+    }
+    
+    @PostMapping("/uploadImage")
+    public void uploadImage(Authentication authentication, @RequestBody UploadImageRequestBody body) {
+        Profile profile = (Profile) authentication.getPrincipal();
+        logger.info("POST request to upload an image from user {}", profile.getName());
+
+        requireAdmin(profile);
+
+        imageService.saveImage(body.getData());
     }
 
     private void requireAdmin(Profile profile) {

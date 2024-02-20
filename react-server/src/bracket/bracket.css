@@ -5,6 +5,21 @@
     position: relative;
 }
 
+.bracket-page .background {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+}
+
+.bracket-page .background .background-image {
+    opacity: 0.4;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
 .bracket-page .react-transform-wrapper {
     width: 100%; 
     height: 100%;
@@ -42,4 +57,11 @@
     stroke-width: 2px;
     stroke-linecap: round;
     overflow: visible;
+}
+
+/* Desktop */
+@media only screen and (min-width: 600px) {
+    .bracket-page .background {
+        padding: 4em;
+    }
 }

@@ -86,6 +86,7 @@ public class TournamentFactory {
         tournament.setPrivacy(builder.getPrivacy());
         tournament.setMode(builder.getMode());
         tournament.setCreatorId(builder.getCreator().getId());
+        tournament.setBackgroundImageId(builder.getBackgroundImage());
 
         return tournament;
     }

@@ -1,0 +1,19 @@
+.file-upload .file-details {
+    display: flex;
+    gap: 1em;
+    align-items: center;
+
+    margin-bottom: 1em;
+}
+
+.file-upload p {
+    margin: 0;
+}
+
+.file-upload img {
+    width: 10em;
+}
+
+.file-upload input {
+    display: none;
+}

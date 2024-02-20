@@ -7,10 +7,12 @@ import SongCard from "../card/SongCard";
 import Song from "../model/Song";
 import { TournamentRound } from "../model/Tournament";
 import TournamentBuilder from "../model/TournamentBuilder";
+import { getImageList, imageUrl } from "../service/ImageService";
 import { createTournament, searchSongs } from "../service/TournamentService";
 import TournamentModeButtons from "./TournamentModeButtons";
 import TournamentPrivacyButtons from "./TournamentPrivacyButtons";
 import "./tournament-creation.css";
+import ImageSelectionModal from "./ImageSelectionModal";
 
 export default function TournamentCreationPage() {
     const [builder, setBuilder] = useState(new TournamentBuilder());
@@ -24,6 +26,7 @@ export default function TournamentCreationPage() {
         setSaving(true);
         e.preventDefault();
         if(valid) {
+            console.log("submitting", builder);
             createTournament(builder)
                 .then(() => navigate("/"));
         }
@@ -81,6 +84,14 @@ interface PageProps {
 }
 
 function SetupPage({builder, setBuilder}: PageProps) {
+    const [imageIds, setImageIds] = useState<number[]>([]);
+    const [showImageSelectionModal, setShowImageSelectionModal] = useState(false);
+
+    useEffect(() => {
+        getImageList()
+            .then(ids => setImageIds(ids));
+    }, []);
+
     return (
         <div className="setup">
             <label>
@@ -121,6 +132,20 @@ function SetupPage({builder, setBuilder}: PageProps) {
             </label>
             <TournamentModeButtons value={builder.mode} onSelect={mode => setBuilder(builder.setMode(mode))} />
             <TournamentPrivacyButtons value={builder.privacy} onSelect={privacy => setBuilder(builder.setPrivacy(privacy))} />
+            <ImageSelectionModal
+                show={showImageSelectionModal}
+                onHide={() => setShowImageSelectionModal(false)}
+                imageList={imageIds}
+                image={1}
+                onSelect={id => {
+                    setBuilder(builder.setBackgroundImage(id));
+                    setShowImageSelectionModal(false);
+                }}
+            />
+            <div className="background-image-details">
+                <Button onClick={() => setShowImageSelectionModal(true)}>Select Background Image</Button>
+                {builder.backgroundImage && <img src={imageUrl(builder.backgroundImage)} alt=""/>}
+            </div>
         </div>
     );
 }
