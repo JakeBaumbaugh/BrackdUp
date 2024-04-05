@@ -6,6 +6,8 @@ import { CodeResponse, useGoogleLogin } from "@react-oauth/google";
 import { login, logout } from "../service/ProfileService";
 import { useEffect } from "react";
 
+const devLocalhost = process.env.REACT_APP_LOCALHOST;
+
 export default function ProfileButton() {
     const {profile: [profile, setProfile], forceLogin: [forceLogin]} = useProfileContext();
 
@@ -13,13 +15,26 @@ export default function ProfileButton() {
         return <Tooltip id="logout-tooltip" {...props}>Logout</Tooltip>
     }
 
-    const onLogin = (codeResponse: CodeResponse) => {
+    const onLoginClick = () => {
+        if (devLocalhost) {
+            const email = prompt("Please enter an email address.");
+            if (email) {
+                login(email)
+                    .then(profile => setProfile(profile))
+                    .catch(() => setProfile(null));
+            }
+        } else {
+            googleLogin();
+        }
+    };
+
+    const onGoogleSuccess = (codeResponse: CodeResponse) => {
         login(codeResponse.code)
             .then(profile => setProfile(profile))
             .catch(() => setProfile(null));
     };
 
-    const onLogout = () => {
+    const onLogoutClick = () => {
         logout()
             .then(() => setProfile(null))
             .catch(() => console.log("Failed to log out."));
@@ -27,7 +42,7 @@ export default function ProfileButton() {
 
     const googleLogin = useGoogleLogin({
         flow: "auth-code",
-        onSuccess: onLogin
+        onSuccess: onGoogleSuccess
     });
 
     // Force login popup without user interact
@@ -42,13 +57,13 @@ export default function ProfileButton() {
             <img
                 src={profile.pictureLink}
                 className="clickable darken-hover rotate-hover"
-                onClick={onLogout}
+                onClick={onLogoutClick}
             />
         </OverlayTrigger>
     ) : (
         <div
             className="login-button clickable darken-hover rotate-hover"
-            onClick={() => googleLogin()}
+            onClick={() => onLoginClick()}
         >
             <FcGoogle/>
         </div>

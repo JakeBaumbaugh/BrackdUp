@@ -1,6 +1,17 @@
-export const BASE_URL = process.env.REACT_APP_SERVER_URL ?? "";
-if(!process.env?.REACT_APP_SERVER_URL) {
-    console.warn("Server URL not found, using empty default.");
+export const BASE_URL = getBaseUrl();
+
+function getBaseUrl(): string {
+    let url;
+    if (process.env.REACT_APP_LOCALHOST) {
+        url = process.env.REACT_APP_LOCALHOST_URL;
+    } else {
+        url = process.env.REACT_APP_SERVER_URL;
+    }
+    if (!url) {
+        console.warn("Server URL not found, using empty default.");
+        return "";
+    }
+    return url;
 }
 
 export function get(url: string, jwt?: string): Promise<Response> {
