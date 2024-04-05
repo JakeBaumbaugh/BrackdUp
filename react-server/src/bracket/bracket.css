@@ -20,6 +20,10 @@
     object-fit: contain;
 }
 
+.bracket-page .background .background-image.missing {
+    display: none;
+}
+
 .bracket-page .react-transform-wrapper {
     width: 100%; 
     height: 100%;
