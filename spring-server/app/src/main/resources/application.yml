@@ -25,3 +25,4 @@ logging:
 resolve.delay.seconds: 10
 start.delay.seconds: 1
 user.admins: jake.baumbaugh@gmail.com
+dev.localhost: false

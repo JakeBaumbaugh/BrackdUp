@@ -1,10 +1,12 @@
 package tournament.app;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -23,6 +25,9 @@ import tournament.service.ProfileService;
 @EnableWebSecurity
 public class SecurityConfig {
     private static final Logger logger = LoggerFactory.getLogger(SecurityConfig.class);
+
+    @Value("${dev.localhost:false}")
+    private boolean devLocalhost;
 
     private ProfileService profileService;
     private GoogleService googleService;
@@ -57,15 +62,21 @@ public class SecurityConfig {
                 })
                 .deleteCookies("jwt")
             )
-            .addFilterBefore(new JwtTokenFilter(profileService, googleService), UsernamePasswordAuthenticationFilter.class)
+            .addFilterBefore(getJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class)
             .build();
     }
 
     public CorsConfigurationSource corsConfigurationSource() {
+        List<String> allowedOrigins = new ArrayList<>(4);
+        allowedOrigins.add("https://madness.basefive.org");
+        allowedOrigins.add("https://madness.basefive.org:3000");
+        allowedOrigins.add("https://madness-dev.basefive.org:3000");
+        if (devLocalhost) {
+            allowedOrigins.add("https://localhost:3000");
+        }
+
         final CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(List.of("https://madness.basefive.org",
-                                         "https://madness.basefive.org:3000",
-                                         "https://madness-dev.basefive.org:3000"));
+        config.setAllowedOrigins(allowedOrigins);
         config.setAllowedMethods(List.of("HEAD", "GET", "POST", "OPTIONS", "DELETE"));
         config.setAllowedHeaders(List.of("Authorization", "Cache-Control", "Content-Type"));
         config.setAllowCredentials(true);
@@ -73,6 +84,14 @@ public class SecurityConfig {
         final UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", config);
         return source;
+    }
+
+    private JwtTokenFilter getJwtTokenFilter() {
+        if (devLocalhost) {
+            return new LocalhostJwtTokenFilter(profileService);
+        } else {
+            return new GoogleJwtTokenFilter(profileService, googleService);
+        }
     }
 
 }
