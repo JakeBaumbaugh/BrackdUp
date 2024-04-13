@@ -76,16 +76,16 @@ public class TournamentRound {
         matches.add(match);
     }
 
-    public boolean validSongVotes(List<Song> songs) {
-        // O(songs x matches), maybe could be better
-        Set<TournamentMatch> votedMatches = songs.stream()
-                .map(song -> matches.stream()
-                        .filter(match -> match.getSong1().getId().equals(song.getId()) || match.getSong2().getId().equals(song.getId()))
+    public boolean validEntryVotes(List<Entry> entries) {
+        // O(entries x matches), maybe could be better
+        Set<TournamentMatch> votedMatches = entries.stream()
+                .map(entry -> matches.stream()
+                        .filter(match -> match.getEntry1().getId().equals(entry.getId()) || match.getEntry2().getId().equals(entry.getId()))
                         .findFirst()
                         .orElse(null)
                 )
                 .collect(Collectors.toSet());
-        return !votedMatches.contains(null) && votedMatches.size() == songs.size();
+        return !votedMatches.contains(null) && votedMatches.size() == entries.size();
     }
 
     @Transient

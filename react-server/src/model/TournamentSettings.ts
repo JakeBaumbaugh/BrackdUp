@@ -48,8 +48,8 @@ export default class TournamentSettings {
         return new TournamentSettings(this.tournamentId, this.voters, description, this.matchDescriptions, this.roundDates, this.privacy);
     }
 
-    setMatchDescription(description: string, matchIndex: number, songIndex: number): TournamentSettings {
-        const newMatchDescription = this.matchDescriptions[matchIndex].setSongDescription(description, songIndex);
+    setMatchDescription(description: string, matchIndex: number, entryIndex: number): TournamentSettings {
+        const newMatchDescription = this.matchDescriptions[matchIndex].setEntryDescription(description, entryIndex);
         const matchDescriptions = this.matchDescriptions.toSpliced(matchIndex, 1, newMatchDescription);
         return new TournamentSettings(this.tournamentId, this.voters, this.currentRoundDescription, matchDescriptions, this.roundDates, this.privacy);
     }
@@ -78,29 +78,29 @@ export default class TournamentSettings {
 }
 
 export class MatchDescription {
-    song1Title: string;
-    song1Description: string;
-    song2Title: string;
-    song2Description: string;
+    entry1Line1: string;
+    entry1Description: string;
+    entry2Line1: string;
+    entry2Description: string;
 
-    constructor(song1Title: string, song1Description: string, song2Title: string, song2Description: string) {
-        this.song1Title = song1Title;
-        this.song1Description = song1Description;
-        this.song2Title = song2Title;
-        this.song2Description = song2Description;
+    constructor(entry1Line1: string, entry1Description: string, entry2Line1: string, entry2Description: string) {
+        this.entry1Line1 = entry1Line1;
+        this.entry1Description = entry1Description;
+        this.entry2Line1 = entry2Line1;
+        this.entry2Description = entry2Description;
     }
 
     static fromJson(data: any): MatchDescription {
-        return new MatchDescription(data.song1Title ?? "", data.song1Description ?? "", data.song2Title ?? "", data.song2Description ?? "");
+        return new MatchDescription(data.entry1Line1 ?? "", data.entry1Description ?? "", data.entry2Line1 ?? "", data.entry2Description ?? "");
     }
 
-    setSongDescription(description: string, index: number): MatchDescription {
+    setEntryDescription(description: string, index: number): MatchDescription {
         if(index === 1) {
-            return new MatchDescription(this.song1Title, description, this.song2Title, this.song2Description);
+            return new MatchDescription(this.entry1Line1, description, this.entry2Line1, this.entry2Description);
         } else if(index === 2) {
-            return new MatchDescription(this.song1Title, this.song1Description, this.song2Title, description);
+            return new MatchDescription(this.entry1Line1, this.entry1Description, this.entry2Line1, description);
         } else {
-            return new MatchDescription(this.song1Title, this.song1Description, this.song2Title, this.song2Description);
+            return new MatchDescription(this.entry1Line1, this.entry1Description, this.entry2Line1, this.entry2Description);
         }
     }
 }

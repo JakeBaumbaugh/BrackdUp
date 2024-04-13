@@ -1,7 +1,7 @@
-import { useMemo } from "react";
+import { Fragment, useMemo } from "react";
 import { TransformComponent, TransformWrapper } from "react-zoom-pan-pinch";
-import SongCard from "../card/SongCard";
-import { BracketSong } from "../model/Song";
+import EntryCard from "../card/EntryCard";
+import { BracketEntry } from "../model/Entry";
 import { Tournament, TournamentMatch } from "../model/Tournament";
 import MatchConnectorColumn from "./MatchConnectorColumn";
 
@@ -14,8 +14,8 @@ export default function Bracket({tournament}: BracketProps) {
         const matches: (TournamentMatch|null)[][] = tournament.levels.map(level => level.rounds.flatMap(round => {
             const isActive = tournament.getVotableRound()?.id === round.id;
             round.matches.forEach(match => {
-                match.song1.activeRound = isActive;
-                match.song2.activeRound = isActive;
+                match.entry1.activeRound = isActive;
+                match.entry2.activeRound = isActive;
             });
             return round.matches;
         }));
@@ -32,75 +32,75 @@ export default function Bracket({tournament}: BracketProps) {
         return matches;
     }, [tournament]);
 
-    const songs: (BracketSong|null)[][] = useMemo(() => {
-        const songs = matches.map((level, levelIndex) =>
+    const entries: (BracketEntry|null)[][] = useMemo(() => {
+        const entries = matches.map((level, levelIndex) =>
             level.flatMap((match, matchIndex) => {
                 if(match) {
-                    const song1 = {...match.song1} as BracketSong;
-                    const song2 = {...match.song2} as BracketSong;
+                    const entry1 = {...match.entry1} as BracketEntry;
+                    const entry2 = {...match.entry2} as BracketEntry;
                     if(levelIndex > 0) {
                         const match1Index = matchIndex * 2;
                         const match2Index = matchIndex * 2 + 1;
                         const prevLevel = matches[levelIndex - 1];
-                        song1.parent1VoteCount = prevLevel[match1Index]?.song1VoteCount;
-                        song1.parent2VoteCount = prevLevel[match1Index]?.song2VoteCount;
-                        song2.parent1VoteCount = prevLevel[match2Index]?.song1VoteCount;
-                        song2.parent2VoteCount = prevLevel[match2Index]?.song2VoteCount;
+                        entry1.parent1VoteCount = prevLevel[match1Index]?.entry1VoteCount;
+                        entry1.parent2VoteCount = prevLevel[match1Index]?.entry2VoteCount;
+                        entry2.parent1VoteCount = prevLevel[match2Index]?.entry1VoteCount;
+                        entry2.parent2VoteCount = prevLevel[match2Index]?.entry2VoteCount;
                     }
-                    song1.receivedVoteCount = match.song1VoteCount;
-                    song2.receivedVoteCount = match.song2VoteCount;
-                    const totalVoteCount = (match.song1VoteCount ?? 0) + (match.song2VoteCount ?? 0);
-                    song1.totalVoteCount = totalVoteCount;
-                    song2.totalVoteCount = totalVoteCount;
-                    // Clear activeRound boolean on original song object
-                    match.song1.activeRound = undefined;
-                    match.song2.activeRound = undefined;
-                    return [song1, song2];
+                    entry1.receivedVoteCount = match.entry1VoteCount;
+                    entry2.receivedVoteCount = match.entry2VoteCount;
+                    const totalVoteCount = (match.entry1VoteCount ?? 0) + (match.entry2VoteCount ?? 0);
+                    entry1.totalVoteCount = totalVoteCount;
+                    entry2.totalVoteCount = totalVoteCount;
+                    // Clear activeRound boolean on original entry object
+                    match.entry1.activeRound = undefined;
+                    match.entry2.activeRound = undefined;
+                    return [entry1, entry2];
                 } else {
                     return [null, null];
                 }
             })
         );
         const lastMatch = matches.at(-1)![0];
-        const songWinner = lastMatch?.songWinner as BracketSong ?? null;
-        if(songWinner) {
-            songWinner.parent1VoteCount = lastMatch!.song1VoteCount;
-            songWinner.parent2VoteCount = lastMatch!.song2VoteCount;
+        const entryWinner = lastMatch?.entryWinner as BracketEntry ?? null;
+        if(entryWinner) {
+            entryWinner.parent1VoteCount = lastMatch!.entry1VoteCount;
+            entryWinner.parent2VoteCount = lastMatch!.entry2VoteCount;
         }
-        songs.push([songWinner]);
-        return songs;
+        entries.push([entryWinner]);
+        return entries;
     }, [matches]);
 
-    const songColumns = useMemo(() => {
-        const leftSongs: (BracketSong|null)[][] = [];
-        const rightSongs: (BracketSong|null)[][] = [];
-        songs.forEach(level => {
+    const entryColumns = useMemo(() => {
+        const leftEntries: (BracketEntry|null)[][] = [];
+        const rightEntries: (BracketEntry|null)[][] = [];
+        entries.forEach(level => {
             if(level.length > 1) {
                 const halfLength = level.length / 2;
-                leftSongs.push(level.slice(0, halfLength));
-                rightSongs.push(level.slice(halfLength));
+                leftEntries.push(level.slice(0, halfLength));
+                rightEntries.push(level.slice(halfLength));
             }
         });
-        const finalSong = songs.at(-1)![0];
-        return [...leftSongs, [finalSong], ...(rightSongs.toReversed())];
-    }, [songs]);
+        const finalEntry = entries.at(-1)![0];
+        return [...leftEntries, [finalEntry], ...(rightEntries.toReversed())];
+    }, [entries]);
 
-    return songColumns ? (
+    return entryColumns ? (
         <TransformWrapper minScale={0.5} maxScale={2}>
             <TransformComponent>
                 <div className="bracket">
-                    {songColumns.map((songs, index) => <>
-                        {index > 0 && <MatchConnectorColumn left={songColumns[index-1].length} right={songs.length}/>}
-                        <div className={index < songColumns.length / 2 ? "column left-column" : "column right-column"}>
-                            {songs.map(song =>
-                                <SongCard
-                                    song={song}
-                                    final={index == (songColumns.length - 1) / 2}
-                                    // key={`${song?.title}-${song?.artist}`}
+                    {entryColumns.map((entries, index) => <Fragment key={`column-${index}`}>
+                        {index > 0 && <MatchConnectorColumn left={entryColumns[index-1].length} right={entries.length}/>}
+                        <div className={index < entryColumns.length / 2 ? "column left-column" : "column right-column"}>
+                            {entries.map(entry =>
+                                <EntryCard
+                                    entry={entry}
+                                    final={index == (entryColumns.length - 1) / 2}
+                                    key={`${index}-${entry?.line1}-${entry?.line2}`}
                                 />
                             )}
                         </div>
-                    </>)}
+                    </Fragment>)}
                 </div>
             </TransformComponent>
         </TransformWrapper>

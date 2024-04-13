@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 
 import tournament.model.Profile;
 import tournament.model.RoundStatus;
-import tournament.model.Song;
+import tournament.model.Entry;
 import tournament.model.Tournament;
 import tournament.model.TournamentMatch;
 import tournament.model.TournamentRound;
@@ -41,8 +41,8 @@ public class VoteService {
     public List<Vote> findValidVotesByMatch(TournamentMatch match) {
         return findByMatch(match)
                 .stream()
-                .filter(vote -> vote.getSong() != null
-                                && (vote.getSong().equals(match.getSong1()) || vote.getSong().equals(match.getSong2())))
+                .filter(vote -> vote.getEntry() != null
+                                && (vote.getEntry().equals(match.getEntry1()) || vote.getEntry().equals(match.getEntry2())))
                 .toList();
     }
 
@@ -61,50 +61,50 @@ public class VoteService {
     public void resolveMatch(TournamentMatch match) {
         logger.debug("Selecting a winner for match {}", match.getId());
 
-        Song song1 = match.getSong1();
-        Song song2 = match.getSong2();
+        Entry entry1 = match.getEntry1();
+        Entry entry2 = match.getEntry2();
         List<Vote> votes = findValidVotesByMatch(match);
         
-        List<Vote> song1Votes = new ArrayList<>();
-        List<Vote> song2Votes = new ArrayList<>();
+        List<Vote> entry1Votes = new ArrayList<>();
+        List<Vote> entry2Votes = new ArrayList<>();
         votes.forEach(vote -> {
-            if (vote.getSong().equals(song1)) {
-                song1Votes.add(vote);
+            if (vote.getEntry().equals(entry1)) {
+                entry1Votes.add(vote);
             } else {
-                song2Votes.add(vote);
+                entry2Votes.add(vote);
             }
         });
         
-        match.setSong1VoteCount(song1Votes.size());
-        match.setSong2VoteCount(song2Votes.size());
-        logger.info("Found {} votes for song 1 and {} votes for song 2 for match {}", song1Votes.size(), song2Votes.size(), match.getId());
+        match.setEntry1VoteCount(entry1Votes.size());
+        match.setEntry2VoteCount(entry2Votes.size());
+        logger.info("Found {} votes for entry 1 and {} votes for entry 2 for match {}", entry1Votes.size(), entry2Votes.size(), match.getId());
 
-        Song winner;
-        if (song1Votes.size() > song2Votes.size()) {
-            winner = song1;
-        } else if (song2Votes.size() > song1Votes.size()) {
-            winner = song2;
+        Entry winner;
+        if (entry1Votes.size() > entry2Votes.size()) {
+            winner = entry1;
+        } else if (entry2Votes.size() > entry1Votes.size()) {
+            winner = entry2;
         } else {
             // Handle tie
             Optional<Vote> lastVote = votes.stream().max((vote1, vote2) -> vote1.getTimestamp().compareTo(vote2.getTimestamp()));
             if (lastVote.isPresent()) {
-                Song lastVoteSong = lastVote.get().getSong();
-                winner = lastVoteSong.equals(song1) ? song2 : song1;
+                Entry lastVoteEntry = lastVote.get().getEntry();
+                winner = lastVoteEntry.equals(entry1) ? entry2 : entry1;
             } else {
                 // No votes recorded, select randomly
-                winner = Math.random() > 0.5 ? song1 : song2;
+                winner = Math.random() > 0.5 ? entry1 : entry2;
             }
         }
-        match.setSongWinner(winner);
+        match.setEntryWinner(winner);
 
-        logger.debug("Selected song \"{}\" as winner for match {}", match.getSongWinnerTitle(), match.getId());
+        logger.debug("Selected entry \"{}\" as winner for match {}", match.getEntryWinnerLine1(), match.getId());
     }
 
     public void resolveRound(TournamentRound round) {
         round.getMatches().forEach(this::resolveMatch);
     }
 
-    public void submitVotes(Profile profile, TournamentRound round, List<Song> songs) {
+    public void submitVotes(Profile profile, TournamentRound round, List<Entry> entries) {
         // Cognitive and runtime complexity could be cleaned up here, refactor if needed
 
         // Get old vote objects
@@ -115,10 +115,10 @@ public class VoteService {
         List<Vote> oldVotes = findAllById(voteIds);
 
         // Create new vote objects
-        List<Vote> votes = songs.stream().map(song -> {
+        List<Vote> votes = entries.stream().map(entry -> {
             TournamentMatch match = round.getMatches()
                     .stream()
-                    .filter(m -> m.getSong1().equals(song) || m.getSong2().equals(song))
+                    .filter(m -> m.getEntry1().equals(entry) || m.getEntry2().equals(entry))
                     .findFirst()
                     .get();
             
@@ -131,8 +131,8 @@ public class VoteService {
                         newVote.setMatch(match);
                         return newVote;
                     });
-            if(!song.equals(vote.getSong())) {
-                vote.setSong(song);
+            if(!entry.equals(vote.getEntry())) {
+                vote.setEntry(entry);
                 vote.setTimestamp();
             }
             return vote;
@@ -154,24 +154,24 @@ public class VoteService {
                 .flatMap(level -> level.getRounds().stream()) // Get all rounds in tournament
                 .filter(round -> round.getStatus() == RoundStatus.RESOLVED) // Filter only resolved rounds
                 .flatMap(round -> round.getMatches().stream()) // Get all matches in resolved rounds
-                .filter(match -> match.getSong1VoteCount() == null || match.getSong2VoteCount() == null) // Filter only matches without vote counts
+                .filter(match -> match.getEntry1VoteCount() == null || match.getEntry2VoteCount() == null) // Filter only matches without vote counts
                 .forEach(match -> {
-                    // Find votes for song 1 and song 2
+                    // Find votes for entry 1 and entry 2
                     List<Vote> votes = findValidVotesByMatch(match);
-                    List<Vote> song1Votes = new ArrayList<>();
-                    List<Vote> song2Votes = new ArrayList<>();
+                    List<Vote> entry1Votes = new ArrayList<>();
+                    List<Vote> entry2Votes = new ArrayList<>();
                     votes.forEach(vote -> {
-                        if (vote.getSong().equals(match.getSong1())) {
-                            song1Votes.add(vote);
+                        if (vote.getEntry().equals(match.getEntry1())) {
+                            entry1Votes.add(vote);
                         } else {
-                            song2Votes.add(vote);
+                            entry2Votes.add(vote);
                         }
                     });
                     // Populate vote counts
-                    match.setSong1VoteCount(song1Votes.size());
-                    match.setSong2VoteCount(song2Votes.size());
-                    logger.debug("Set {} votes for song 1 and {} votes for song 2 for match {} in tournament {}",
-                            song1Votes.size(), song2Votes.size(), match.getId(), tournament.getId());
+                    match.setEntry1VoteCount(entry1Votes.size());
+                    match.setEntry2VoteCount(entry2Votes.size());
+                    logger.debug("Set {} votes for entry 1 and {} votes for entry 2 for match {} in tournament {}",
+                            entry1Votes.size(), entry2Votes.size(), match.getId(), tournament.getId());
                 });
         return tournament;
     }

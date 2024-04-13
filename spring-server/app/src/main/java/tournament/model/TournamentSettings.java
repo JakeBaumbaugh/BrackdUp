@@ -25,10 +25,10 @@ public class TournamentSettings {
 
     @Getter @Setter @NoArgsConstructor @AllArgsConstructor @ToString @EqualsAndHashCode
     public static class MatchDescription {
-        private String song1Title;
-        private String song1Description;
-        private String song2Title;
-        private String song2Description;
+        private String entry1Line1;
+        private String entry1Description;
+        private String entry2Line1;
+        private String entry2Description;
     }
 
     @Getter @Setter @NoArgsConstructor @AllArgsConstructor @ToString @EqualsAndHashCode

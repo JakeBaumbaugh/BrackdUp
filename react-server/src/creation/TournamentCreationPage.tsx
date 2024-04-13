@@ -1,18 +1,19 @@
 import { Moment } from "moment";
-import { Dispatch, FormEvent, SetStateAction, useEffect, useMemo, useState } from "react";
+import { Dispatch, FormEvent, SetStateAction, useCallback, useEffect, useMemo, useState } from "react";
 import { Button, Card, CardBody } from "react-bootstrap";
 import DateTime from "react-datetime";
 import { useNavigate } from "react-router-dom";
-import SongCard from "../card/SongCard";
-import Song from "../model/Song";
+import EntryCard from "../card/EntryCard";
+import Entry from "../model/Entry";
 import { TournamentRound } from "../model/Tournament";
 import TournamentBuilder from "../model/TournamentBuilder";
 import { getImageList, imageUrl } from "../service/ImageService";
-import { createTournament, searchSongs } from "../service/TournamentService";
+import { createTournament, getTournamentTypes, searchEntries } from "../service/TournamentService";
 import TournamentModeButtons from "./TournamentModeButtons";
 import TournamentPrivacyButtons from "./TournamentPrivacyButtons";
 import "./tournament-creation.css";
 import ImageSelectionModal from "./ImageSelectionModal";
+import TournamentType from "../model/TournamentType";
 
 export default function TournamentCreationPage() {
     const [builder, setBuilder] = useState(new TournamentBuilder());
@@ -38,7 +39,7 @@ export default function TournamentCreationPage() {
             content = <SetupPage builder={builder} setBuilder={setBuilder}/>;
             break;
         case 1:
-            content = <SongSelectPage builder={builder} setBuilder={setBuilder}/>;
+            content = <EntrySelectPage builder={builder} setBuilder={setBuilder}/>;
             break;
         case 2:
             content = <SchedulePage builder={builder} setBuilder={setBuilder}/>;
@@ -84,13 +85,24 @@ interface PageProps {
 }
 
 function SetupPage({builder, setBuilder}: PageProps) {
+    const [tournamentTypes, setTournamentTypes] = useState<TournamentType[]>([]);
     const [imageIds, setImageIds] = useState<number[]>([]);
     const [showImageSelectionModal, setShowImageSelectionModal] = useState(false);
 
     useEffect(() => {
+        getTournamentTypes()
+            .then(types => setTournamentTypes(types));
         getImageList()
             .then(ids => setImageIds(ids));
     }, []);
+
+    const selectTournamentType = (index: number) => {
+        setBuilder(builder.setType(tournamentTypes[index]));
+    };
+    
+    const tournamentTypeIndex = useMemo(() =>
+        tournamentTypes.findIndex(type => type.type === builder.type.type)
+    , [tournamentTypes, builder.type]);
 
     return (
         <div className="setup">
@@ -103,8 +115,8 @@ function SetupPage({builder, setBuilder}: PageProps) {
                 />
             </label>
             <label>
-                <span>Song Count</span>
-                <select value={builder.songCount} onChange={e => setBuilder(builder.setSongCount(parseInt(e.target.value)))}>
+                <span>Entry Count</span>
+                <select value={builder.entryCount} onChange={e => setBuilder(builder.setEntryCount(parseInt(e.target.value)))}>
                     <option value="4">4</option>
                     <option value="8">8</option>
                     <option value="16">16</option>
@@ -120,6 +132,14 @@ function SetupPage({builder, setBuilder}: PageProps) {
                     <option value="4">4</option>
                     <option value="8">8</option>
                     <option value="16">16</option>
+                </select>
+            </label>
+            <label>
+                <span>Tournament Type</span>
+                <select value={tournamentTypeIndex} onChange={e => selectTournamentType(parseInt(e.target.value))}>
+                    {tournamentTypes.map((type, index) => (
+                        <option value={index} key={type.type}>{type.type}</option>
+                    ))}
                 </select>
             </label>
             <label>
@@ -150,25 +170,25 @@ function SetupPage({builder, setBuilder}: PageProps) {
     );
 }
 
-function SongSelectPage({builder, setBuilder}: PageProps) {
-    const [title, setTitle] = useState("");
-    const [artist, setArtist] = useState("");
+function EntrySelectPage({builder, setBuilder}: PageProps) {
+    const [line1, setLine1] = useState("");
+    const [line2, setLine2] = useState("");
     const [spotify, setSpotify] = useState("");
     const [youtube, setYoutube] = useState("");
-    const [suggestions, setSuggestions] = useState<Song[]>([]);
+    const [suggestions, setSuggestions] = useState<Entry[]>([]);
 
     useEffect(() => {
         // get suggestions
         refreshSuggestions(builder);
-        // filter out already selected songs by id
-        // maybe set a timer to only retrieve suggestions after a pause between typing
-    }, [title, artist]);
+        // filter out already selected entries by id
+        // TODO: set a timer to only retrieve suggestions after a pause between typing (debounce)
+    }, [line1, line2]);
 
     const refreshSuggestions = (builder: TournamentBuilder) => {
-        if(title || artist) {
-            searchSongs(title, artist)
+        if(line1 || line2) {
+            searchEntries(builder.type.type, line1, line2)
                 .then(suggestions => {
-                    suggestions = suggestions.filter(song => !builder.hasSong(song));
+                    suggestions = suggestions.filter(entry => !builder.hasEntry(entry));
                     setSuggestions(suggestions);
                 });
         } else {
@@ -176,82 +196,86 @@ function SongSelectPage({builder, setBuilder}: PageProps) {
         }
     };
 
-    const addNewSong = () => {
-        const trimmedTitle = title.trim();
-        const trimmedArtist = artist.trim();
-        const trimmedSpotify = spotify.trim();
-        const trimmedYoutube = youtube.trim();
-        const song: Song = {
+    const addNewEntry = () => {
+        const entry: Entry = {
             id: -1,
-            title: trimmedTitle,
-            artist: trimmedArtist,
-            spotify: trimmedSpotify !== "" ? trimmedSpotify : undefined,
-            youtube: trimmedYoutube !== "" ? trimmedYoutube : undefined
+            line1: line1.trim(),
+            line2: line2.trim() || undefined,
+            spotify: spotify.trim() || undefined,
+            youtube: youtube.trim() || undefined
         };
-        if(trimmedTitle && trimmedArtist) {
-            addSong(song);
+        // Line 1 must be present and either:
+        // A) Line 2 must be present, B) Line 2 is disabled, or C) Type is MISC, so Line 2 is optional
+        if (entry.line1 && (entry.line2 || !builder.type.line2 || builder.type.type === "MISC")) {
+            addEntry(entry);
         }
     };
 
-    const addSong = (song: Song) => {
-        if(builder.songs.length < builder.songCount && !builder.hasSong(song)) {
-            setBuilder(builder.addSong(song));
-            setTitle("");
-            setArtist("");
+    const addEntry = (entry: Entry) => {
+        if(builder.entries.length < builder.entryCount && !builder.hasEntry(entry)) {
+            setBuilder(builder.addEntry(entry));
+            setLine1("");
+            setLine2("");
             setSpotify("");
             setYoutube("");
         }
     };
 
-    const removeSong = (song: Song) => {
+    const removeEntry = (entry: Entry) => {
         setBuilder(builder => {
-            builder = builder.removeSong(song);
+            builder = builder.removeEntry(entry);
             refreshSuggestions(builder);
             return builder;
         });
     };
 
     return (
-        <div className="song-select">
-            <div className="song-input">
-                <div className="song-fields">
+        <div className="entry-select">
+            <div className="entry-input">
+                <div className="entry-fields">
                     <label>
-                        <span>Title</span>
-                        <input type="text" value={title} onChange={e => setTitle(e.target.value)}/>
+                        <span>{builder.type.line1Label}</span>
+                        <input type="text" value={line1} onChange={e => setLine1(e.target.value)}/>
                     </label>
-                    <label>
-                        <span>Artist</span>
-                        <input type="text" value={artist} onChange={e => setArtist(e.target.value)}/>
-                    </label>
-                    <label>
-                        <span>Spotify Link</span>
-                        <input type="text" value={spotify} onChange={e => setSpotify(e.target.value)}/>
-                    </label>
-                    <label>
-                        <span>Youtube Link</span>
-                        <input type="text" value={youtube} onChange={e => setYoutube(e.target.value)}/>
-                    </label>
+                    {builder.type.line2 && (
+                        <label>
+                            <span>{builder.type.line2Label ?? "Line 2"}</span>
+                            <input type="text" value={line2} onChange={e => setLine2(e.target.value)}/>
+                        </label>
+                    )}
+                    {builder.type.spotify && (
+                        <label>
+                            <span>Spotify Link</span>
+                            <input type="text" value={spotify} onChange={e => setSpotify(e.target.value)}/>
+                        </label>
+                    )}
+                    {builder.type.youtube && (
+                        <label>
+                            <span>Youtube Link</span>
+                            <input type="text" value={youtube} onChange={e => setYoutube(e.target.value)}/>
+                        </label>
+                    )}
                 </div>
-                <button type="button" onClick={addNewSong}>+</button>
-                <div className="song-suggestions">
+                <button type="button" onClick={addNewEntry}>+</button>
+                <div className="entry-suggestions">
                     <p>Suggestions:</p>
-                    {suggestions.length > 0 ? suggestions.map(song => (
-                        <SongCard
-                            key={`${song.id}-${song.title}-${song.artist}`}
-                            song={song}
-                            onClick={() => addSong(song)}
+                    {suggestions.length > 0 ? suggestions.map(entry => (
+                        <EntryCard
+                            key={`${entry.id}-${entry.line1}-${entry.line2}`}
+                            entry={entry}
+                            onClick={() => addEntry(entry)}
                             selectable
                         />
-                    )) : (title || artist) ? <p>No existing songs found.</p> : <p>Enter title or artist to see suggestions.</p>}
+                    )) : (line1 || line2) ? <p>No existing entries found.</p> : <p>Enter information to see suggestions.</p>}
                 </div>
             </div>
-            <div className="song-collection">
-                <p>Selected Songs ({builder.songs.length}/{builder.songCount}):</p>
-                {builder.songs.map(song => (
-                    <SongCard 
-                        key={`${song.title}-${song.artist}`}
-                        song={song}
-                        onClick={() => removeSong(song)}
+            <div className="entry-collection">
+                <p>Selected Entries ({builder.entries.length}/{builder.entryCount}):</p>
+                {builder.entries.map(entry => (
+                    <EntryCard 
+                        key={`${entry.line1}-${entry.line2}`}
+                        entry={entry}
+                        onClick={() => removeEntry(entry)}
                         deletable
                     />
                 ))}

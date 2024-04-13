@@ -1,40 +1,52 @@
-.song-card {
+.entry-card {
     border: solid 2px var(--dark-color);
     border-radius: 6px;
     background-color: #c0bfbc;
     color: var(--dark-color);
+
     display: flex;
     flex-direction: column;
     width: 18em;
+    height: calc(3em + 17px);
     gap: 1px;
+
     overflow: hidden;
     transition: filter, background-color 220ms;
 }
 
-.song-card > div {
+.entry-card > div {
     padding: 3px 10px 3px 3px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
     background-color: #f3f1ed;
     transition: background-color 220ms;
 }
 
-.song-card > div:after {
+.entry-card > div > div {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.entry-card > div > div:after {
     content: "\200b";
 }
 
-.song-card > div:last-child {
+.entry-card > div:nth-child(2) {
     filter: brightness(94%) saturate(130%);
 }
 
-.song-card.active > div {
+.entry-card > div:only-child {
+    height: 100%;
+    font-size: 1.5em;
+    line-height: calc(2em + 7px);
+}
+
+.entry-card.active > div {
     /* background-color: #cfdef5; */
     background-color: #fcf1c0;
     /* background-color: #ebd7f7; */
 }
 
-.song-card.selected > div {
+.entry-card.selected > div {
     background-color: #d7f7da;
 }
 
@@ -56,45 +68,45 @@
     background-color: #FAA;
 }
 
-.song-card.clickable.selectable:hover,
-.song-card.clickable.selectable:active {
+.entry-card.clickable.selectable:hover,
+.entry-card.clickable.selectable:active {
     background-color: #add1b0;
 }
 
-.song-card.clickable.selectable:hover > *,
-.song-card.clickable.selectable:active > * {
+.entry-card.clickable.selectable:hover > *,
+.entry-card.clickable.selectable:active > * {
     background-color: #d7f7da;
 }
 
-.song-card-wrapper {
+.entry-card-wrapper {
     position: relative;
 }
 
-.song-card-wrapper .tag {
+.entry-card-wrapper .tag {
     position: absolute;
 }
 
-.song-card-wrapper .tag.top-tag {
+.entry-card-wrapper .tag.top-tag {
     bottom: 50%;
     right: 100%;
 }
 
-.song-card-wrapper .tag.bottom-tag {
+.entry-card-wrapper .tag.bottom-tag {
     top: 100%;
 }
 
-.left-column .song-card-wrapper .tag.after-tag {
+.left-column .entry-card-wrapper .tag.after-tag {
     left: calc(100% + 1px);
 }
 
-.right-column .song-card-wrapper .tag.after-tag {
+.right-column .entry-card-wrapper .tag.after-tag {
     right: calc(100% + 1px);
 }
 
-.song-card-wrapper:nth-child(2n) .tag.after-tag {
+.entry-card-wrapper:nth-child(2n) .tag.after-tag {
     top: 50%;
 }
 
-.song-card-wrapper:nth-child(2n+1) .tag.after-tag {
+.entry-card-wrapper:nth-child(2n+1) .tag.after-tag {
     bottom: 50%;
 }

@@ -20,7 +20,7 @@ import io.micrometer.common.util.StringUtils;
 import jakarta.transaction.Transactional;
 import tournament.model.Profile;
 import tournament.model.RoundStatus;
-import tournament.model.Song;
+import tournament.model.Entry;
 import tournament.model.Tournament;
 import tournament.model.TournamentBuilder;
 import tournament.model.TournamentLevel;
@@ -35,7 +35,7 @@ import tournament.model.TournamentSummary;
 import tournament.model.TournamentVoter;
 import tournament.model.Vote;
 import tournament.model.VoteId;
-import tournament.repository.SongRepository;
+import tournament.repository.EntryRepository;
 import tournament.repository.TournamentRepository;
 import tournament.repository.TournamentVoterRepository;
 
@@ -52,7 +52,7 @@ public class TournamentService {
     private ProfileService profileService;
     private VoteService voteService;
     private TournamentRepository tournamentRepository;
-    private SongRepository songRepository;
+    private EntryRepository entryRepository;
     private TournamentVoterRepository tournamentVoterRepository;
     private TournamentFactory tournamentFactory;
     private ThreadPoolTaskScheduler threadPoolTaskScheduler;
@@ -61,14 +61,14 @@ public class TournamentService {
     public TournamentService(ProfileService profileService,
                              VoteService voteService,
                              TournamentRepository tournamentRepository,
-                             SongRepository songRepository,
+                             EntryRepository entryRepository,
                              TournamentVoterRepository tournamentVoterRepository,
                              TournamentFactory tournamentFactory,
                              ThreadPoolTaskScheduler threadPoolTaskScheduler) {
         this.profileService = profileService;
         this.voteService = voteService;
         this.tournamentRepository = tournamentRepository;
-        this.songRepository = songRepository;
+        this.entryRepository = entryRepository;
         this.tournamentVoterRepository = tournamentVoterRepository;
         this.tournamentFactory = tournamentFactory;
         this.threadPoolTaskScheduler = threadPoolTaskScheduler;
@@ -133,36 +133,18 @@ public class TournamentService {
         return tournament;
     }
 
-    public List<Song> getSongs(List<Integer> songIds) {
-        return songRepository.findAllById(songIds);
+    public List<Entry> getEntries(List<Integer> entryIds) {
+        return entryRepository.findAllById(entryIds);
     }
 
-    public List<Song> searchSongs(String title, String artist) {
-        boolean titleIsBlank = StringUtils.isBlank(title);
-        boolean artistIsBlank = StringUtils.isBlank(artist);
-        if(titleIsBlank && artistIsBlank) {
-            return List.of();
-        }
-        if (titleIsBlank) {
-            return songRepository.findByArtistContainingIgnoreCase(artist);
-        }
-        if (artistIsBlank) {
-            return songRepository.findByTitleContainingIgnoreCase(title);
-        }
-        List<Song> titleLike = songRepository.findByTitleContainingIgnoreCase(title);
-        List<Song> artistLike = songRepository.findByArtistContainingIgnoreCase(artist);
-        titleLike.retainAll(artistLike);
-        return titleLike;
-    }
-
-    public List<Integer> getVotedSongIds(Profile profile, TournamentRound round) {
+    public List<Integer> getVotedEntryIds(Profile profile, TournamentRound round) {
         List<VoteId> voteIds = round.getMatches()
                 .stream()
                 .map(match -> new VoteId(profile, match))
                 .toList();
         List<Vote> votes = voteService.findAllById(voteIds);
         return votes.stream()
-                .map(vote -> vote.getSong().getId())
+                .map(vote -> vote.getEntry().getId())
                 .toList();
     }
 
@@ -171,12 +153,12 @@ public class TournamentService {
      * if it was the final voter for the round on an instant tournament
      * @param profile       The user profile that submitted the votes
      * @param round         The round containing the matches being voted on
-     * @param songs         The songs which the user voted for
+     * @param entries       The entries which the user voted for
      * @param tournament    The tournament containing the matches being voted on
      * @return              Whether the round ended as a result of the vote
      */
-    public boolean vote(Profile profile, TournamentRound round, List<Song> songs, Tournament tournament) {
-        voteService.submitVotes(profile, round, songs);
+    public boolean vote(Profile profile, TournamentRound round, List<Entry> entries, Tournament tournament) {
+        voteService.submitVotes(profile, round, entries);
         // Resolve round if necessary
         if (tournament.getMode() == TournamentMode.INSTANT) {
             boolean allVoted = getVotersForTournament(tournament)
@@ -223,7 +205,7 @@ public class TournamentService {
         List<MatchDescription> matchDescriptions = currentRound
                 .map(round -> round.getMatches()
                         .stream()
-                        .map(match -> new MatchDescription(match.getSong1Title(), match.getSong1Description(), match.getSong2Title(), match.getSong2Description()))
+                        .map(match -> new MatchDescription(match.getEntry1Line1(), match.getEntry1Description(), match.getEntry2Line1(), match.getEntry2Description()))
                         .toList()
                 )
                 .orElse(null);
@@ -295,10 +277,10 @@ public class TournamentService {
             logger.debug("New matches created:");
             for(int matchIndex = 0; matchIndex < round.getMatches().size(); matchIndex += 2) {
                 TournamentMatch match = new TournamentMatch();
-                match.setSong1(round.getMatches().get(matchIndex).getSongWinner());
-                match.setSong2(round.getMatches().get(matchIndex+1).getSongWinner());
+                match.setEntry1(round.getMatches().get(matchIndex).getEntryWinner());
+                match.setEntry2(round.getMatches().get(matchIndex+1).getEntryWinner());
                 newMatches.add(match);
-                logger.debug("\"{}\" vs. \"{}\"", match.getSong1().getTitle(), match.getSong2().getTitle());
+                logger.debug("\"{}\" vs. \"{}\"", match.getEntry1().getLine1(), match.getEntry2().getLine1());
             }
             
             // Add new matches to resulting round
@@ -422,19 +404,19 @@ public class TournamentService {
                     for (int i = 0; i < matches.size(); i++) {
                         TournamentMatch match = matches.get(i);
                         MatchDescription matchDescription = matchDescriptions.get(i);
-                        if (!match.getSong1Title().equals(matchDescription.getSong1Title())) {
-                            logger.warn("Failing to set round descriptions, song titles did not match: \"{}\" and \"{}\"",
-                                    match.getSong1Title(), matchDescription.getSong1Title());
+                        if (!match.getEntry1Line1().equals(matchDescription.getEntry1Line1())) {
+                            logger.warn("Failing to set round descriptions, entry line1s did not match: \"{}\" and \"{}\"",
+                                    match.getEntry1Line1(), matchDescription.getEntry1Line1());
                             return;
                         }
 
-                        if (!match.getSong2Title().equals(matchDescription.getSong2Title())) {
-                            logger.warn("Failing to set round descriptions, song titles did not match: \"{}\" and \"{}\"",
-                                    match.getSong2Title(), matchDescription.getSong2Title());
+                        if (!match.getEntry2Line1().equals(matchDescription.getEntry2Line1())) {
+                            logger.warn("Failing to set round descriptions, entry line1s did not match: \"{}\" and \"{}\"",
+                                    match.getEntry1Line1(), matchDescription.getEntry2Line1());
                             return;
                         }
-                        match.setSong1Description(matchDescription.getSong1Description());
-                        match.setSong2Description(matchDescription.getSong2Description());
+                        match.setEntry1Description(matchDescription.getEntry1Description());
+                        match.setEntry2Description(matchDescription.getEntry2Description());
                     }
                     currentRound.setDescription(roundDescription);
                     logger.info("Saving round descriptions on round {} of tournament {}", currentRound.getId(), tournamentId);

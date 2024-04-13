@@ -6,7 +6,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatusCode;
-import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,19 +15,19 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
-import tournament.model.Image;
+import tournament.model.Entry;
 import tournament.model.Profile;
-import tournament.model.Song;
 import tournament.model.Tournament;
 import tournament.model.TournamentBuilder;
 import tournament.model.TournamentRound;
 import tournament.model.TournamentSettings;
 import tournament.model.TournamentSummary;
+import tournament.model.TournamentType;
 import tournament.rest.request.VoteRequestBody;
 import tournament.rest.response.VoteResponseBody;
-import tournament.service.ImageService;
 import tournament.service.ProfileService;
 import tournament.service.TournamentService;
+import tournament.service.TournamentTypeService;
 
 @RestController
 public class TournamentController {
@@ -36,13 +35,13 @@ public class TournamentController {
 
     private TournamentService tournamentService;
     private ProfileService profileService;
-    private ImageService imageService;
+    private TournamentTypeService tournamentTypeService;
 
     @Autowired
-    public TournamentController(TournamentService tournamentService, ProfileService profileService, ImageService imageService) {
+    public TournamentController(TournamentService tournamentService, ProfileService profileService, TournamentTypeService tournamentTypeService) {
         this.tournamentService = tournamentService;
         this.profileService = profileService;
-        this.imageService = imageService;
+        this.tournamentTypeService = tournamentTypeService;
     }
     
     @GetMapping("/tournament")
@@ -79,17 +78,17 @@ public class TournamentController {
                 .orElseThrow(() -> create400("Tournament not found."));
         TournamentRound activeRound = tournament.getVotableRound()
                 .orElseThrow(() -> create400("Tournament does not have an active round."));
-        List<Song> songs = tournamentService.getSongs(body.getSongs());
-        if(!activeRound.validSongVotes(songs)) {
-            throw create400("Songs did not match active round.");
+        List<Entry> entries = tournamentService.getEntries(body.getEntries());
+        if(!activeRound.validEntryVotes(entries)) {
+            throw create400("Entries did not match active round.");
         }
 
-        boolean roundEnded = tournamentService.vote(profile, activeRound, songs, tournament);
+        boolean roundEnded = tournamentService.vote(profile, activeRound, entries, tournament);
         return new VoteResponseBody(roundEnded);
     }
 
     @GetMapping("/tournament/vote")
-    public List<Integer> getVotedSongIds(Authentication authentication, @RequestParam Integer tournamentId) {
+    public List<Integer> getVotedEntryIds(Authentication authentication, @RequestParam Integer tournamentId) {
         Profile profile = (Profile) authentication.getPrincipal();
         logger.info("GET request for votes cast on tournament id={} from user {}", tournamentId, profile.getName());
 
@@ -102,7 +101,7 @@ public class TournamentController {
         TournamentRound activeRound = tournament.getVotableRound()
                 .orElseThrow(() -> create400("Tournament does not have an active round."));
         
-        return tournamentService.getVotedSongIds(profile, activeRound);
+        return tournamentService.getVotedEntryIds(profile, activeRound);
     }
 
     @PostMapping("/tournament/create")
@@ -133,12 +132,6 @@ public class TournamentController {
         tournamentService.deleteTournament(tournamentId);
     }
 
-    @GetMapping("/song/search")
-    public List<Song> searchSongs(@RequestParam(required = false) String title, @RequestParam(required = false) String artist) {
-        logger.info("GET request to search songs for title={} and artist={}", title, artist);
-        return tournamentService.searchSongs(title, artist);
-    }
-
     @GetMapping("tournament/settings")
     public TournamentSettings getTournamentSettings(Authentication authentication, @RequestParam Integer tournamentId) {
         Profile profile = (Profile) authentication.getPrincipal();
@@ -161,6 +154,14 @@ public class TournamentController {
         }
 
         tournamentService.saveTournamentSettings(settings);
+    }
+
+    @GetMapping("tournament/types")
+    public List<TournamentType> getTournamentTypes(Authentication authentication) {
+        Profile profile = authentication != null ? (Profile) authentication.getPrincipal() : null;
+        logger.info("GET request for list of tournament types from user {}", profile != null ? profile.getName() : null);
+
+        return tournamentTypeService.getTypes();
     }
 
     private ResponseStatusException create404(String message) {

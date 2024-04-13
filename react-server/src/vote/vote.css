@@ -16,7 +16,7 @@
     gap: var(--item-gap);
 }
 
-.match .song-card {
+.match .entry-card {
     font-size: 12pt;
     flex: 0 0 auto;
 }
@@ -119,11 +119,11 @@
         flex-wrap: wrap;
     }
 
-    .vote-page .song-card-wrapper  {
+    .vote-page .entry-card-wrapper  {
         width: 100%;
     }
 
-    .vote-page .song-card-wrapper .song-card {
+    .vote-page .entry-card-wrapper .entry-card {
         width: 100%;
     }
 
