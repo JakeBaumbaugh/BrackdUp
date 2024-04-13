@@ -1,11 +1,11 @@
-import Song from "./Song";
+import Entry from "./Entry";
 
 export default class TournamentSummary {
     id: number;
     name: string;
     startDate?: Date;
     endDate?: Date;
-    songWinner?: Song;
+    entryWinner?: Entry;
     votingStartDate?: Date;
     votingEndDate?: Date;
     spotifyPlaylist?: string;
@@ -14,7 +14,7 @@ export default class TournamentSummary {
                 name: string,
                 startDate?: Date,
                 endDate?: Date,
-                songWinner?: Song,
+                entryWinner?: Entry,
                 votingStartDate?: Date,
                 votingEndDate?: Date,
                 spotifyPlaylist?: string) {
@@ -22,7 +22,7 @@ export default class TournamentSummary {
         this.name = name;
         this.startDate = startDate;
         this.endDate = endDate;
-        this.songWinner = songWinner;
+        this.entryWinner = entryWinner;
         this.votingStartDate = votingStartDate;
         this.votingEndDate = votingEndDate;
         this.spotifyPlaylist = spotifyPlaylist;
@@ -33,6 +33,6 @@ export default class TournamentSummary {
         const endDate = data.endDate ? new Date(data.endDate) : undefined;
         const votingStartDate = data.votingStartDate ? new Date(data.votingStartDate) : undefined;
         const votingEndDate = data.votingEndDate ? new Date(data.votingEndDate) : undefined;
-        return new TournamentSummary(data.id, data.name, startDate, endDate, data.songWinner, votingStartDate, votingEndDate, data.spotifyPlaylist);
+        return new TournamentSummary(data.id, data.name, startDate, endDate, data.entryWinner, votingStartDate, votingEndDate, data.spotifyPlaylist);
     }
 }

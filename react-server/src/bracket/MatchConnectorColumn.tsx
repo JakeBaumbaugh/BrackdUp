@@ -3,7 +3,7 @@ interface MatchConnectorColumnProps {
     right: number;
 }
 
-export default function MatchConnectorColun({left, right}: MatchConnectorColumnProps) {
+export default function MatchConnectorColumn({left, right}: MatchConnectorColumnProps) {
     const greater = Math.max(left, right);
     const lesser = Math.min(left, right);
     const height = `${100/greater}%`;

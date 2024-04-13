@@ -45,13 +45,13 @@
     gap: 8px;
 }
 
-.bracket .song-card-wrapper {
+.bracket .entry-card-wrapper {
     font-size: 7pt;
     font-weight: 550;
     color: #282c34d0;
 }
 
-.bracket .song-card.final {
+.bracket .entry-card.final {
     font-size: 10pt;
 }
 

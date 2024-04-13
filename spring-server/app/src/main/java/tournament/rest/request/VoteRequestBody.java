@@ -11,5 +11,5 @@ import lombok.ToString;
 @Getter @Setter @NoArgsConstructor @ToString @EqualsAndHashCode
 public class VoteRequestBody {
     private Integer tournament;
-    private List<Integer> songs;
+    private List<Integer> entries;
 }

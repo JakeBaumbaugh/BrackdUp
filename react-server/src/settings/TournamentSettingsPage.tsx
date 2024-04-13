@@ -106,8 +106,8 @@ interface SetupRoundDescriptionsProps {
 function SetupRoundDescriptions({settings, setSettings}: SetupRoundDescriptionsProps) {
     const setRoundDescription = (value: string) =>
         setSettings(settings => settings!.setCurrentRoundDescription(value));
-    const setMatchDescription = (value: string, matchIndex: number, songIndex: number) =>
-        setSettings(settings => settings!.setMatchDescription(value, matchIndex, songIndex));
+    const setMatchDescription = (value: string, matchIndex: number, entryIndex: number) =>
+        setSettings(settings => settings!.setMatchDescription(value, matchIndex, entryIndex));
 
     return (
         <div className="round-descriptions">
@@ -118,14 +118,14 @@ function SetupRoundDescriptions({settings, setSettings}: SetupRoundDescriptionsP
                 onChange={e => setRoundDescription(e.target.value)}
             />
             {settings.matchDescriptions.map((match, index) => <>
-                <label>{match.song1Title}</label>
+                <label>{match.entry1Line1}</label>
                 <textarea
-                    value={match.song1Description}
+                    value={match.entry1Description}
                     onChange={e => setMatchDescription(e.target.value, index, 1)}
                 />
-                <label>{match.song2Title}</label>
+                <label>{match.entry2Line1}</label>
                 <textarea
-                    value={match.song2Description}
+                    value={match.entry2Description}
                     onChange={e => setMatchDescription(e.target.value, index, 2)}
                 />
             </>)}

@@ -16,31 +16,31 @@ public class TournamentMatch {
     
     @ToString.Exclude
     @ManyToOne
-    @JoinColumn(name = "song_1")
-    private Song song1;
+    @JoinColumn(name = "entry_1")
+    private Entry entry1;
 
     @ToString.Exclude
     @ManyToOne
-    @JoinColumn(name = "song_2")
-    private Song song2;
+    @JoinColumn(name = "entry_2")
+    private Entry entry2;
 
     @ToString.Exclude
     @ManyToOne
-    @JoinColumn(name = "song_winner")
-    private Song songWinner;
+    @JoinColumn(name = "entry_winner")
+    private Entry entryWinner;
 
-    @Column(name = "song_1_vote_count")
-    private Integer song1VoteCount;
+    @Column(name = "entry_1_vote_count")
+    private Integer entry1VoteCount;
     
-    @Column(name = "song_2_vote_count")
-    private Integer song2VoteCount;
+    @Column(name = "entry_2_vote_count")
+    private Integer entry2VoteCount;
 
     @ToString.Exclude
-    @Column(name = "song_1_description")
-    private String song1Description;
+    @Column(name = "entry_1_description")
+    private String entry1Description;
     @ToString.Exclude
-    @Column(name = "song_2_description")
-    private String song2Description;
+    @Column(name = "entry_2_description")
+    private String entry2Description;
 
     @ToString.Exclude
     @JsonIgnore
@@ -48,32 +48,32 @@ public class TournamentMatch {
     @OrderBy("timestamp ASC")
     private List<Vote> votes;
 
-    @ToString.Include(name = "song1")
+    @ToString.Include(name = "entry1")
     @Transient
     @JsonIgnore
-    public String getSong1Title() {
-        return song1 != null ? song1.getTitle() : null;
+    public String getEntry1Line1() {
+        return entry1 != null ? entry1.getLine1() : null;
     }
 
-    @ToString.Include(name = "song2")
+    @ToString.Include(name = "entry2")
     @Transient
     @JsonIgnore
-    public String getSong2Title() {
-        return song2 != null ? song2.getTitle() : null;
+    public String getEntry2Line1() {
+        return entry2 != null ? entry2.getLine1() : null;
     }
 
-    @ToString.Include(name = "songWinner")
+    @ToString.Include(name = "entryWinner")
     @Transient
     @JsonIgnore
-    public String getSongWinnerTitle() {
-        return songWinner != null ? songWinner.getTitle() : null;
+    public String getEntryWinnerLine1() {
+        return entryWinner != null ? entryWinner.getLine1() : null;
     }
 
-    public String getSong1Description() {
-        return song1Description != null ? song1Description : "";
+    public String getEntry1Description() {
+        return entry1Description != null ? entry1Description : "";
     }
 
-    public String getSong2Description() {
-        return song2Description != null ? song2Description : "";
+    public String getEntry2Description() {
+        return entry2Description != null ? entry2Description : "";
     }
 }

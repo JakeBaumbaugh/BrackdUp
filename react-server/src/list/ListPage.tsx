@@ -27,7 +27,7 @@ export default function ListPage() {
             const activeTourmaments: TournamentSummary[] = [];
             const futureTournaments: TournamentSummary[] = [];
             tournaments.forEach(t => {
-                if (t.songWinner) {
+                if (t.entryWinner) {
                     expiredTournaments.push(t);
                 } else if (t.votingEndDate || !t.startDate) {
                     activeTourmaments.push(t);
@@ -63,14 +63,14 @@ export default function ListPage() {
                         <h2>{t.name}</h2>
                         <TournamentCardContent summary={t} refreshSummary={() => getTournamentSummaries()}/>
                     </div>
-                    { (t.spotifyPlaylist || t.votingEndDate || (!t.startDate && !t.songWinner)) && (
+                    { (t.spotifyPlaylist || t.votingEndDate || (!t.startDate && !t.entryWinner)) && (
                         <div className="button-row">
                             { t.spotifyPlaylist && (
                                 <a href={t.spotifyPlaylist} target="_blank">
                                     <img src={SpotifyLogo} alt="Spotify Logo"/>
                                 </a>
                             )}
-                            { (t.votingEndDate || (!t.startDate && !t.songWinner)) && (
+                            { (t.votingEndDate || (!t.startDate && !t.entryWinner)) && (
                                 <div onClick={() => navigate(`/tournament/vote?id=${t.id}`)}>
                                     <Button variant="danger">VOTE</Button>
                                 </div>
@@ -98,8 +98,8 @@ function TournamentCardContent({summary, refreshSummary}: TournamentCardProps) {
     const date = new Date();
 
     // Tournament over
-    if(summary.songWinner) {
-        return <p>Winner: {summary.songWinner.title}</p>
+    if(summary.entryWinner) {
+        return <p>Winner: {summary.entryWinner.line1}</p>
     }
 
     // Instant tournament in progress

@@ -29,8 +29,8 @@ public class Vote {
     private TournamentMatch match;
 
     @ManyToOne
-    @JoinColumn(name = "song_id")
-    private Song song;
+    @JoinColumn(name = "entry_id")
+    private Entry entry;
 
     private LocalDateTime timestamp;
 

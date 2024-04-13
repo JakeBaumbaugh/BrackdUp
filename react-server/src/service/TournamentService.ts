@@ -1,9 +1,10 @@
+import Entry from "../model/Entry";
 import { VoteResponseBody } from "../model/ResponseBodies";
-import Song from "../model/Song";
 import { Tournament } from "../model/Tournament";
 import TournamentBuilder from "../model/TournamentBuilder";
 import TournamentSettings from "../model/TournamentSettings";
 import TournamentSummary from "../model/TournamentSummary";
+import TournamentType from "../model/TournamentType";
 import { delet, get, post } from "./ServiceUtil";
 
 export function getTournament(id: number): Promise<Tournament|undefined> {
@@ -26,10 +27,10 @@ export function getTournaments(): Promise<TournamentSummary[]> {
         });
 }
 
-export function submitVote(tournamentId: number, songIds: number[]): Promise<VoteResponseBody> {
+export function submitVote(tournamentId: number, entryIds: number[]): Promise<VoteResponseBody> {
     return post("/tournament/vote", {
         tournament: tournamentId,
-        songs: songIds
+        entries: entryIds
     })
         .then(res => res.json())
 }
@@ -61,16 +62,25 @@ export function deleteTournament(tournamentId: number): Promise<Response> {
     return delet(`/tournament/delete?tournamentId=${tournamentId}`);
 }
 
-export function searchSongs(title: string, artist: string): Promise<Song[]> {
-    return get(`/song/search?title=${title}&artist=${artist}`)
+export function searchEntries(type: string, line1: string, line2: string): Promise<Entry[]> {
+    return get(`/entry/search?type=${type}&line1=${line1}&line2=${line2}`)
         .then(res => res.json())
-        .then(res => res as Song[])
+        .then(res => res as Entry[])
         .catch(() => {
-            console.log("Failed to search songs.");
+            console.log("Failed to search entries.");
             return [];
         });
 }
 
 export function createTournament(builder: TournamentBuilder): Promise<Response> {
     return post("/tournament/create", builder);
+}
+
+export function getTournamentTypes(): Promise<TournamentType[]> {
+    return get("/tournament/types")
+        .then(res => res.json())
+        .catch(() => {
+            console.log("Failed to retrieve tournament types.");
+            return [];
+        });
 }

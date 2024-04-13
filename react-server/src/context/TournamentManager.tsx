@@ -26,7 +26,7 @@ export default function TournamentManager({children}: PropsWithChildren) {
             })
             .catch(() => setTournament(null));
         const votesPromise = currentRound ? getVotes(tournament!.id)
-            .then(songIds => setUserVotes(songIds ? new Set(songIds) : null))
+            .then(entryIds => setUserVotes(entryIds ? new Set(entryIds) : null))
             .catch(() => setUserVotes(null)) : Promise.resolve();
         return Promise.all([tournamentPromise, votesPromise])
     };

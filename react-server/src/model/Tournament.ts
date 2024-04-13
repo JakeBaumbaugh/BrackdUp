@@ -1,4 +1,4 @@
-import Song, { BracketSong } from "./Song";
+import Entry, { BracketEntry } from "./Entry";
 
 export type TournamentPrivacy = "PUBLIC" | "VISIBLE" | "PRIVATE";
 export type TournamentMode = "SCHEDULED" | "INSTANT";
@@ -27,44 +27,44 @@ export class Tournament {
         return new Tournament(data.id, data.name, levels, data.mode, data.spotifyPlaylist, data.matchesPerRound, data.creatorId);
     }
 
-    getSongColumns(): (BracketSong|null)[][] {
-        const leftSongs: (BracketSong|null)[][] = [];
-        const rightSongs: (BracketSong|null)[][] = [];
+    getEntryColumns(): (BracketEntry|null)[][] {
+        const leftEntries: (BracketEntry|null)[][] = [];
+        const rightEntries: (BracketEntry|null)[][] = [];
         // Assumption: first level is filled out entirely
-        let halfLength = this.levels[0].getSongs().length / 2;
+        let halfLength = this.levels[0].getEntries().length / 2;
         this.levels.forEach(level => {
-            const levelSongs = level.getSongs();
-            const firstHalf = levelSongs.slice(0, halfLength);
-            const secondHalf = levelSongs.slice(halfLength);
-            if(levelSongs.length > 0) {
-                leftSongs.push(firstHalf);
-                rightSongs.unshift(secondHalf);
+            const levelEntries = level.getEntries();
+            const firstHalf = levelEntries.slice(0, halfLength);
+            const secondHalf = levelEntries.slice(halfLength);
+            if(levelEntries.length > 0) {
+                leftEntries.push(firstHalf);
+                rightEntries.unshift(secondHalf);
             }
             halfLength /= 2;
         });
         // Fill with any nulls necessary
-        if(leftSongs.length > 1 && leftSongs.at(-1)!.length != leftSongs.at(-2)!.length / 2) {
-            const toAdd = leftSongs.at(-2)!.length / 2 - leftSongs.at(-1)!.length;
+        if(leftEntries.length > 1 && leftEntries.at(-1)!.length != leftEntries.at(-2)!.length / 2) {
+            const toAdd = leftEntries.at(-2)!.length / 2 - leftEntries.at(-1)!.length;
             const nulls = new Array(toAdd).fill(null);
-            leftSongs.at(-1)!.push(...nulls);
+            leftEntries.at(-1)!.push(...nulls);
         }
-        if(rightSongs.length > 1 && rightSongs.at(0)!.length != rightSongs.at(1)!.length / 2) {
-            const toAdd = rightSongs.at(1)!.length / 2 - rightSongs.at(0)!.length;
+        if(rightEntries.length > 1 && rightEntries.at(0)!.length != rightEntries.at(1)!.length / 2) {
+            const toAdd = rightEntries.at(1)!.length / 2 - rightEntries.at(0)!.length;
             const nulls = new Array(toAdd).fill(null);
-            rightSongs.at(0)!.push(...nulls);
+            rightEntries.at(0)!.push(...nulls);
         }
-        while(leftSongs.at(-1)!.length != 1) {
-            const nulls = new Array(leftSongs.at(-1)!.length / 2).fill(null);
-            leftSongs.push(nulls);
+        while(leftEntries.at(-1)!.length != 1) {
+            const nulls = new Array(leftEntries.at(-1)!.length / 2).fill(null);
+            leftEntries.push(nulls);
         }
-        while(rightSongs.at(0)!.length != 1) {
-            const nulls = new Array(rightSongs.at(0)!.length / 2).fill(null);
-            rightSongs.unshift(nulls);
+        while(rightEntries.at(0)!.length != 1) {
+            const nulls = new Array(rightEntries.at(0)!.length / 2).fill(null);
+            rightEntries.unshift(nulls);
         }
-        return [...leftSongs, [this.getWinner()], ...rightSongs];
+        return [...leftEntries, [this.getWinner()], ...rightEntries];
     }
 
-    getWinner(): Song|null {
+    getWinner(): Entry|null {
         // Check for no levels
         if(!this.levels || this.levels.length == 0) {
             return null;
@@ -78,7 +78,7 @@ export class Tournament {
         if(!finalMatches || finalMatches.length != 1) {
             return null;
         }
-        return finalMatches[0].songWinner ?? null;
+        return finalMatches[0].entryWinner ?? null;
     }
 
     getActiveRound(): TournamentRound|undefined {
@@ -124,8 +124,8 @@ export class TournamentLevel {
         return new TournamentLevel(data.id, data.name, rounds);
     }
 
-    getSongs(): Song[] {
-        return this.rounds.flatMap(round => round.getSongs());
+    getEntries(): Entry[] {
+        return this.rounds.flatMap(round => round.getEntries());
     }
 }
 
@@ -155,11 +155,11 @@ export class TournamentRound {
         return new TournamentRound(data.id, startDate, endDate, matches, data.status, data.description);
     }
 
-    getSongs(): Song[] {
+    getEntries(): Entry[] {
         const isActive = this.isActive();
-        const songs = this.matches.flatMap(match => match.getSongs());
-        songs.forEach(song => song.activeRound = isActive);
-        return songs;
+        const entries = this.matches.flatMap(match => match.getEntries());
+        entries.forEach(entry => entry.activeRound = isActive);
+        return entries;
     }
 
     isActive(): boolean {
@@ -177,34 +177,34 @@ export class TournamentRound {
 
 export class TournamentMatch {
     id: number;
-    song1: Song;
-    song2: Song;
-    songWinner?: Song;
-    song1VoteCount?: number;
-    song2VoteCount?: number;
-    song1Description: string;
-    song2Description: string;
+    entry1: Entry;
+    entry2: Entry;
+    entryWinner?: Entry;
+    entry1VoteCount?: number;
+    entry2VoteCount?: number;
+    entry1Description: string;
+    entry2Description: string;
 
-    constructor(id: number, song1: Song, song2: Song, songWinner?: Song, song1VoteCount?: number, song2VoteCount?: number, song1Description?: string, song2Description?: string) {
+    constructor(id: number, entry1: Entry, entry2: Entry, entryWinner?: Entry, entry1VoteCount?: number, entry2VoteCount?: number, entry1Description?: string, entry2Description?: string) {
         this.id = id;
-        this.song1 = song1;
-        this.song2 = song2;
-        this.songWinner = songWinner;
-        this.song1VoteCount = song1VoteCount;
-        this.song2VoteCount = song2VoteCount;
-        this.song1Description = song1Description ?? "";
-        this.song2Description = song2Description ?? "";
+        this.entry1 = entry1;
+        this.entry2 = entry2;
+        this.entryWinner = entryWinner;
+        this.entry1VoteCount = entry1VoteCount;
+        this.entry2VoteCount = entry2VoteCount;
+        this.entry1Description = entry1Description ?? "";
+        this.entry2Description = entry2Description ?? "";
     }
 
     static fromJson(data: any): TournamentMatch {
-        return new TournamentMatch(data.id, data.song1, data.song2, data.songWinner, data.song1VoteCount, data.song2VoteCount, data.song1Description, data.song2Description);
+        return new TournamentMatch(data.id, data.entry1, data.entry2, data.entryWinner, data.entry1VoteCount, data.entry2VoteCount, data.entry1Description, data.entry2Description);
     }
 
-    getSongs(): Song[] {
-        return [{...this.song1}, {...this.song2}];
+    getEntries(): Entry[] {
+        return [{...this.entry1}, {...this.entry2}];
     }
 
     copy(): TournamentMatch {
-        return new TournamentMatch(this.id, this.song1, this.song2, this.songWinner, this.song1VoteCount, this.song2VoteCount, this.song1Description, this.song2Description);
+        return new TournamentMatch(this.id, this.entry1, this.entry2, this.entryWinner, this.entry1VoteCount, this.entry2VoteCount, this.entry1Description, this.entry2Description);
     }
 }

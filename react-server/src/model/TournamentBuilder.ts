@@ -1,12 +1,14 @@
-import Song from "./Song";
+import Entry from "./Entry";
 import { TournamentLevel, TournamentMode, TournamentPrivacy, TournamentRound } from "./Tournament";
+import TournamentType, { DEFAULT_MISC_TYPE } from "./TournamentType";
 
 export default class TournamentBuilder {
     name: string;
-    songCount: number;
+    entryCount: number;
     matchesPerRound: number;
+    type: TournamentType;
     spotifyPlaylist: string;
-    songs: Song[];
+    entries: Entry[];
     levels: TournamentLevel[];
     privacy: TournamentPrivacy;
     mode: TournamentMode;
@@ -14,10 +16,11 @@ export default class TournamentBuilder {
 
     constructor() {
         this.name = "";
-        this.songCount = 64;
+        this.entryCount = 64;
         this.matchesPerRound = 8;
+        this.type = DEFAULT_MISC_TYPE;
         this.spotifyPlaylist = "";
-        this.songs = [];
+        this.entries = [];
         this.levels = this.buildLevels();
         this.privacy = "VISIBLE";
         this.mode = "SCHEDULED";
@@ -26,10 +29,11 @@ export default class TournamentBuilder {
     copy(): TournamentBuilder {
         const newBuilder = new TournamentBuilder();
         newBuilder.name = this.name;
-        newBuilder.songCount = this.songCount;
+        newBuilder.entryCount = this.entryCount;
         newBuilder.matchesPerRound = this.matchesPerRound;
+        newBuilder.type = this.type;
         newBuilder.spotifyPlaylist = this.spotifyPlaylist;
-        newBuilder.songs = this.songs;
+        newBuilder.entries = this.entries;
         newBuilder.levels = this.levels;
         newBuilder.privacy = this.privacy;
         newBuilder.mode = this.mode;
@@ -43,9 +47,9 @@ export default class TournamentBuilder {
             console.log("Missing tournament name.");
             return false;
         }
-        // Check song count
-        if (this.songs.length !== this.songCount) {
-            console.log("Incorrect song count.");
+        // Check entry count
+        if (this.entries.length !== this.entryCount) {
+            console.log("Incorrect entry count.");
             return false;
         }
         // Check start/end date order
@@ -70,9 +74,9 @@ export default class TournamentBuilder {
         return newBuilder;
     }
 
-    setSongCount(songCount: number): TournamentBuilder {
+    setEntryCount(entryCount: number): TournamentBuilder {
         const newBuilder = this.copy();
-        newBuilder.songCount = songCount;
+        newBuilder.entryCount = entryCount;
         newBuilder.levels = newBuilder.buildLevels();
         return newBuilder;
     }
@@ -81,6 +85,12 @@ export default class TournamentBuilder {
         const newBuilder = this.copy();
         newBuilder.matchesPerRound = matchesPerRound;
         newBuilder.levels = newBuilder.buildLevels();
+        return newBuilder;
+    }
+
+    setType(type: TournamentType): TournamentBuilder {
+        const newBuilder = this.copy();
+        newBuilder.type = type;
         return newBuilder;
     }
 
@@ -108,27 +118,27 @@ export default class TournamentBuilder {
         return newBuilder;
     }
 
-    setSongs(songs: Song[]): TournamentBuilder {
+    setEntries(entries: Entry[]): TournamentBuilder {
         const newBuilder = this.copy();
-        newBuilder.songs = songs;
+        newBuilder.entries = entries;
         return newBuilder;
     }
 
-    addSong(song: Song): TournamentBuilder {
+    addEntry(entry: Entry): TournamentBuilder {
         const newBuilder = this.copy();
-        newBuilder.songs = [...newBuilder.songs, song];
+        newBuilder.entries = [...newBuilder.entries, entry];
         return newBuilder;
     }
 
-    removeSong(song: Song): TournamentBuilder {
+    removeEntry(entry: Entry): TournamentBuilder {
         const newBuilder = this.copy();
-        const index = newBuilder.songs.indexOf(song);
-        newBuilder.songs = newBuilder.songs.toSpliced(index, 1);
+        const index = newBuilder.entries.indexOf(entry);
+        newBuilder.entries = newBuilder.entries.toSpliced(index, 1);
         return newBuilder;
     }
 
-    hasSong(song: Song): boolean {
-        return this.songs.some(s => s.title === song.title && s.artist === song.artist);
+    hasEntry(entry: Entry): boolean {
+        return this.entries.some(e => e.line1 === entry.line1 && e.line2 === entry.line2);
     }
 
     buildLevels(): TournamentLevel[] {
@@ -137,8 +147,8 @@ export default class TournamentBuilder {
 
         const levels: TournamentLevel[] = [];
         let levelNumber = 1;
-        for(let songsInLevel = this.songCount; songsInLevel >= 2; songsInLevel /= 2) {
-            const matchesInLevel = songsInLevel / 2;
+        for(let entriesInLevel = this.entryCount; entriesInLevel >= 2; entriesInLevel /= 2) {
+            const matchesInLevel = entriesInLevel / 2;
             const roundsInLevel = Math.ceil(matchesInLevel / this.matchesPerRound);
             const rounds: TournamentRound[] = [];
             for(let roundIndex = 0; roundIndex < roundsInLevel; roundIndex++) {

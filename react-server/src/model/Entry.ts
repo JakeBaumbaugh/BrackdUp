@@ -1,14 +1,13 @@
-export default interface Song {
+export default interface Entry {
     id: number;
-    title: string;
-    artist: string;
+    line1: string;
+    line2?: string;
     spotify?: string;
     youtube?: string;
     activeRound?: boolean;
 }
 
-
-export interface BracketSong extends Song {
+export interface BracketEntry extends Entry {
     parent1VoteCount?: number;
     parent2VoteCount?: number;
     receivedVoteCount?: number;

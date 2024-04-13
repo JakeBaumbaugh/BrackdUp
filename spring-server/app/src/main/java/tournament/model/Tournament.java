@@ -30,6 +30,7 @@ public class Tournament {
     private Integer id;
     private String name;
     private Integer matchesPerRound;
+    private String type;
     private String spotifyPlaylist;
 
     @Enumerated(EnumType.STRING)
@@ -59,7 +60,7 @@ public class Tournament {
         if(lastRound.getMatches().size() == 1) {
             summary.setEndDate(lastRound.getEndDate());
             TournamentMatch finalMatch = lastRound.getMatches().get(0);
-            summary.setSongWinner(finalMatch.getSongWinner());
+            summary.setEntryWinner(finalMatch.getEntryWinner());
         }
         getCurrentOrNextRound().ifPresent(round -> {
             if (round.getStatus() == RoundStatus.CREATED) {
