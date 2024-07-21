@@ -1,0 +1,28 @@
+.seeding-modal .modal-content {
+    max-height: calc(100vh - 2 * var(--bs-modal-margin));
+}
+
+.seeding-modal .modal-body {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1em;
+    min-height: 0;
+}
+
+.seeding-modal .card-column {
+    display: flex;
+    flex-direction: column;
+    gap: 1em;
+    min-height: 0;
+}
+
+.seeding-modal .card-column > .entry-list-card {
+    flex-grow: 1;
+}
+
+.droppable-add-card {
+    padding: 1em;
+    text-align: center;
+    font-size: 16pt;
+    font-weight: bold;
+}

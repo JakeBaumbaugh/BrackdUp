@@ -73,6 +73,13 @@ export function searchEntries(type: string, line1: string, line2: string): Promi
 }
 
 export function createTournament(builder: TournamentBuilder): Promise<Response> {
+    // Set entries as final entryOrder before submit
+    builder.entries = builder.entryOrder;
+    // Clear fields unused by server
+    builder.divisions = [];
+    builder.seedingOrder = [];
+    builder.tieredSeedingOrder = [];
+    builder.entryOrder = [];
     return post("/tournament/create", builder);
 }
 

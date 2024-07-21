@@ -6,7 +6,7 @@ import { CodeResponse, useGoogleLogin } from "@react-oauth/google";
 import { login, logout } from "../service/ProfileService";
 import { useEffect } from "react";
 
-const devLocalhost = process.env.REACT_APP_LOCALHOST;
+const devLocalhost = process.env.REACT_APP_LOCALHOST === "true";
 
 export default function ProfileButton() {
     const {profile: [profile, setProfile], forceLogin: [forceLogin]} = useProfileContext();

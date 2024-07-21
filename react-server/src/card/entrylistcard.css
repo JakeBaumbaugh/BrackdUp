@@ -1,0 +1,75 @@
+.entry-list-card {
+    overflow-y: auto;
+}
+
+.entry-list-card .card-body {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5em;
+    align-items: center;
+    user-select: none;
+}
+
+.entry-list-card p {
+    margin-bottom: 0;
+    padding-bottom: 0.5em;
+}
+
+.entry-list-card p.sticky-title {
+    position: sticky;
+    top: 0;
+    z-index: 5;
+
+    background-color: var(--bs-card-bg);
+    width: 100%;
+    text-align: center;
+    padding-top: var(--bs-card-spacer-y);
+    margin-top: calc(-1 * var(--bs-card-spacer-y));
+}
+
+.entry-list-card p.overfull {
+    color: red;
+}
+
+.entry-list-card p.full {
+    /* opacity: 60%; */
+    color: #777;
+}
+
+.entry-list-card .sortable-drop-zone {
+    width: 100%;
+    position: relative;
+    padding: calc((3em + 17px + 1em) / 2);
+    margin: calc((3em + 17px + 1em) / -2);
+}
+
+.entry-list-card .sortable-drop-zone {
+    z-index: -10;
+}
+
+.entry-list-card .sortable-drop-zone.toFront {
+    z-index: 2000;
+}
+
+.entry-list-card .sortable-drop-zone hr {
+    margin: -3px 20%;
+    visibility: hidden;
+    color: #07D;
+    background-color: #07D;
+    opacity: 100%;
+    height: 3px;
+}
+
+.entry-list-card .sortable-drop-zone.hover hr {
+    visibility: visible;
+}
+
+.entry-list-card .numbered-card-wrapper {
+    display: grid;
+    grid-template-columns: 2em 1fr;
+    gap: 4px;
+}
+
+.entry-list-card .numbered-card-wrapper > span {
+    line-height: calc(3em + 17px);
+}

@@ -7,6 +7,10 @@ export default interface Entry {
     activeRound?: boolean;
 }
 
+export function entryKey(entry: Entry): string {
+    return `${entry.id}-${entry.line1}-${entry.line2}`;
+}
+
 export interface BracketEntry extends Entry {
     parent1VoteCount?: number;
     parent2VoteCount?: number;

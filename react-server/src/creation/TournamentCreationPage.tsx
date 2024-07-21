@@ -1,19 +1,23 @@
 import { Moment } from "moment";
-import { Dispatch, FormEvent, SetStateAction, useCallback, useEffect, useMemo, useState } from "react";
+import { Dispatch, FormEvent, SetStateAction, useEffect, useMemo, useState } from "react";
 import { Button, Card, CardBody } from "react-bootstrap";
 import DateTime from "react-datetime";
 import { useNavigate } from "react-router-dom";
+import Bracket from "../bracket/Bracket";
 import EntryCard from "../card/EntryCard";
+import { DroppableEntryListCard } from "../card/EntryListCard";
 import Entry from "../model/Entry";
-import { TournamentRound } from "../model/Tournament";
-import TournamentBuilder from "../model/TournamentBuilder";
+import { Tournament, TournamentMatch, TournamentRound } from "../model/Tournament";
+import TournamentBuilder, { TournamentOrder } from "../model/TournamentBuilder";
+import TournamentType from "../model/TournamentType";
 import { getImageList, imageUrl } from "../service/ImageService";
 import { createTournament, getTournamentTypes, searchEntries } from "../service/TournamentService";
+import ImageSelectionModal from "./ImageSelectionModal";
+import SeedingModal from "./SeedingModal";
 import TournamentModeButtons from "./TournamentModeButtons";
+import TournamentOrderButtons from "./TournamentOrderButtons";
 import TournamentPrivacyButtons from "./TournamentPrivacyButtons";
 import "./tournament-creation.css";
-import ImageSelectionModal from "./ImageSelectionModal";
-import TournamentType from "../model/TournamentType";
 
 export default function TournamentCreationPage() {
     const [builder, setBuilder] = useState(new TournamentBuilder());
@@ -42,6 +46,12 @@ export default function TournamentCreationPage() {
             content = <EntrySelectPage builder={builder} setBuilder={setBuilder}/>;
             break;
         case 2:
+            content = <DivisionPage builder={builder} setBuilder={setBuilder}/>;
+            break;
+        case 3:
+            content = <OrderPage builder={builder} setBuilder={setBuilder}/>;
+            break;
+        case 4:
             content = <SchedulePage builder={builder} setBuilder={setBuilder}/>;
             break;
         default:
@@ -59,7 +69,7 @@ export default function TournamentCreationPage() {
                         onClick={() => setPage(page => page - 1)}
                         disabled={page <= 0}
                     >BACK</Button>
-                    {page === 2 ? (
+                    {page === 4 ? (
                         <Button
                         type="submit"
                         key="submit-button"
@@ -280,6 +290,89 @@ function EntrySelectPage({builder, setBuilder}: PageProps) {
                     />
                 ))}
             </div>
+        </div>
+    );
+}
+
+function DivisionPage({builder, setBuilder}: PageProps) {
+    const divisionSize = builder.entryCount / builder.divisions.length;
+
+    return (
+        <div className="division-page">
+            <label>
+                <span>Number of Divisions</span>
+                <select value={builder.divisions.length} onChange={e => setBuilder(builder => builder.setDivisionCount(parseInt(e.target.value)))}>
+                    <option value="0">None</option>
+                    <option value="2">2</option>
+                    <option value="4">4</option>
+                    <option value="8">8</option>
+                </select>
+            </label>
+            <DroppableEntryListCard
+                title="ENTRY BANK"
+                entries={builder.entries.filter(entry => !builder.divisionsContains(entry))}
+                className="entry-bank"
+                stickyTitle
+                onDrop={entry => setBuilder(builder => builder.removeEntryFromDivisions(entry))}
+            />
+            <div className="division-container">
+                {builder.divisions.map((division, index) => (
+                    <DroppableEntryListCard
+                        title={`${division.length}/${divisionSize}`}
+                        entries={division}
+                        className="division"
+                        stickyTitle
+                        onDrop={entry => setBuilder(builder => builder.removeEntryFromDivisions(entry).addToDivision(index, entry))}
+                        maxSize={divisionSize}
+                        key={index}
+                    />
+                ))}
+            </div>
+        </div>
+    );
+}
+
+function OrderPage({builder, setBuilder}: PageProps) {
+    const [showSeedingModal, setShowSeedingModal] = useState(false);
+    const [tieredModal, setTieredModal] = useState(false);
+
+    const selectOrder = (order: TournamentOrder) => {
+        if (order === "RANDOM" || order === "INORDER") {
+            setBuilder(builder => builder.setOrder(order));
+        } else {
+            setTieredModal(order === "TIEREDSEEDS");
+            setShowSeedingModal(true);
+
+        }
+    };
+
+    const submitSeedingModal = () => {
+        setBuilder(builder => builder.setOrder(tieredModal ? "TIEREDSEEDS" : "SEEDED"));
+        setShowSeedingModal(false);
+    };
+
+    const sampleTournament = useMemo(() => {
+        const levels = builder.buildLevels();
+        const matches = [];
+        for (let i = 0; i < builder.entryOrder.length; i += 2) {
+            matches.push(new TournamentMatch(-1, builder.entryOrder[i], builder.entryOrder[i+1]));
+        }
+        levels[0].rounds[0].matches = matches;
+        return new Tournament(-1, builder.name, levels, builder.mode);
+    }, [builder]);
+
+    return (
+        <div className="order-page">
+            <TournamentOrderButtons value={builder.order} onSelect={selectOrder}/>
+            <Bracket tournament={sampleTournament}/>
+            <SeedingModal
+                show={showSeedingModal}
+                closeModal={() => setShowSeedingModal(false)}
+                onSubmit={submitSeedingModal}
+                builder={builder}
+                setBuilder={setBuilder}
+                tiered={tieredModal}
+            />
         </div>
     );
 }
