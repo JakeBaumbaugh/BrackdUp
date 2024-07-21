@@ -66,9 +66,7 @@ public class TournamentFactory {
                     });
         }
 
-        // Shuffle entries
         entries = entryService.saveAll(entries);
-        Collections.shuffle(entries);
 
         // Build first level matches
         TournamentLevel firstLevel = levels.get(0);

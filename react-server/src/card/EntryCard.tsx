@@ -1,7 +1,8 @@
-import { PropsWithChildren, useRef } from "react";
+import { PropsWithChildren, Ref, useRef } from "react";
 import { BracketEntry } from "../model/Entry";
 import "./entrycard.css";
 import { OverlayTrigger, Tooltip } from "react-bootstrap";
+import { useDrag } from "react-dnd";
 
 interface EntryCardProps {
     entry: BracketEntry|null;
@@ -10,9 +11,10 @@ interface EntryCardProps {
     onClick?: () => void;
     deletable?: boolean;
     selectable?: boolean;
+    cardRef?: Ref<HTMLDivElement>;
 }
 
-export default function EntryCard({entry, final, votedFor, onClick, deletable, selectable}: EntryCardProps) {
+export default function EntryCard({entry, final, votedFor, onClick, deletable, selectable, cardRef}: EntryCardProps) {
     let cardClass = "custom-card entry-card";
     if (final) {
         cardClass += " final";
@@ -35,7 +37,7 @@ export default function EntryCard({entry, final, votedFor, onClick, deletable, s
 
     return (
         <div className="entry-card-wrapper">
-            <div className={cardClass} onClick={onClick}>
+            <div className={cardClass} onClick={onClick} ref={cardRef}>
                 <div>
                     <OverflowTooltip>{entry?.line1}</OverflowTooltip>
                 </div>
@@ -62,4 +64,16 @@ function OverflowTooltip({children}: PropsWithChildren) {
             {content}
         </OverlayTrigger>
     ) : content;
+}
+
+export function DraggableEntryCard(props: EntryCardProps) {
+    const [{isDragging}, dragRef] = useDrag(() => ({
+        type: "entry",
+        item: props.entry,
+        collect: (monitor) => ({
+            isDragging: monitor.isDragging()
+        })
+    }));
+
+    return <EntryCard cardRef={dragRef} {...props}/>
 }

@@ -22,7 +22,7 @@ export default function TournamentPrivacyButtons({value, onSelect}: TournamentPr
                 <p>Public</p>
             </ToggleButton>
             <ToggleButton
-                id="public-privacy-button"
+                id="visible-privacy-button"
                 type="radio"
                 value="VISIBLE"
                 checked={value === "VISIBLE"}
@@ -32,7 +32,7 @@ export default function TournamentPrivacyButtons({value, onSelect}: TournamentPr
                 <p>Visible</p>
             </ToggleButton>
             <ToggleButton
-                id="public-privacy-button"
+                id="private-privacy-button"
                 type="radio"
                 value="PRIVATE"
                 checked={value === "PRIVATE"}
