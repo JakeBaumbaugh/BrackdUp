@@ -2,7 +2,7 @@ export const BASE_URL = getBaseUrl();
 
 function getBaseUrl(): string {
     let url;
-    if (process.env.REACT_APP_LOCALHOST) {
+    if (process.env.REACT_APP_LOCALHOST == "true") {
         url = process.env.REACT_APP_LOCALHOST_URL;
     } else {
         url = process.env.REACT_APP_SERVER_URL;

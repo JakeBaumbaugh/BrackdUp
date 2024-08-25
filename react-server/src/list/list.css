@@ -46,10 +46,10 @@
     transition: background-color 220ms;
 }
 
-.tournament-card .tournament-card-content:hover, 
-.tournament-card .tournament-card-content:focus,
-.tournament-card.create-tournament-card:hover,
-.tournament-card.create-tournament-card:focus {
+.App:not(.brackd-up) .tournament-card .tournament-card-content:hover, 
+.App:not(.brackd-up) .tournament-card .tournament-card-content:focus,
+.App:not(.brackd-up) .tournament-card.create-tournament-card:hover,
+.App:not(.brackd-up) .tournament-card.create-tournament-card:focus {
     background-color: var(--card-hover-color);
 }
 

@@ -1,0 +1,65 @@
+.tournament-card {
+    width: 14em;
+    height: 10em;
+
+    display: block;
+    position: relative;
+    border: none;
+    background-color: var(--secondary-white);
+    text-decoration: none;
+    color: inherit;
+
+    --border-radius: .5em;
+    --border-edge: 3px;
+    border-radius: var(--border-radius) 0;
+
+    transition: all 300ms;
+}
+
+.tournament-card .border-tl, .tournament-card .border-br {
+    border-radius: var(--border-radius) 0;
+    border-width: 5px;
+    border-style: solid;
+    pointer-events: none;
+
+    transition: all 300ms;
+}
+
+.tournament-card .border-tl {
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: var(--border-edge);
+    right: var(--border-edge);
+
+    border-color: var(--primary-red) #0000 #0000 var(--primary-red);
+}
+
+.tournament-card .border-br {
+    position: absolute;
+    top: var(--border-edge);
+    left: var(--border-edge);
+    bottom: 0;
+    right: 0;
+
+    border-color: #0F00 var(--primary-blue) var(--primary-blue) #0000;
+}
+
+.brackd-up .tournament-card-content {
+    position: relative;
+    font-weight: bold;
+    background: none;
+    transition: all 300ms;
+}
+
+.tournament-card:hover {
+    transform: translateY(10px);
+}
+
+.tournament-card:hover .border-tl, .tournament-card:hover .border-br {
+    border-width: 12px;
+}
+
+.brackd-up .tournament-card p {
+    margin: 0;
+}

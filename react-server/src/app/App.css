@@ -1,12 +1,11 @@
 * {
     box-sizing: border-box;
-}
-
-.App {
     --vh100: calc(var(--vh, 1vh) * 100);
     --dark-color: #282c34;
     --header-height: 80px;
+}
 
+.App {
     background-color: #e6e3df;
     height: var(--vh100, 100vh);
     display: flex;
