@@ -89,14 +89,14 @@ export default function Bracket({tournament}: BracketProps) {
         <TransformWrapper minScale={0.5} maxScale={2}>
             <TransformComponent>
                 <div className="bracket">
-                    {entryColumns.map((entries, index) => <Fragment key={`column-${index}`}>
-                        {index > 0 && <MatchConnectorColumn left={entryColumns[index-1].length} right={entries.length}/>}
-                        <div className={index < entryColumns.length / 2 ? "column left-column" : "column right-column"}>
-                            {entries.map(entry =>
+                    {entryColumns.map((entries, columnIndex) => <Fragment key={`column-${columnIndex}`}>
+                        {columnIndex > 0 && <MatchConnectorColumn left={entryColumns[columnIndex-1].length} right={entries.length}/>}
+                        <div className={columnIndex < entryColumns.length / 2 ? "column left-column" : "column right-column"}>
+                            {entries.map((entry, index) =>
                                 <EntryCard
                                     entry={entry}
-                                    final={index == (entryColumns.length - 1) / 2}
-                                    key={`${index}-${entry?.line1}-${entry?.line2}`}
+                                    final={columnIndex == (entryColumns.length - 1) / 2}
+                                    key={`${columnIndex}-${index}`}
                                 />
                             )}
                         </div>
