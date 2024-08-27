@@ -8,7 +8,7 @@ interface TournamentCardProps {
 
 export default function TournamentCard({summary}: Readonly<TournamentCardProps>) {
     return (
-        <Link className="tournament-card" to={`tournament/${summary.id}`}>
+        <Link className="tournament-card" to={`tournament?id=${summary.id}`}>
             <div className="border-tl"/>
             <div className="border-br"/>
             <div className="tournament-card-content">

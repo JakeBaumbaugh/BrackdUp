@@ -90,13 +90,13 @@ header .login-button > svg {
     height: 75%;
 }
 
-.tournament-info {
+header .tournament-info {
     flex-grow: 1;
     border-left: solid 1px #556;
     padding: 12px 1em;
 }
 
-.tournament-info, .profile-wrapper {
+header .tournament-info, .profile-wrapper {
     display: flex;
     gap: 1.5em;
     align-items: center

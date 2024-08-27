@@ -37,12 +37,13 @@
     position: relative;
     display: grid;
     grid-template-rows: var(--header-height) 1fr;
+    overflow: hidden;
 }
 
 .brackd-up main {
-    overflow: auto;
     grid-row: 2 / -1;
     background-color: var(--secondary-white);
+    min-height: 100%;
 }
 
 /* Header */
