@@ -24,6 +24,7 @@ import tournament.model.TournamentSettings;
 import tournament.model.TournamentSummary;
 import tournament.model.TournamentType;
 import tournament.rest.request.VoteRequestBody;
+import tournament.rest.request.VotesRequestBody;
 import tournament.rest.response.VoteResponseBody;
 import tournament.service.ProfileService;
 import tournament.service.TournamentService;
@@ -65,8 +66,8 @@ public class TournamentController {
         return tournamentService.getTournaments(profile);
     }
 
-    @PostMapping("/tournament/vote")
-    public VoteResponseBody vote(Authentication authentication, @RequestBody VoteRequestBody body) {
+    @PostMapping("/tournament/votes")
+    public VoteResponseBody vote(Authentication authentication, @RequestBody VotesRequestBody body) {
         Profile profile = (Profile) authentication.getPrincipal();
         logger.info("POST request to vote on tournament id={} from user {}", body.getTournament(), profile.getName());
         
@@ -80,10 +81,31 @@ public class TournamentController {
                 .orElseThrow(() -> create400("Tournament does not have an active round."));
         List<Entry> entries = tournamentService.getEntries(body.getEntries());
         if(!activeRound.validEntryVotes(entries)) {
-            throw create400("Entries did not match active round.");
+            throw create400("Entries do not match active round.");
         }
 
         boolean roundEnded = tournamentService.vote(profile, activeRound, entries, tournament);
+        return new VoteResponseBody(roundEnded);
+    }
+
+    @PostMapping("/tournament/vote")
+    public VoteResponseBody vote(Authentication authentication, @RequestBody VoteRequestBody body) {
+        Profile profile = (Profile) authentication.getPrincipal();
+        logger.info("POST request to vote on tournament id={} from user {}", body.getTournament(), profile.getName());
+
+        if (!profileService.profileCanVote(profile, body.getTournament())) {
+            throw new ResponseStatusException(HttpStatusCode.valueOf(403));
+        }
+
+        Tournament tournament = tournamentService.getTournament(body.getTournament())
+                .orElseThrow(() -> create400("Tournament not found."));
+        TournamentRound activeRound = tournament.getVotableRound()
+                .orElseThrow(() -> create400("Tournament does not have an active round."));
+        if (!activeRound.entryInRound(body.getEntry())) {
+            throw create400("Entry does not match active round.");
+        }
+
+        boolean roundEnded = tournamentService.vote(profile, activeRound, body.getEntry(), tournament);
         return new VoteResponseBody(roundEnded);
     }
 

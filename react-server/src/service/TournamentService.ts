@@ -27,12 +27,18 @@ export function getTournaments(): Promise<TournamentSummary[]> {
         });
 }
 
-export function submitVote(tournamentId: number, entryIds: number[]): Promise<VoteResponseBody> {
-    return post("/tournament/vote", {
+export function submitVotes(tournamentId: number, entryIds: number[]): Promise<VoteResponseBody> {
+    return post("/tournament/votes", {
         tournament: tournamentId,
         entries: entryIds
-    })
-        .then(res => res.json())
+    }).then(res => res.json());
+}
+
+export function submitVote(tournamentId: number, entryId: number): Promise<VoteResponseBody> {
+    return post("/tournament/vote", {
+        tournament: tournamentId,
+        entry: entryId
+    }).then(res => res.json());
 }
 
 export function getVotes(tournamentId: number): Promise<number[]|null> {

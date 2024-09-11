@@ -1,13 +1,37 @@
+import { useMemo, useState } from "react";
 import { Button } from "react-bootstrap";
-import Bracket from "../../bracket/Bracket";
+import  Bracket, { MatchFocus } from "../../bracket/Bracket";
 import { useTournamentContext } from "../../context/TournamentContext";
-import { Tournament } from "../../model/Tournament";
+import { Tournament, TournamentMatch } from "../../model/Tournament";
+import VoteController from "./VoteController";
 import "./tournamentpage.css";
-import { useMemo } from "react";
-import { Link } from "react-router-dom";
 
 export default function TournamentPage() {
     const {tournament} = useTournamentContext();
+    const [matchFocus, setMatchFocus] = useState<MatchFocus>({match: undefined});
+    const [voteMode, setVoteMode] = useState(false);
+
+    const currentRound = tournament?.getVotableRound();
+
+    const startVoteMode = () => {
+        if (currentRound) {
+            setVoteMode(true);
+            setMatchFocus({match: currentRound?.matches[0]});
+        }
+    };
+
+    const jumpMatchFocus = (offset: number) => setMatchFocus(matchFocus => {
+        const matches = currentRound?.matches ?? [];
+        if (!matchFocus.match) {
+            return {match: matches[0]};
+        }
+        const index = matches.indexOf(matchFocus.match);
+        if (index == -1) {
+            return {match: matches[0]};
+        }
+        const nextIndex = (index + offset) % matches.length;
+        return {match: matches.at(nextIndex)};
+    });
 
     if (tournament === null) {
         return <p>Something went wrong.</p>
@@ -20,20 +44,24 @@ export default function TournamentPage() {
         <div className="tournament-info">
             <h3>{tournament.name}</h3>
             <TournamentInfoPlaylistEmbed tournament={tournament}/>
-            <TournamentInfoCurrentVote tournament={tournament}/>
+            <TournamentInfoCurrentVote tournament={tournament} startVoteMode={startVoteMode}/>
         </div>
         <div className="tournament-page-border"/>
         <div className="tournament-content">
-            <Bracket tournament={tournament}/>
+            <Bracket tournament={tournament} voteMode={voteMode} matchFocus={matchFocus} jumpMatchFocus={jumpMatchFocus}/>
+            {currentRound && (
+                <VoteController voteMode={voteMode} jumpMatchFocus={jumpMatchFocus}/>
+            )}
         </div>
     </div>
 }
 
 interface TournamentInfoProps {
-    readonly tournament: Tournament;
+    tournament: Tournament;
+    startVoteMode?: () => void;
 }
 
-function TournamentInfoPlaylistEmbed({tournament}: TournamentInfoProps) {
+function TournamentInfoPlaylistEmbed({tournament}: Readonly<TournamentInfoProps>) {
     const url = useMemo(() => {
         if (!tournament.spotifyPlaylist) {
             return undefined;
@@ -68,7 +96,7 @@ function TournamentInfoPlaylistEmbed({tournament}: TournamentInfoProps) {
     );
 }
 
-function TournamentInfoCurrentVote({tournament}: TournamentInfoProps) {
+function TournamentInfoCurrentVote({tournament, startVoteMode}: Readonly<TournamentInfoProps>) {
     const currentOrNextRound = useMemo(() => tournament.getCurrentOrNextRound(), [tournament]);
 
     if (!currentOrNextRound) {
@@ -85,9 +113,7 @@ function TournamentInfoCurrentVote({tournament}: TournamentInfoProps) {
     return (
         <p className="vote-message">
             {text}
-            <Link to={`/tournament/vote?id=${tournament.id}`}>
-                <Button>Vote Now!</Button>
-            </Link>
+            <Button onClick={startVoteMode}>Vote Now!</Button>
         </p>
     );
 }

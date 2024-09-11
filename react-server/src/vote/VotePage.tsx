@@ -6,7 +6,7 @@ import EntryCard from "../card/EntryCard";
 import { useTournamentContext } from "../context/TournamentContext";
 import Entry from "../model/Entry";
 import { TournamentMatch } from "../model/Tournament";
-import { submitVote } from "../service/TournamentService";
+import { submitVotes } from "../service/TournamentService";
 import "./vote.css";
 
 export default function VotePage() {
@@ -54,7 +54,7 @@ export default function VotePage() {
     const onSubmit = () => {
         if(tournament && userVotes) {
             setSaving(true);
-            submitVote(tournament.id, [...userVotes])
+            submitVotes(tournament.id, [...userVotes])
                 .then(response => {
                     setSaving(false);
                     if (response.roundEnded) {
