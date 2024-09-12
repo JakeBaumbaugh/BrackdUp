@@ -5,25 +5,15 @@
     gap: 2em;
     background-color: var(--secondary-white);
     max-height: 100%;
-    overflow: auto;
-}
-
-.home-page .tournament-list {
-    display: flex;
-    gap: 2em;
-}
-
-.home-page h3 {
-    font-size: 2em;
-    font-weight: bold;
-    letter-spacing: 1px;
-    transition: all 300ms;
+    overflow: hidden auto;
 }
 
 .home-page .category {
+    position: relative;
     padding: 1em;
     border-radius: 1em;
     border: 2px solid #E9E9E900;
+    overflow: hidden;
     transition: all 300ms;
 }
 
@@ -34,4 +24,64 @@
 .home-page .category:hover h3 {
     transform: translateX(1em);
     letter-spacing: 1.5px;
+}
+
+.home-page h3 {
+    font-size: 2em;
+    font-weight: bold;
+    letter-spacing: 1px;
+    transition: all 300ms;
+
+    position: relative;
+    z-index: 1;
+}
+
+.home-page .tournament-list {
+    display: flex;
+    gap: 2em;
+    width: fit-content;
+    transition: transform 300ms;
+}
+
+.home-page .category .scroll-button {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 2em;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    font-weight: bold;
+    font-size: 24pt;
+
+    --gradient-opacity: .8;
+}
+
+.home-page .category .scroll-button span {
+    transition: all 300ms;
+    opacity: 0;
+}
+
+.home-page .category:hover .scroll-button span {
+    opacity: 1;
+}
+
+.home-page .category .left-scroll-button {
+    left: 0;
+    background: linear-gradient(to left, rgba(var(--secondary-white-rbg), 0), rgba(var(--secondary-white-rbg), var(--gradient-opacity)));
+}
+
+.home-page .category .left-scroll-button:hover span {
+    transform: translateX(-8px);
+}
+
+.home-page .category .right-scroll-button {
+    right: 0;
+    background: linear-gradient(to right, rgba(var(--secondary-white-rbg), 0), rgba(var(--secondary-white-rbg), var(--gradient-opacity)));
+}
+
+.home-page .category .right-scroll-button:hover span {
+    transform: translateX(8px);
 }

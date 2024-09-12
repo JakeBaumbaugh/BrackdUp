@@ -3,7 +3,8 @@
     /* default attempt */
     /* --primary-red: #D44;
     --primary-blue: #44D; */
-    --secondary-white: #FAFDFF;
+    --secondary-white-rbg: 250, 253, 255;
+    --secondary-white: rgb(var(--secondary-white-rbg));
     /* sunset palette from jack */
     /* --primary-red: rgb(213, 50, 7);
     --primary-blue: rgb(86, 147, 191); */
@@ -44,6 +45,7 @@
     grid-row: 2 / -1;
     background-color: var(--secondary-white);
     min-height: 100%;
+    min-width: 0;
 }
 
 /* Header */
