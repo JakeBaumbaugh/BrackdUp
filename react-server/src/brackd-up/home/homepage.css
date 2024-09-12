@@ -4,8 +4,6 @@
     flex-direction: column;
     gap: 2em;
     background-color: var(--secondary-white);
-    max-height: 100%;
-    overflow: hidden auto;
 }
 
 .home-page .category {
@@ -34,6 +32,7 @@
 
     position: relative;
     z-index: 1;
+
 }
 
 .home-page .tournament-list {

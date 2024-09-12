@@ -46,6 +46,7 @@
     background-color: var(--secondary-white);
     min-height: 100%;
     min-width: 0;
+    overflow: hidden auto;
 }
 
 /* Header */
