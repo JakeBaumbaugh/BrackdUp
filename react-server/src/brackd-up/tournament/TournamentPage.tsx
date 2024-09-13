@@ -1,10 +1,13 @@
 import { useMemo, useState } from "react";
 import { Button } from "react-bootstrap";
-import  Bracket, { MatchFocus } from "../../bracket/Bracket";
+import { MdSettings } from "react-icons/md";
+import Bracket, { MatchFocus } from "../../bracket/Bracket";
+import { useProfileContext } from "../../context/ProfileContext";
 import { useTournamentContext } from "../../context/TournamentContext";
-import { Tournament, TournamentMatch } from "../../model/Tournament";
+import { Tournament } from "../../model/Tournament";
 import VoteController from "./VoteController";
 import "./tournamentpage.css";
+import { Link } from "react-router-dom";
 
 export default function TournamentPage() {
     const {tournament} = useTournamentContext();
@@ -45,6 +48,7 @@ export default function TournamentPage() {
             <h3>{tournament.name}</h3>
             <TournamentInfoPlaylistEmbed tournament={tournament}/>
             <TournamentInfoCurrentVote tournament={tournament} startVoteMode={startVoteMode}/>
+            <TournamentManage tournament={tournament}/>
         </div>
         <div className="tournament-page-border"/>
         <div className="tournament-content">
@@ -116,4 +120,17 @@ function TournamentInfoCurrentVote({tournament, startVoteMode}: Readonly<Tournam
             <Button onClick={startVoteMode}>Vote Now!</Button>
         </p>
     );
+}
+
+function TournamentManage({tournament}: Readonly<TournamentInfoProps>) {
+    const {profile: [profile]} = useProfileContext();
+
+    return profile?.canEditTournament(tournament) ? (
+        <Link to={`/tournament/settings?id=${tournament.id}`}>
+            <Button className="icon-text-button">
+                <MdSettings/>
+                <span>Manage</span>
+            </Button>
+        </Link>
+    ) : <></>
 }

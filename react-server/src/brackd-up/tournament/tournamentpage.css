@@ -59,3 +59,16 @@
 .tournament-page .tournament-content .vote-controller.hide {
     bottom: -5em;
 }
+
+.tournament-page .icon-text-button {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding-left: var(--bs-btn-padding-y);
+    text-decoration: none;
+}
+
+.tournament-page .icon-text-button svg {
+    width: 1.5em;
+    height: 1.5em;
+}
