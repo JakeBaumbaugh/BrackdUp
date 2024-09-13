@@ -3,7 +3,7 @@ import { useLoadingScreenContext } from "../../context/LoadingScreenContext";
 import { useProfileContext } from "../../context/ProfileContext";
 import TournamentSummary from "../../model/TournamentSummary";
 import { getTournaments } from "../../service/TournamentService";
-import TournamentCard from "../card/TournamentCard";
+import TournamentCard, { CustomTournamentCard } from "../card/TournamentCard";
 import "./homepage.css";
 
 type HomePageCollection = Record<string, TournamentSummary[]|undefined>;
@@ -54,7 +54,12 @@ export default function HomePage() {
 
     return <div className="home-page">
         {Object.entries(collection).map(([category, summaries]) => (
-            <Category category={category} summaries={summaries} key={category}/>
+            <Category 
+                category={category}
+                summaries={summaries}
+                createTournament={category === "Future Tournaments" && profile?.canCreateTournament()}
+                key={category}
+            />
         ))}
     </div>
 }
@@ -62,9 +67,10 @@ export default function HomePage() {
 interface CategoryProps {
     category: string;
     summaries?: TournamentSummary[];
+    createTournament?: boolean;
 }
 
-function Category({category, summaries}: Readonly<CategoryProps>) {
+function Category({category, summaries, createTournament}: Readonly<CategoryProps>) {
     const categoryRef = useRef<HTMLDivElement>(null);
     const listRef = useRef<HTMLDivElement>(null);
     
@@ -86,10 +92,15 @@ function Category({category, summaries}: Readonly<CategoryProps>) {
     return <div className="category" ref={categoryRef}>
         <h3>{category}</h3>
         <div className="tournament-list" ref={listRef} style={{transform: `translateX(-${listOffset}px)`}}>
+            {createTournament && (
+                <CustomTournamentCard linkTo="/tournament/new">
+                    <div className="new-tournament-contents">+</div>
+                </CustomTournamentCard>
+            )}
             {summaries ? summaries.map(summary => (
                 <TournamentCard summary={summary} key={summary.id}/>
             )) : (
-                <p>No tournaments found.</p>
+                !createTournament && <p>No tournaments found.</p>
             )}
         </div>
         {listOffset > 0 && <ListScrollButton mode="left" onClick={() => addListOffset(-500)}/>}

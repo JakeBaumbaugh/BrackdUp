@@ -13,6 +13,7 @@ import Header from "./Header";
 import HomePage from "../home/HomePage";
 import TournamentPage from "../tournament/TournamentPage";
 import TournamentSettingsPage from "../../settings/TournamentSettingsPage";
+import TournamentCreationPage from "../../creation/TournamentCreationPage";
 
 export default function App() {
     const profileState = useState<Profile|undefined|null>(undefined);
@@ -43,8 +44,8 @@ export default function App() {
                                 <Route path="/" Component={HomePage}/>
                                 <Route path="/tournament" Component={TournamentPage} />
                                 <Route path="/tournament/settings" Component={TournamentSettingsPage} />
-                                {/* <Route path="/tournament/new" Component={TournamentCreationPage} />
-                                <Route path="/admin" Component={AdminPage} /> */}
+                                <Route path="/tournament/new" Component={TournamentCreationPage} />
+                                {/* <Route path="/admin" Component={AdminPage} /> */}
                             </Routes>
                         </main>
                     </div>

@@ -14,6 +14,7 @@ import TournamentPrivacyButtons from "./TournamentPrivacyButtons";
 import "./tournament-creation.css";
 import ImageSelectionModal from "./ImageSelectionModal";
 import TournamentType from "../model/TournamentType";
+import { useProfileContext } from "../context/ProfileContext";
 
 export default function TournamentCreationPage() {
     const [builder, setBuilder] = useState(new TournamentBuilder());
@@ -22,6 +23,11 @@ export default function TournamentCreationPage() {
     const navigate = useNavigate();
 
     const valid = useMemo(() => builder.isValid(), [builder]);
+
+    const {profile: [profile]} = useProfileContext();
+    if (!profile?.isAdmin()) {
+        return "Forbidden";
+    }
 
     const handleSubmit = (e: FormEvent) => {
         setSaving(true);
