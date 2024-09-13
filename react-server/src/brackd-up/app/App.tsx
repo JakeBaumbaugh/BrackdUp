@@ -15,7 +15,7 @@ import TournamentPage from "../tournament/TournamentPage";
 
 export default function App() {
     const profileState = useState<Profile|undefined|null>(undefined);
-    const forceLoginState = useState<boolean>(false);
+    const forceLoginState = useState<boolean>(true);
     const loadingScreenState = useState<boolean>(false);
 
     const [profile, setProfile] = profileState;
@@ -23,9 +23,11 @@ export default function App() {
         profile: profileState, forceLogin: forceLoginState
     }), [profileState, forceLoginState]);
 
+    const [, setForceLogin] = forceLoginState;
     useEffect(() => {
         checkCookies()
             .then(profile => setProfile(profile))
+            .then(() => setForceLogin(false))
             .catch(() => setProfile(null));
     }, []);
 
@@ -39,8 +41,7 @@ export default function App() {
                             <Routes>
                                 <Route path="/" Component={HomePage}/>
                                 <Route path="/tournament" Component={TournamentPage} />
-                                {/* <Route path="/tournament/vote" Component={profile ? VotePage : LoginPage} />
-                                <Route path="/tournament/settings" Component={TournamentSettingsPage} />
+                                {/* <Route path="/tournament/settings" Component={TournamentSettingsPage} />
                                 <Route path="/tournament/new" Component={TournamentCreationPage} />
                                 <Route path="/admin" Component={AdminPage} /> */}
                             </Routes>

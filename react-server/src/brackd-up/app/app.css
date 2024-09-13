@@ -52,12 +52,20 @@
 /* Header */
 .brackd-up header {
     background-color: var(--secondary-white);
+    color: var(--secondary-white);
     padding: 0;
     position: absolute;
     width: 100%;
     height: var(--header-height);
     transition: height 300ms;
     overflow: hidden;
+    z-index: 3;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    --hightlight-width: 8px;
 }
 
 .brackd-up header.loading {
@@ -86,7 +94,7 @@ header .header-bkg-right {
     height: 100%;
 
     background-color: var(--primary-blue);
-    clip-path: polygon(100% 100%, calc(21% + 0.2%) 100%, 81.2% 0, 100% 0);
+    clip-path: polygon(100% 100%, 21.2% 100%, 81.2% 0, 100% 0);
 }
 
 @property --radius {
@@ -115,7 +123,7 @@ header .header-bkg-circles > * {
 
     --base-bkg-position-x: 0px;
     --radius-unit: calc(var(--radius) * 1px);
-    background: radial-gradient(circle at center, var(--secondary-white) var(--radius-unit), transparent var(--radius-unit));
+    background: radial-gradient(circle at center, var(--secondary-white) var(--radius-unit), transparent calc(var(--radius-unit) + 1px));
     background-size: 40vmin 25vmin;
     animation-name: bkg-circles;
     animation-duration: 20s;
@@ -131,7 +139,91 @@ header .header-highlight {
     position: absolute;
     bottom: 0;
     width: 100%;
-    height: 8px;
+    height: var(--hightlight-width);
     background-color: var(--secondary-white);
     opacity: 40%;
+}
+
+header .header-content {
+    position: absolute;
+    top: 0;
+    height: var(--header-height);
+    width: 100%;
+
+    display: flex;
+    align-items: center;
+    padding: 1em;
+    padding-bottom: calc(1em + var(--hightlight-width));
+    justify-content: space-between;
+}
+
+header a {
+    --bs-link-color-rgb: var(--secondary-white);
+    text-decoration: none;
+}
+
+header a:hover {
+    --bs-link-color-rgb: var(--secondary-white);
+    filter: brightness(85%);
+}
+
+header h1 {
+    display: flex;
+    gap: 0;
+    align-items: start;
+    font-size: 2.8em;
+}
+
+header h1 > span:last-child {
+    font-size: 0.75em;
+    margin-top: 2px;
+}
+
+header h1 > img {
+    margin-right: 8px;
+    width: 1.2em;
+    height: 1.2em;
+    transition: transform 300ms;
+}
+
+header a:hover h1 > img {
+    transform: scaleX(-1);
+}
+
+header .profile-button {
+    width: auto;
+    max-width: 4em;
+    height: 4em;
+    border-radius: 2em;
+    overflow: hidden;
+    border: solid 0.5em var(--secondary-white);
+    background-color: var(--secondary-white);
+    display: flex;
+    align-items: center;
+    transition: max-width 300ms;
+}
+
+header .profile-button:hover {
+    max-width: 9.25em;
+}
+
+header .profile-button img,
+header .profile-button svg {
+    width: 3em;
+    height: 3em;
+    border-radius: 50%;
+    flex: 0 0 auto;
+}
+
+header .profile-button svg {
+    padding: 5%;
+}
+
+header .profile-button span {
+    color: var(--bs-body-color);
+    font-weight: bold;
+    font-size: 1.2em;
+    padding: 0 8px;
+    width: max-content;
+    white-space: nowrap;
 }

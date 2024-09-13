@@ -1,15 +1,21 @@
 import { useMemo } from "react";
+import { Link } from "react-router-dom";
 import { useLoadingScreenContext } from "../../context/LoadingScreenContext";
+import { useProfileContext } from "../../context/ProfileContext";
+import BrackdUpLogo from "../../images/logo-512.png";
+import LoginCard from "../card/LoginCard";
+import ProfileButton from "../../app/ProfileButton";
 
 export default function Header() {
-    const [loading, setLoading] = useLoadingScreenContext();
+    const [loading] = useLoadingScreenContext();
+    const {forceLogin: [forceLogin]} = useProfileContext();
     
-    const className = loading ? "loading" : "";
+    const className = loading || forceLogin ? "loading" : "";
 
     const headerCirclesIndices = useMemo(() => [...Array(4).keys()], []);
 
     return (
-        <header className={className} onClick={() => setLoading(!loading)}>
+        <header className={className}>
             <div className="header-bkg">
                 <div className="header-bkg-left"/>
                 <div className="header-bkg-right"/>
@@ -20,6 +26,17 @@ export default function Header() {
                 </div>
             </div>
             <div className="header-highlight"/>
+            <div className="header-content">
+                <Link to="/">
+                    <h1>
+                        <img src={BrackdUpLogo} alt="BrackdUp"/>
+                        <span>Brackd</span>
+                        <span>Up</span>
+                    </h1>
+                </Link>
+                <ProfileButton/>
+            </div>
+            {forceLogin && <LoginCard/>}
         </header>
     );
 }

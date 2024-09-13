@@ -1,10 +1,10 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import TournamentSummary from "../../model/TournamentSummary";
-import { getTournaments } from "../../service/TournamentService";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useLoadingScreenContext } from "../../context/LoadingScreenContext";
 import { useProfileContext } from "../../context/ProfileContext";
-import "./homepage.css";
+import TournamentSummary from "../../model/TournamentSummary";
+import { getTournaments } from "../../service/TournamentService";
 import TournamentCard from "../card/TournamentCard";
+import "./homepage.css";
 
 type HomePageCollection = Record<string, TournamentSummary[]|undefined>;
 
