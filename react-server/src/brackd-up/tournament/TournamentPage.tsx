@@ -1,16 +1,14 @@
-import { useMemo, useState } from "react";
-import { Button, ButtonGroup, ToggleButton, ToggleButtonGroup } from "react-bootstrap";
-import { MdInfoOutline, MdSettings } from "react-icons/md";
+import { useEffect, useState } from "react";
+import { ToggleButton, ToggleButtonGroup } from "react-bootstrap";
+import { MdInfoOutline } from "react-icons/md";
+import { RiStackshareLine } from "react-icons/ri";
+import { useMediaQuery } from "react-responsive";
 import Bracket, { MatchFocus } from "../../bracket/Bracket";
-import { useProfileContext } from "../../context/ProfileContext";
 import { useTournamentContext } from "../../context/TournamentContext";
 import { Tournament, TournamentRound } from "../../model/Tournament";
+import TournamentInfo from "./TournamentInfo";
 import VoteController from "./VoteController";
 import "./tournamentpage.css";
-import { Link } from "react-router-dom";
-import { useMediaQuery } from "react-responsive";
-import { RiStackshareLine } from "react-icons/ri";
-import TournamentInfo from "./TournamentInfo";
 
 export default function TournamentPage() {
     const {tournament} = useTournamentContext();
@@ -18,6 +16,8 @@ export default function TournamentPage() {
     const [voteMode, setVoteMode] = useState(false);
 
     const currentRound = tournament?.getVotableRound();
+
+    useEffect(() => setVoteMode(false), [currentRound?.id]);
 
     const startVoteMode = () => {
         if (currentRound) {
@@ -31,7 +31,7 @@ export default function TournamentPage() {
         if (!matchFocus.match) {
             return {match: matches[0]};
         }
-        const index = matches.indexOf(matchFocus.match);
+        const index = matches.findIndex(match => match.id === matchFocus.match!.id);
         if (index == -1) {
             return {match: matches[0]};
         }
@@ -80,14 +80,21 @@ type Tab = "BRACKET" | "INFO";
 function MobileView({tournament, currentRound, voteMode, startVoteMode, matchFocus, jumpMatchFocus}: Readonly<ViewProps>) {
     const [tab, setTab] = useState<Tab>("BRACKET");
 
-    let pageContent;
+    const beginVote = () => {
+        setTab("BRACKET");
+        startVoteMode();
+    };
 
+    let pageContent;
     switch (tab) {
         case "BRACKET":
-            pageContent = <Bracket tournament={tournament} voteMode={voteMode} matchFocus={matchFocus} jumpMatchFocus={jumpMatchFocus}/>;
+            pageContent = <>
+                <Bracket tournament={tournament} voteMode={voteMode} matchFocus={matchFocus} jumpMatchFocus={jumpMatchFocus}/>
+                <VoteController voteMode={voteMode} jumpMatchFocus={jumpMatchFocus}/>
+            </>;
             break;
         case "INFO":
-            pageContent = <TournamentInfo tournament={tournament} startVoteMode={startVoteMode}/>;
+            pageContent = <TournamentInfo tournament={tournament} startVoteMode={beginVote}/>;
             break;
     }
 

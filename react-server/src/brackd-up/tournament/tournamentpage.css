@@ -3,6 +3,7 @@
     grid-template-columns: 30em 16px 2fr;
     width: 100%;
     height: 100%;
+    overflow: hidden;
 }
 
 /* Tournament Info */
@@ -82,6 +83,7 @@
 
     .tournament-page .tab-selector {
         border-radius: 0;
+        background-color: var(--secondary-white);
     }
 
     .tournament-page .tab-selector .btn {
