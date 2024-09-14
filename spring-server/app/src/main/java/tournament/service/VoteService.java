@@ -50,6 +50,14 @@ public class VoteService {
         return voteRepository.findByMatchIn(round.getMatches());
     }
 
+    public List<Vote> findByRound(TournamentRound round, Profile profile) {
+        List<VoteId> voteIds = round.getMatches()
+                .stream()
+                .map(match -> new VoteId(profile, match))
+                .toList();
+        return findAllById(voteIds);
+    }
+
     public List<Vote> saveAll(List<Vote> votes) {
         return voteRepository.saveAll(votes);
     }
@@ -108,11 +116,7 @@ public class VoteService {
         // Cognitive and runtime complexity could be cleaned up here, refactor if needed
 
         // Get old vote objects
-        List<VoteId> voteIds = round.getMatches()
-                .stream()
-                .map(match -> new VoteId(profile, match))
-                .toList();
-        List<Vote> oldVotes = findAllById(voteIds);
+        List<Vote> oldVotes = findByRound(round, profile);
 
         // Create new vote objects
         List<Vote> votes = entries.stream().map(entry -> {
@@ -146,6 +150,41 @@ public class VoteService {
                 .filter(oldVote -> votes.stream().noneMatch(vote -> vote.getMatch().equals(oldVote.getMatch())))
                 .toList();
         deleteAll(removeVotes);
+    }
+
+    public void submitVote(Profile profile, TournamentRound round, Entry entry) {
+        // Skip if vote already exists
+        boolean alreadyContainsEntry = findByRound(round, profile)
+                .stream()
+                .anyMatch(vote -> vote.getEntry().equals(entry));
+        if (alreadyContainsEntry) {
+            return;
+        }
+
+        // Remove old vote for match
+        TournamentMatch match = round.getMatches()
+                    .stream()
+                    .filter(m -> m.getEntry1().equals(entry) || m.getEntry2().equals(entry))
+                    .findFirst()
+                    .get();
+        voteRepository.deleteById(new VoteId(profile, match));
+
+        // Save vote for entry
+        Vote vote = new Vote();
+        vote.setProfile(profile);
+        vote.setMatch(match);
+        vote.setEntry(entry);
+        vote.setTimestamp();
+        voteRepository.save(vote);
+    }
+
+    public void removeVote(Profile profile, TournamentRound round, Entry entry) {
+        // Find votes on round by profile
+        List<Vote> votes = findByRound(round, profile);
+        // Filter for vote for entry (should be unique if any)
+        votes.removeIf(vote -> !vote.getEntry().equals(entry));
+        // Delete vote
+        deleteAll(votes);
     }
 
     public Tournament fillVoteCounts(Tournament tournament) {

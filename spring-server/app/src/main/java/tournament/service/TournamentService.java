@@ -16,11 +16,10 @@ import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.stereotype.Service;
 
-import io.micrometer.common.util.StringUtils;
 import jakarta.transaction.Transactional;
+import tournament.model.Entry;
 import tournament.model.Profile;
 import tournament.model.RoundStatus;
-import tournament.model.Entry;
 import tournament.model.Tournament;
 import tournament.model.TournamentBuilder;
 import tournament.model.TournamentLevel;
@@ -163,13 +162,43 @@ public class TournamentService {
         if (tournament.getMode() == TournamentMode.INSTANT) {
             boolean allVoted = getVotersForTournament(tournament)
                     .stream()
-                    .allMatch(TournamentVoter::getHasVoted);
+                    .allMatch(TournamentVoter::getFullVoted);
             if (allVoted) {
                 resolveRound(tournament.getId(), round.getId());
                 return true;
             }
         }
         return false;
+    }
+
+    /**
+     * Saves the user profile's submitted votes. Also resolves the round
+     * if it was the final voter for the round on an instant tournament
+     * @param profile       The user profile that submitted the votes
+     * @param round         The round containing the matches being voted on
+     * @param entryId       The id of the entry the user voted for
+     * @param tournament    The tournament containing the matches being voted on
+     * @return              Whether the round ended as a result of the vote
+     */
+    public boolean vote(Profile profile, TournamentRound round, Integer entryId, Tournament tournament) {
+        Entry entry = getEntries(List.of(entryId)).get(0);
+        voteService.submitVote(profile, round, entry);
+        // Resolve round if necessary
+        if (tournament.getMode() == TournamentMode.INSTANT) {
+            boolean allVoted = getVotersForTournament(tournament)
+                    .stream()
+                    .allMatch(TournamentVoter::getFullVoted);
+            if (allVoted) {
+                resolveRound(tournament.getId(), round.getId());
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public void removeVote(Profile profile, TournamentRound round, Integer entryId) {
+        Entry entry = getEntries(List.of(entryId)).get(0);
+        voteService.removeVote(profile, round, entry);
     }
 
     public List<TournamentVoter> getVotersForTournament(Integer tournamentId) {
@@ -182,10 +211,19 @@ public class TournamentService {
         List<TournamentVoter> voters = tournamentVoterRepository.findAllByTournamentId(tournament.getId());
         // Check if voters have voted for the current votable round
         tournament.getVotableRound().ifPresent(round -> {
-            List<Vote> roundVotes = voteService.findByRound(round);
+            int matchCount = round.getMatches().size();
             voters.forEach(voter -> {
                 Profile profile = voter.getProfile();
-                voter.setHasVoted(profile != null && roundVotes.stream().anyMatch(vote -> vote.getProfile().equals(profile)));
+                if (profile != null) {
+                    List<Vote> votes = voteService.findByRound(round, profile);
+                    // Any votes submitted
+                    voter.setHasVoted(!votes.isEmpty());
+                    // Votes submitted for all matches
+                    voter.setFullVoted(votes.size() == matchCount);
+                } else {
+                    voter.setHasVoted(false);
+                    voter.setFullVoted(false);
+                }
             });
         });
         return voters;

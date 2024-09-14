@@ -1,60 +1,43 @@
-import { Button } from "react-bootstrap";
-import { MdOutlineAdminPanelSettings, MdSettings } from "react-icons/md";
-import { useNavigate } from "react-router-dom";
+import { useMemo } from "react";
+import { Link } from "react-router-dom";
+import { useLoadingScreenContext } from "../context/LoadingScreenContext";
 import { useProfileContext } from "../context/ProfileContext";
-import { useTournamentContext } from "../context/TournamentContext";
-import MadnessLogo from "../images/icon.png";
-import SpotifyLogo from "../images/spotify_logo.svg";
+import BrackdUpLogo from "../images/logo-512.png";
+import LoginCard from "../card/LoginCard";
 import ProfileButton from "./ProfileButton";
+import "./header.css";
 
 export default function Header() {
-    const navigate = useNavigate();
-    const {tournament} = useTournamentContext();
-    const {profile: [profile]} = useProfileContext();
+    const [loading] = useLoadingScreenContext();
+    const {forceLogin: [forceLogin]} = useProfileContext();
+    
+    const className = loading || forceLogin ? "loading" : "";
 
-    const activeRound = tournament?.getActiveRound();
-    const votableRound = tournament?.getVotableRound();
+    const headerCirclesIndices = useMemo(() => [...Array(4).keys()], []);
 
     return (
-        <header className={tournament ? "with-tournament" : ""}>
-            <h1 className="clickable darken-hover" onClick={() => navigate("/")}>
-                <img src={MadnessLogo} alt="Music Madness" className="rotate-hover"/>
-                Music Madness
-            </h1>
-            {tournament && (
-                <div className="tournament-info">
-                    <h2 className="clickable darken-hover" onClick={() => navigate(`/tournament?id=${tournament.id}`)}>
-                        {tournament.name}
-                    </h2>
-                    {tournament.spotifyPlaylist && (
-                        <a href={tournament.spotifyPlaylist} target="_blank">
-                            <img src={SpotifyLogo} alt="Spotify Button" className="clickable darken-hover rotate-hover"/>
-                        </a>
-                    )}
-                    {activeRound && (
-                        <Button
-                            variant="danger"
-                            onClick={() => navigate(`/tournament/vote?id=${tournament.id}`)}
-                            disabled={activeRound !== votableRound}
-                        >VOTE</Button>
-                    )}
-                    {profile?.canEditTournament(tournament) && (
-                        <MdSettings
-                            className="clickable darken-hover rotate-hover"
-                            onClick={() => navigate(`tournament/settings?id=${tournament.id}`)}
-                        />
-                    )}
+        <header className={className}>
+            <div className="header-bkg">
+                <div className="header-bkg-left"/>
+                <div className="header-bkg-right"/>
+                <div className="header-bkg-circles">
+                    {headerCirclesIndices.map(index => (
+                        <div style={{animationDelay: `-${index*5}s`}} key={index}/>
+                    ))}
                 </div>
-            )}
-            <div className="profile-wrapper">
-                {profile?.isAdmin() && (
-                    <MdOutlineAdminPanelSettings
-                        className="clickable darken-hover rotate-hover"
-                        onClick={() => navigate('/admin')}
-                    />
-                )}
-                <ProfileButton />
             </div>
+            <div className="header-highlight"/>
+            <div className="header-content">
+                <Link to="/">
+                    <h1>
+                        <img src={BrackdUpLogo} alt="BrackdUp"/>
+                        <span>Brackd</span>
+                        <span>Up</span>
+                    </h1>
+                </Link>
+                <ProfileButton/>
+            </div>
+            {forceLogin && <LoginCard/>}
         </header>
     );
 }

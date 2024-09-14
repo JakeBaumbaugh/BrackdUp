@@ -18,6 +18,7 @@ import tournament.model.TournamentBuilder;
 import tournament.model.TournamentLevel;
 import tournament.model.TournamentMatch;
 import tournament.model.TournamentMode;
+import tournament.model.TournamentPrivacy;
 import tournament.model.TournamentRound;
 import tournament.repository.TournamentRepository;
 
@@ -106,6 +107,8 @@ public class TournamentFactory {
         tournament.setName(name);
         tournament.setMatchesPerRound(matchesPerRound);
         tournament.setType(tournamentTypeService.validateType("SONG").getType());
+        tournament.setPrivacy(TournamentPrivacy.VISIBLE);
+        tournament.setMode(TournamentMode.SCHEDULED);
         tournament.setLevels(new ArrayList<>());
 
         // Build levels

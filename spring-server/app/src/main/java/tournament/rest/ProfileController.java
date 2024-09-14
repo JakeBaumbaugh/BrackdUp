@@ -12,6 +12,7 @@ import tournament.model.Profile;
 public class ProfileController {
     private static final Logger logger = LoggerFactory.getLogger(ProfileController.class);
 
+    // Submit login request
     @PostMapping("/login")
     public Profile login(Authentication authentication) {
         Profile profile = (Profile) authentication.getPrincipal();

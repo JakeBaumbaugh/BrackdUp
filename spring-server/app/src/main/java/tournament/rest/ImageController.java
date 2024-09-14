@@ -37,6 +37,7 @@ public class ImageController {
         this.imageService = imageService;
     }
 
+    // Get list of images for tournament background
     @GetMapping("list")
     public List<Integer> getImageList(Authentication authentication) {
         Profile profile = authentication != null ? (Profile) authentication.getPrincipal() : null;
@@ -45,6 +46,7 @@ public class ImageController {
         return imageService.listImages();
     }
 
+    // Get image data by image id for tournament background
     @GetMapping(value = "", produces = MediaType.IMAGE_PNG_VALUE)
     public byte[] getImage(Authentication authentication, @RequestParam Integer id) {
         Profile profile = authentication != null ? (Profile) authentication.getPrincipal() : null;
@@ -55,6 +57,7 @@ public class ImageController {
                 .orElseThrow(() -> create404("Image not found."));
     }
 
+    // Get image data by tournament id for tournament bcakground
     @GetMapping(value = "tournament", produces = MediaType.IMAGE_PNG_VALUE)
     public byte[] getTournamentBackgroundImage(Authentication authentication, @RequestParam Integer tournamentId) {
         Profile profile = authentication != null ? (Profile) authentication.getPrincipal() : null;

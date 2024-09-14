@@ -41,9 +41,7 @@
 }
 
 .entry-card.active > div {
-    /* background-color: #cfdef5; */
     background-color: #fcf1c0;
-    /* background-color: #ebd7f7; */
 }
 
 .entry-card.selected > div {

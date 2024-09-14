@@ -39,6 +39,7 @@ public class AdminController {
         this.imageService = imageService;
     }
 
+    // Create random tournament for testing
     @GetMapping("/randomTournament")
     public Integer randomTournament(Authentication authentication, @RequestParam String name) {
         Profile profile = (Profile) authentication.getPrincipal();
@@ -49,6 +50,7 @@ public class AdminController {
         return tournamentService.generateTournament(name).getId();
     }
     
+    // Fill random vote counts for testing
     @GetMapping("/fillVoteCounts")
     public void fillVoteCounts(Authentication authentication, @RequestParam Integer tournamentId) {
         Profile profile = (Profile) authentication.getPrincipal();
@@ -62,6 +64,7 @@ public class AdminController {
         tournamentService.fillVoteCounts(tournament);
     }
 
+    // Get list of profiles for admin page
     @GetMapping("/profiles")
     public List<Profile> getProfiles(Authentication authentication) {
         Profile profile = (Profile) authentication.getPrincipal();
@@ -72,6 +75,7 @@ public class AdminController {
         return profileService.getProfiles();
     }
 
+    // Update profile data
     @PostMapping("/updateProfile")
     public Profile updateProfile(Authentication authentication, @RequestBody Profile profileToSave) {
         Profile profile = (Profile) authentication.getPrincipal();
@@ -82,6 +86,7 @@ public class AdminController {
         return profileService.updateProfile(profileToSave).orElse(null);
     }
 
+    // Delete profile
     @DeleteMapping("/deleteProfile")
     public void deleteProfile(Authentication authentication, @RequestParam Integer id) {
         Profile profile = (Profile) authentication.getPrincipal();
@@ -92,6 +97,7 @@ public class AdminController {
         profileService.deleteProfile(id);
     }
     
+    // Upload image for tournament backgrounds
     @PostMapping("/uploadImage")
     public void uploadImage(Authentication authentication, @RequestBody UploadImageRequestBody body) {
         Profile profile = (Profile) authentication.getPrincipal();

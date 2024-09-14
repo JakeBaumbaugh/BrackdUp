@@ -28,6 +28,9 @@ public class TournamentVoter {
     @Transient
     private Boolean hasVoted;
 
+    @Transient
+    private Boolean fullVoted;
+
     public void setEmail(String email) {
         this.email = email.toLowerCase();
     }

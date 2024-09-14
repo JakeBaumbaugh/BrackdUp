@@ -1,15 +1,27 @@
-import { Fragment, useMemo } from "react";
+import { Fragment, useEffect, useMemo } from "react";
 import { TransformComponent, TransformWrapper } from "react-zoom-pan-pinch";
 import EntryCard from "../card/EntryCard";
+import { useTournamentContext } from "../context/TournamentContext";
 import { BracketEntry } from "../model/Entry";
 import { Tournament, TournamentMatch } from "../model/Tournament";
+import { removeVote, submitVote } from "../service/TournamentService";
 import MatchConnectorColumn from "./MatchConnectorColumn";
+import "./bracket.css";
+
+export interface MatchFocus {
+    focusId?: number;
+    lastVotedId?: number;
+}
 
 interface BracketProps {
     tournament: Tournament;
+    voteMode?: boolean;
+    matchFocus?: MatchFocus;
 }
 
-export default function Bracket({tournament}: BracketProps) {
+export default function Bracket({tournament, voteMode, matchFocus}: Readonly<BracketProps>) {
+    const {loadData, userVotes} = useTournamentContext();
+
     const matches = useMemo(() => {
         const matches: (TournamentMatch|null)[][] = tournament.levels.map(level => level.rounds.flatMap(round => {
             const isActive = tournament.getVotableRound()?.id === round.id;
@@ -38,6 +50,8 @@ export default function Bracket({tournament}: BracketProps) {
                 if(match) {
                     const entry1 = {...match.entry1} as BracketEntry;
                     const entry2 = {...match.entry2} as BracketEntry;
+                    entry1.matchId = match.id;
+                    entry2.matchId = match.id;
                     if(levelIndex > 0) {
                         const match1Index = matchIndex * 2;
                         const match2Index = matchIndex * 2 + 1;
@@ -85,24 +99,66 @@ export default function Bracket({tournament}: BracketProps) {
         return [...leftEntries, [finalEntry], ...(rightEntries.toReversed())];
     }, [entries]);
 
+    const clickEntry = (entryId: number) => {
+        if (userVotes?.has(entryId)) {
+            // Remove vote
+            removeVote(tournament.id, entryId)
+                .then(() => loadData())
+                .catch(e => console.error("Failed to remove vote. TODO: Handle error.", e));
+        } else {
+            // Submit vote
+            submitVote(tournament.id, entryId)
+                .then(() => loadData())
+                .catch(e => console.error("Failed to submit vote. TODO: Handle error.", e));
+        }
+    };
+
     return entryColumns ? (
-        <TransformWrapper minScale={0.5} maxScale={2}>
-            <TransformComponent>
-                <div className="bracket">
-                    {entryColumns.map((entries, index) => <Fragment key={`column-${index}`}>
-                        {index > 0 && <MatchConnectorColumn left={entryColumns[index-1].length} right={entries.length}/>}
-                        <div className={index < entryColumns.length / 2 ? "column left-column" : "column right-column"}>
-                            {entries.map(entry =>
-                                <EntryCard
-                                    entry={entry}
-                                    final={index == (entryColumns.length - 1) / 2}
-                                    key={`${index}-${entry?.line1}-${entry?.line2}`}
-                                />
-                            )}
-                        </div>
-                    </Fragment>)}
-                </div>
-            </TransformComponent>
+        <TransformWrapper minScale={0.5} maxScale={2} centerOnInit>
+            {({zoomToElement}) => <BracketContent
+                entryColumns={entryColumns} 
+                voteMode={!!voteMode}
+                clickEntry={clickEntry}
+                matchFocus={matchFocus}
+                zoomToElement={zoomToElement}
+            />}
         </TransformWrapper>
     ) : <></>;
+}
+
+interface BracketContentProps {
+    entryColumns: (BracketEntry|null)[][];
+    voteMode: boolean;
+    clickEntry: (entryId: number) => void;
+    matchFocus?: MatchFocus;
+    zoomToElement?: (node: string, scale?: number) => void;
+}
+
+function BracketContent({entryColumns, voteMode, clickEntry, matchFocus, zoomToElement}: Readonly<BracketContentProps>) {
+    const {userVotes} = useTournamentContext();
+
+    useEffect(() => {
+        if (matchFocus?.focusId && zoomToElement) {
+            zoomToElement(`match-connector-${matchFocus.focusId}`);
+        }
+    }, [matchFocus]);
+
+    return <TransformComponent>
+        <div className="bracket">
+            {entryColumns.map((entries, columnIndex) => <Fragment key={`column-${columnIndex}`}>
+                {columnIndex > 0 && <MatchConnectorColumn leftColumn={entryColumns[columnIndex-1]} rightColumn={entries}/>}
+                <div className={columnIndex < entryColumns.length / 2 ? "column left-column" : "column right-column"}>
+                    {entries.map((entry, index) =>
+                        <EntryCard
+                            entry={entry}
+                            final={columnIndex == (entryColumns.length - 1) / 2}
+                            key={`${columnIndex}-${index}`}
+                            onClick={(voteMode && entry?.activeRound) ? () => clickEntry(entry.id) : undefined}
+                            votedFor={voteMode && entry?.activeRound && userVotes?.has(entry.id)}
+                        />
+                    )}
+                </div>
+            </Fragment>)}
+        </div>
+    </TransformComponent>
 }
