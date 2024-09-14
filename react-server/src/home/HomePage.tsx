@@ -85,6 +85,18 @@ interface CategoryProps {
 function Category({category, summaries, createTournament}: Readonly<CategoryProps>) {
     const categoryRef = useRef<HTMLDivElement>(null);
     const listRef = useRef<HTMLDivElement>(null);
+    const [, setStateUpdater] = useState([0]);
+    const forceRerender = () => {
+        setStateUpdater([0]);
+    }
+
+    useEffect(() => {
+        const observer = new MutationObserver(forceRerender);
+        if (listRef.current) {
+            observer.observe(listRef.current, {childList: true});
+        }
+        return () => observer.disconnect();
+    }, [listRef.current]);
     
     const categoryWidth = useMemo(() => {
         if (!categoryRef.current) {
@@ -95,7 +107,7 @@ function Category({category, summaries, createTournament}: Readonly<CategoryProp
         const borderWidth = parseFloat(style.borderLeftWidth) + parseFloat(style.borderRightWidth);
         return parseFloat(style.width) - paddingWidth - borderWidth;
     }, [categoryRef.current, window.screen.width]);
-    const listWidth = useMemo(() => listRef.current?.offsetWidth ?? 0, [listRef.current, window.screen.width]);
+    const listWidth = listRef.current?.offsetWidth ?? 0;
     const maxOffset = Math.max(listWidth - categoryWidth, 0);
 
     const [listOffset, setListOffset] = useState(0);
