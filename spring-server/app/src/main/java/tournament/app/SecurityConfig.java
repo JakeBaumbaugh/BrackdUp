@@ -71,6 +71,9 @@ public class SecurityConfig {
         allowedOrigins.add("https://madness.basefive.org");
         allowedOrigins.add("https://madness.basefive.org:3000");
         allowedOrigins.add("https://madness-dev.basefive.org:3000");
+        allowedOrigins.add("https://brackdup.basefive.org");
+        allowedOrigins.add("https://brackdup.basefive.org:3000");
+        allowedOrigins.add("https://brackdup-dev.basefive.org:3000");
         if (devLocalhost) {
             allowedOrigins.add("https://localhost:3000");
         }
