@@ -20,11 +20,11 @@ export default function App() {
     const forceLoginState = useState<boolean>(true);
     const loadingScreenState = useState<boolean>(false);
 
-    const [profile, setProfile] = profileState;
     const profileContext = useMemo(() => ({
         profile: profileState, forceLogin: forceLoginState
     }), [profileState, forceLoginState]);
 
+    const [, setProfile] = profileState;
     const [, setForceLogin] = forceLoginState;
     useEffect(() => {
         checkCookies()

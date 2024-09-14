@@ -72,3 +72,41 @@
     width: 1.5em;
     height: 1.5em;
 }
+
+/* Mobile View */
+@media only screen and (max-width: 600px) {
+    .tournament-page {
+        grid-template-columns: 1fr;
+        grid-template-rows: 1fr 4em;
+    }
+
+    .tournament-page .tab-selector {
+        border-radius: 0;
+    }
+
+    .tournament-page .tab-selector .btn {
+        border-bottom: none;
+        border-radius: 0;
+        flex: 1 0 0;
+        font-weight: bold;
+        font-size: 0.75em;
+
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: space-evenly;
+    }
+
+    .tournament-page .tab-selector .btn:first-child {
+        border-left: none;
+    }
+
+    .tournament-page .tab-selector .btn:last-child {
+        border-right: none;
+    }
+
+    .tournament-page .tab-selector .btn svg {
+        width: 2em;
+        height: 2em;
+    }
+}

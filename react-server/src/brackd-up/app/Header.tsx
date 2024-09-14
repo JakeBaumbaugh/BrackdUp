@@ -5,6 +5,7 @@ import { useProfileContext } from "../../context/ProfileContext";
 import BrackdUpLogo from "../../images/logo-512.png";
 import LoginCard from "../card/LoginCard";
 import ProfileButton from "../../app/ProfileButton";
+import "./header.css";
 
 export default function Header() {
     const [loading] = useLoadingScreenContext();

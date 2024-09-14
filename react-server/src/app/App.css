@@ -90,7 +90,7 @@ header .login-button > svg {
     height: 75%;
 } */
 
-header .tournament-info {
+/* header .tournament-info {
     flex-grow: 1;
     border-left: solid 1px #556;
     padding: 12px 1em;
@@ -111,7 +111,7 @@ header h2 {
 .profile-wrapper > svg {
     width: 2em;
     height: 2em;
-}
+} */
 
 #g_a11y_announcement {
     display: none;
@@ -133,23 +133,23 @@ header h2 {
 @media only screen and (max-width: 600px) {
 
     .App {
-        --header-height: 50px;
+        /* --header-height: 50px; */
     }
 
     header {
-        font-size: 8pt;
+        /* font-size: 8pt; */
     }
 
     header.with-tournament {
-        --header-height: 100px;
-        padding-bottom: calc(var(--header-height) / 2);
+        /* --header-height: 100px;
+        padding-bottom: calc(var(--header-height) / 2); */
     }
 
     header h1 {
-        font-size: 16pt;
+        /* font-size: 16pt; */
     }
 
-    .tournament-info {
+    /* .tournament-info {
         position: absolute;
         background-color: #7a797e;
         left: 0;
@@ -173,5 +173,5 @@ header h2 {
         width: 3em;
         height: 3em;
         flex-shrink: 0;
-    }
+    } */
 }

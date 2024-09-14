@@ -82,8 +82,8 @@ function Category({category, summaries, createTournament}: Readonly<CategoryProp
         const paddingWidth = parseFloat(style.paddingLeft) + parseFloat(style.paddingRight);
         const borderWidth = parseFloat(style.borderLeftWidth) + parseFloat(style.borderRightWidth);
         return parseFloat(style.width) - paddingWidth - borderWidth;
-    }, [categoryRef.current]);
-    const listWidth = useMemo(() => listRef.current?.offsetWidth ?? 0, [listRef.current]);
+    }, [categoryRef.current, window.screen.width]);
+    const listWidth = useMemo(() => listRef.current?.offsetWidth ?? 0, [listRef.current, window.screen.width]);
     const maxOffset = Math.max(listWidth - categoryWidth, 0);
 
     const [listOffset, setListOffset] = useState(0);

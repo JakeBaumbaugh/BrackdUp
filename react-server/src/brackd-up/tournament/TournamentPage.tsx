@@ -1,13 +1,16 @@
 import { useMemo, useState } from "react";
-import { Button } from "react-bootstrap";
-import { MdSettings } from "react-icons/md";
+import { Button, ButtonGroup, ToggleButton, ToggleButtonGroup } from "react-bootstrap";
+import { MdInfoOutline, MdSettings } from "react-icons/md";
 import Bracket, { MatchFocus } from "../../bracket/Bracket";
 import { useProfileContext } from "../../context/ProfileContext";
 import { useTournamentContext } from "../../context/TournamentContext";
-import { Tournament } from "../../model/Tournament";
+import { Tournament, TournamentRound } from "../../model/Tournament";
 import VoteController from "./VoteController";
 import "./tournamentpage.css";
 import { Link } from "react-router-dom";
+import { useMediaQuery } from "react-responsive";
+import { RiStackshareLine } from "react-icons/ri";
+import TournamentInfo from "./TournamentInfo";
 
 export default function TournamentPage() {
     const {tournament} = useTournamentContext();
@@ -36,6 +39,8 @@ export default function TournamentPage() {
         return {match: matches.at(nextIndex)};
     });
 
+    const isDesktop = useMediaQuery({ minWidth: 600 });
+
     if (tournament === null) {
         return <p>Something went wrong.</p>
     }
@@ -43,13 +48,23 @@ export default function TournamentPage() {
         return <p>Loading...</p>
     }
 
+    const props = {tournament, currentRound, voteMode, startVoteMode, matchFocus, jumpMatchFocus};
+
+    return isDesktop ? <DesktopView {...props}/> : <MobileView {...props}/>;
+}
+
+interface ViewProps {
+    tournament: Tournament;
+    currentRound: TournamentRound | undefined;
+    voteMode: boolean;
+    startVoteMode: () => void;
+    matchFocus: MatchFocus;
+    jumpMatchFocus: (offset: number) => void;
+}
+
+function DesktopView({tournament, currentRound, voteMode, startVoteMode, matchFocus, jumpMatchFocus}: Readonly<ViewProps>) {
     return <div className="tournament-page">
-        <div className="tournament-info">
-            <h3>{tournament.name}</h3>
-            <TournamentInfoPlaylistEmbed tournament={tournament}/>
-            <TournamentInfoCurrentVote tournament={tournament} startVoteMode={startVoteMode}/>
-            <TournamentManage tournament={tournament}/>
-        </div>
+        <TournamentInfo tournament={tournament} startVoteMode={startVoteMode}/>
         <div className="tournament-page-border"/>
         <div className="tournament-content">
             <Bracket tournament={tournament} voteMode={voteMode} matchFocus={matchFocus} jumpMatchFocus={jumpMatchFocus}/>
@@ -60,77 +75,35 @@ export default function TournamentPage() {
     </div>
 }
 
-interface TournamentInfoProps {
-    tournament: Tournament;
-    startVoteMode?: () => void;
-}
+type Tab = "BRACKET" | "INFO";
 
-function TournamentInfoPlaylistEmbed({tournament}: Readonly<TournamentInfoProps>) {
-    const url = useMemo(() => {
-        if (!tournament.spotifyPlaylist) {
-            return undefined;
-        }
-        let url = tournament.spotifyPlaylist;
-        if (!url.includes("embed")) {
-            // convert url to embed url
-            url = url.replace("spotify.com/playlist", "spotify.com/embed/playlist");
-        }
-        if (!url.includes("theme=0")) {
-            // force theme=0
-            const queryChar = url.includes("?") ? "&" : "?";
-            url += queryChar + "theme=0";
-        }
-        return url;
-    }, [tournament.spotifyPlaylist]);
+function MobileView({tournament, currentRound, voteMode, startVoteMode, matchFocus, jumpMatchFocus}: Readonly<ViewProps>) {
+    const [tab, setTab] = useState<Tab>("BRACKET");
 
-    if (!url) {
-        return <></>;
+    let pageContent;
+
+    switch (tab) {
+        case "BRACKET":
+            pageContent = <Bracket tournament={tournament} voteMode={voteMode} matchFocus={matchFocus} jumpMatchFocus={jumpMatchFocus}/>;
+            break;
+        case "INFO":
+            pageContent = <TournamentInfo tournament={tournament} startVoteMode={startVoteMode}/>;
+            break;
     }
 
-    return (
-        <iframe
-            title="Spotify Playlist Embed"
-            style={{borderRadius: "12px"}}
-            src={url}
-            width="100%"
-            height="400"
-            allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" 
-            loading="lazy"
-        />
-    );
-}
-
-function TournamentInfoCurrentVote({tournament, startVoteMode}: Readonly<TournamentInfoProps>) {
-    const currentOrNextRound = useMemo(() => tournament.getCurrentOrNextRound(), [tournament]);
-
-    if (!currentOrNextRound) {
-        return <></>;
-    }
-
-    if (!currentOrNextRound.isActive()) {
-        // not started yet
-        return <p>{`Voting begins at ${currentOrNextRound.startDate!.toLocaleString()}`}</p>;
-    }
-
-    const text = tournament.mode === "SCHEDULED" ? `Voting ends at ${currentOrNextRound.endDate!.toLocaleString()}.` : "Voting is open.";
-
-    return (
-        <p className="vote-message">
-            {text}
-            <Button onClick={startVoteMode}>Vote Now!</Button>
-        </p>
-    );
-}
-
-function TournamentManage({tournament}: Readonly<TournamentInfoProps>) {
-    const {profile: [profile]} = useProfileContext();
-
-    return profile?.canEditTournament(tournament) ? (
-        <Link to={`/tournament/settings?id=${tournament.id}`}>
-            <Button className="icon-text-button">
-                <MdSettings/>
-                <span>Manage</span>
-            </Button>
-        </Link>
-    ) : <></>
+    return <div className="tournament-page">
+        <div className="tournament-content">
+            {pageContent}
+        </div>
+            <ToggleButtonGroup className="tab-selector" type="radio" name="tab" value={tab} onChange={value => setTab(value)}>
+                <ToggleButton id="bracket-tab-btn" value="BRACKET" variant="outline-primary">
+                    <RiStackshareLine/>
+                    <span>BRACKET</span>
+                </ToggleButton>
+                <ToggleButton id="info-tab-btn" value="INFO" variant="outline-primary">
+                    <MdInfoOutline/>
+                    <span>INFO</span>
+                </ToggleButton>
+            </ToggleButtonGroup>
+    </div>
 }
