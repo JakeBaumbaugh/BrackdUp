@@ -9,7 +9,7 @@ import lombok.Setter;
 import lombok.ToString;
 
 @Getter @Setter @NoArgsConstructor @ToString @EqualsAndHashCode
-public class VoteRequestBody {
+public class VotesRequestBody {
     private Integer tournament;
-    private Integer entry;
+    private List<Integer> entries;
 }

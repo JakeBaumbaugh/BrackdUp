@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom";
 import Bracket from "../bracket/Bracket";
 import EntryCard from "../card/EntryCard";
 import { DroppableEntryListCard } from "../card/EntryListCard";
+import { useProfileContext } from "../context/ProfileContext";
 import Entry from "../model/Entry";
 import { Tournament, TournamentMatch, TournamentRound } from "../model/Tournament";
 import TournamentBuilder, { TournamentOrder } from "../model/TournamentBuilder";
@@ -26,6 +27,11 @@ export default function TournamentCreationPage() {
     const navigate = useNavigate();
 
     const valid = useMemo(() => builder.isValid(), [builder]);
+
+    const {profile: [profile]} = useProfileContext();
+    if (!profile?.isAdmin()) {
+        return "Forbidden";
+    }
 
     const handleSubmit = (e: FormEvent) => {
         setSaving(true);

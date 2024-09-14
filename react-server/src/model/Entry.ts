@@ -16,4 +16,5 @@ export interface BracketEntry extends Entry {
     parent2VoteCount?: number;
     receivedVoteCount?: number;
     totalVoteCount?: number;
+    matchId?: number;
 }

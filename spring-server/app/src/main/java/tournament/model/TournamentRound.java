@@ -88,6 +88,11 @@ public class TournamentRound {
         return !votedMatches.contains(null) && votedMatches.size() == entries.size();
     }
 
+    public boolean entryInRound(Integer entryId) {
+        return matches.stream()
+                .anyMatch(match -> match.getEntry1().getId().equals(entryId) || match.getEntry2().getId().equals(entryId));
+    }
+
     @Transient
     @JsonIgnore
     public boolean isDateInRange(ZonedDateTime zdt) {

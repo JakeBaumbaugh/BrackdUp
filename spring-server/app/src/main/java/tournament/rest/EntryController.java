@@ -23,6 +23,7 @@ public class EntryController {
         this.entryService = entryService;
     }
 
+    // Search entries by line1 and line2
     @GetMapping("/entry/search")
     public List<Entry> search(@RequestParam String type, @RequestParam(required = false) String line1, @RequestParam(required = false) String line2) {
         logger.info("GET request to search entries for type={}, line1={} and line2={}", type, line1, line2);

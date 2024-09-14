@@ -41,7 +41,7 @@ export default function TournamentSettingsPage() {
     const onSave = () => {
         if(settings) {
             saveTournamentSettings(settings)
-                .then(() => navigate("/"));
+                .then(() => navigate(tournament ? `/tournament?id=${tournament?.id}` : "/"));
         }
     };
 

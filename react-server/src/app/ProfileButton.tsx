@@ -1,15 +1,14 @@
+import { CodeResponse, useGoogleLogin } from "@react-oauth/google";
 import { OverlayTrigger, Tooltip } from "react-bootstrap";
 import { OverlayInjectedProps } from "react-bootstrap/esm/Overlay";
 import { FcGoogle } from "react-icons/fc";
 import { useProfileContext } from "../context/ProfileContext";
-import { CodeResponse, useGoogleLogin } from "@react-oauth/google";
 import { login, logout } from "../service/ProfileService";
-import { useEffect } from "react";
 
 const devLocalhost = process.env.REACT_APP_LOCALHOST === "true";
 
 export default function ProfileButton() {
-    const {profile: [profile, setProfile], forceLogin: [forceLogin]} = useProfileContext();
+    const {profile: [profile, setProfile], forceLogin: [, setForceLogin]} = useProfileContext();
 
     const renderLogoutTooltip = (props: OverlayInjectedProps) => {
         return <Tooltip id="logout-tooltip" {...props}>Logout</Tooltip>
@@ -21,6 +20,7 @@ export default function ProfileButton() {
             if (email) {
                 login(email)
                     .then(profile => setProfile(profile))
+                    .then(() => setForceLogin(false))
                     .catch(() => setProfile(null));
             }
         } else {
@@ -31,6 +31,7 @@ export default function ProfileButton() {
     const onGoogleSuccess = (codeResponse: CodeResponse) => {
         login(codeResponse.code)
             .then(profile => setProfile(profile))
+            .then(() => setForceLogin(false))
             .catch(() => setProfile(null));
     };
 
@@ -40,32 +41,26 @@ export default function ProfileButton() {
             .catch(() => console.log("Failed to log out."));
     };
 
+    const onButtonClick = profile ? onLogoutClick : onLoginClick;
+
     const googleLogin = useGoogleLogin({
         flow: "auth-code",
         onSuccess: onGoogleSuccess
     });
 
-    // Force login popup without user interact
-    useEffect(() => {
-        if(forceLogin && !profile) {
-            googleLogin();
-        }
-    }, [profile, forceLogin]);
-
-    return profile ? (
+    const contents = profile ? (
         <OverlayTrigger placement="left" overlay={renderLogoutTooltip}>
-            <img
-                src={profile.pictureLink}
-                className="clickable darken-hover rotate-hover"
-                onClick={onLogoutClick}
-            />
+            <>
+                <img src={profile.pictureLink}/>
+                <span>Log out</span>
+            </>
         </OverlayTrigger>
     ) : (
-        <div
-            className="login-button clickable darken-hover rotate-hover"
-            onClick={() => onLoginClick()}
-        >
-            <FcGoogle/>
-        </div>
+        <>
+            <FcGoogle role="button"/>
+            <span>Sign in</span>
+        </>
     );
+
+    return <div className="profile-button" role="button" onClick={onButtonClick}>{contents}</div>
 }
