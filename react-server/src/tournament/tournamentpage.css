@@ -9,6 +9,8 @@
 /* Tournament Info */
 .tournament-page .tournament-info {
     padding: 1em;
+    height: 100%;
+    overflow-y: auto;
 }
 
 .tournament-page .tournament-info h3 {
